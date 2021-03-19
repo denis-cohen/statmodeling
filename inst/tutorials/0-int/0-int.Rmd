@@ -1,0 +1,104 @@
+---
+title: "Statistical Modeling with R and Stan"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## Schedule
+
+| Session | Time                           | Topics                                                                                                     |
+|:-------:|--------------------------------|------------------------------------------------------------------------------------------------------------|
+| 1       | Day 1, 09:00-11:00             | **R Math & Programming Refresher**                                                                         |
+|         |                                | 1. Good coding practices                                                                                   |
+|         |                                | 2. Object types and conversions; slicing and indexing                                                      |
+|         |                                | 3. Control structures                                                                                      |
+|         |                                | 4. Probability distributions                                                                               |
+|         |                                | 5. Linear algebra                                                                                          |
+| 2       | Day 1, 11:00-13:00             | **Generalized Linear Models**                                                                              |
+|         |                                | 1. GLM basics: Systematic component, link function, family/likelihood; model matrix, coefficient vector    |
+|         |                                | 2. The simulation approach                                                                                 |
+|         |                                | 3. Quantities of interest (definition, calculation, simulation)                                            |
+| 3       | Day 1, 14:00-16:00             | **Bayesian Fundamentals**                                                                                  |
+|         |                                | 1. Fundamental concepts: Prior distribution, likelihood, posterior distribution                            |
+|         |                                | 2. MCMC Algorithms                                                                                         |
+| 4       | Day 2, 09:00-11:00             | **Applied Bayesian Statistics Using Stan: Basics** (Application: Linear Model)                             |
+|         |                                | 1. Stan: Language, documentation, and core program blocks                                                  |
+|         |                                | 2. The Bayesian workflow                                                                                   |
+| 5       | Day 2, 11:00-13:00             | **Applied Bayesian Statistics Using Stan: Extensions** (Application: Binary Choice Models)                 |
+|         |                                | 1. Optional Stan program blocks: Functions, transformed data, transformed parameters, generated quantities |
+|         |                                | 2. Efficiency tuning                                                                                       |
+|         |                                | 3. Processing posterior draws in Stan and R                                                                |
+| 6       | Day 2, 14:00-16:00             | **Applied Bayesian Statistics Using Stan: Advanced Modeling**                                              |
+|         |                                | 1. Measurement models                                                                                      |
+|         |                                | 2. Hierarchical models                                                                                     |
+|         |                                | 3. Systems of equations                                                                                    |
+
+## Topic 1
+
+### Exercise 
+
+*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+
+Write the R code required to add two plus two:
+
+```{r two-plus-two, exercise=TRUE}
+
+```
+
+### Exercise with Code
+
+*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
+
+Now write a function that adds any two numbers and then call it:
+
+```{r add-function, exercise=TRUE, exercise.lines = 5}
+add <- function() {
+  
+}
+```
+
+## Topic 2
+
+### Exercise with Hint
+
+*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
+
+Modify the following code to limit the number of rows printed to 5:
+
+```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
+mtcars
+```
+
+```{r print-limit-hint}
+head(mtcars)
+```
+
+### Quiz
+
+*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
+
+Some questions to verify that you understand the purposes of various base and recommended R packages:
+
+```{r quiz}
+quiz(
+  question("Which package contains functions for installing other R packages?",
+    answer("base"),
+    answer("tools"),
+    answer("utils", correct = TRUE),
+    answer("codetools")
+  ),
+  question("Which of the R packages listed below are used to create plots?",
+    answer("lattice", correct = TRUE),
+    answer("tools"),
+    answer("stats"),
+    answer("grid", correct = TRUE)
+  )
+)
+```
+
