@@ -16,7 +16,6 @@ Imports:
     learnr,
     dplyr,
     Matrix,
-    Math,
     lme4,
     arm,
     abind,
