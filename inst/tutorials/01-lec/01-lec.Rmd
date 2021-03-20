@@ -4,7 +4,8 @@ output: learnr::tutorial
 runtime: shiny_prerendered
 ---
 
-```{r setup, include=FALSE}
+```{r 01-lec-setup, include=FALSE}
+detach(package:learnr, unload = TRUE)
 library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
 ```
@@ -18,7 +19,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 Write the R code required to add two plus two:
 
-```{r two-plus-two, exercise=TRUE}
+```{r 01-lec-two-plus-two, exercise=TRUE}
 
 ```
 
@@ -28,7 +29,7 @@ Write the R code required to add two plus two:
 
 Now write a function that adds any two numbers and then call it:
 
-```{r add-function, exercise=TRUE, exercise.lines = 5}
+```{r 01-lec-add-function, exercise=TRUE, exercise.lines = 5}
 add <- function() {
   
 }
@@ -42,11 +43,11 @@ add <- function() {
 
 Modify the following code to limit the number of rows printed to 5:
 
-```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
+```{r 01-lec-print-limit, exercise=TRUE, exercise.eval=TRUE}
 mtcars
 ```
 
-```{r print-limit-hint}
+```{r 01-lec-print-limit-hint}
 head(mtcars)
 ```
 
@@ -56,7 +57,7 @@ head(mtcars)
 
 Some questions to verify that you understand the purposes of various base and recommended R packages:
 
-```{r quiz}
+```{r 01-lec-quiz}
 quiz(
   question("Which package contains functions for installing other R packages?",
     answer("base"),
