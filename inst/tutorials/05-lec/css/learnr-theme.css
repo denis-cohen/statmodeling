@@ -1,0 +1,94 @@
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
+@import url(https://fonts.googleapis.com/css?family=Fira+Mono);
+
+body {
+  background-color: #ffffff;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 12;
+}
+
+em {
+    font-family: 'Source Sans Pro', sans-serif;
+    color: slategrey;
+}
+
+.ace-tm {
+    background-color: #ffffff;
+    color: black;
+}
+
+.panel, pre {
+    border-radius: 0;
+    border-color: #e0e0e0;
+    background-color: #ffffff;
+}
+
+.panel-default > .panel-heading {
+    color: #555555;
+    background-color: #ffffff;
+    border-color: #dddddd;
+}
+
+.topicsList .topic {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 40px;
+    font-size: 15px;
+    padding-left: 10px;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: 2px 80px;
+    background-position: left 100%;
+        background-position-y: 100%;
+    background-image: url(images/topicProgress.png);
+    border-bottom: 1px solid slategrey;
+    -webkit-transition-property: background-position;
+    transition-property: background-position;
+    -webkit-transition-duration: 0.25s;
+    transition-duration: 0.25s;
+}
+
+.topicsList .topic.current {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #003056;
+    color: #ffffff;
+    border: 0px;
+}
+
+code {
+    font-family: 'Fira Mono', monospace;
+    color: slategrey;
+    background-color: #f0f0f0;
+    font-size: 12px;
+}
+
+a {
+    font-family: 'Montserrat', sans-serif;
+    color: slategrey;
+    text-decoration: none;
+}
+
+.btn-primary, .btn-success, .btn-info {
+    color: #ffffff;
+    background-color: #003056;
+    background-image: none;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.btn-default {
+    color: #ffffff;
+    background-color: #003056;
+    background-image: none;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+}
+
+h2 {
+  color: #e28a61;
+  font-family: 'Montserrat', sans-serif;
+}
+
+h3 {
+  color: #e28a61;
+  font-family: 'Montserrat', sans-serif;
+}
