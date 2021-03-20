@@ -5,7 +5,8 @@ runtime: shiny_prerendered
 ---
 
 ```{r 01-lab-setup, include=FALSE}
-detach(package:learnr, unload = TRUE)
+if ("learnr" %in% (.packages()))
+  detach(package:learnr, unload = TRUE)
 library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
 ```
