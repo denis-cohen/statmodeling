@@ -21,3 +21,4 @@ Imports:
     abind,
     rstan,
     coda
+RoxygenNote: 7.1.1

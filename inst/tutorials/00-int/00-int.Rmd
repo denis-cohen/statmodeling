@@ -1,6 +1,8 @@
 ---
 title: "Statistical Modeling with R and Stan"
-output: learnr::tutorial
+output: 
+  learnr::tutorial:
+    css: css/learnr-theme.css
 runtime: shiny_prerendered
 ---
 

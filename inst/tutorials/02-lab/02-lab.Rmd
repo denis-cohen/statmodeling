@@ -1,5 +1,5 @@
 ---
-title: "Tutorial"
+title: "Lab: Generalized Linear Models"
 output: 
   learnr::tutorial:
     css: css/learnr-theme.css

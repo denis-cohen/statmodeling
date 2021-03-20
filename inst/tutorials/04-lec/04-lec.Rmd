@@ -1,6 +1,8 @@
 ---
-title: "Tutorial"
-output: learnr::tutorial
+title: "Lecture: Applied Bayesian Statistics Using Stan: Basics"
+output: 
+  learnr::tutorial:
+    css: css/learnr-theme.css
 runtime: shiny_prerendered
 ---
 
