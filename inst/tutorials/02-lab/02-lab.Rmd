@@ -1,6 +1,8 @@
 ---
 title: "Tutorial"
-output: learnr::tutorial
+output: 
+  learnr::tutorial:
+    css: css/learnr-theme.css
 runtime: shiny_prerendered
 ---
 
