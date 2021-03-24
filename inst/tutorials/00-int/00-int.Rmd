@@ -11,13 +11,47 @@ if ("learnr" %in% (.packages()))
   detach(package:learnr, unload = TRUE)
 library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
+
+## Save package names as a vector of strings
+pkgs <-  c()
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
 ```
 
+## Hi, I'm Denis!
+
+- 
+
+## Who are you?
+
+- 
+
+## Statistical Modeling with R and Stan
+
+### Primary Learning Objectives
+
+1. Understand generalized linear models as a common theoretical framework for statistical models
+1. Understand how to process estimates from generalized linear models into substantively meaningful quantities of interest *without* relying on pre-implemented software
+1. Understand how to use distributional summaries as a flexible framework for reporting inferential uncertainty
+1. *Applied* Bayesian statistics: Learn how to translate formal statistical models into code using Stan
+
+### Secondary Learning Objectives
+
+1. Bump up your programming skills
+1. Bump up your understanding of probability theory
+1. Bum up your data visualization skills
+1. *Theoretical* Bayesian statistics: Learn about fundamentals concepts of Bayesian statistics
 
 ## Schedule
 
 | Session | Time                           | Topics                                                                                                     |
-|:-------:|--------------------------------|------------------------------------------------------------------------------------------------------------|
+|:-------:|:-------------------------------|:-----------------------------------------------------------------------------------------------------------|
 | 1       | Day 1, 09:00-11:00             | **R Math & Programming Refresher**                                                                         |
 |         |                                | 1. Good coding practices                                                                                   |
 |         |                                | 2. Object types and conversions; slicing and indexing                                                      |
@@ -43,66 +77,23 @@ knitr::opts_chunk$set(echo = FALSE)
 |         |                                | 2. Hierarchical models                                                                                     |
 |         |                                | 3. Systems of equations                                                                                    |
 
-## Topic 1
+## Structure of our sessions
 
-### Exercise 
+We have 120 minutes per session. We will flexibly divide each session into the following sequence:
 
-*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+1. Lecture
+2. Hands-on exercises (breakout rooms, in teams of two)
+3. Discussing solutions to exercises
+4. Breaks
 
-Write the R code required to add two plus two:
+## Feedback
 
-```{r two-plus-two, exercise=TRUE}
+While bits and pieces of the teaching materials existed before, much of this
+workshop is a first. Feel free to share your feedback at any time, especially
+when you have suggestions that we can accommdate on the fly.
 
-```
+## Questions?
 
-### Exercise with Code
 
-*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
 
-Now write a function that adds any two numbers and then call it:
-
-```{r add-function, exercise=TRUE, exercise.lines = 5}
-add <- function() {
-  
-}
-```
-
-## Topic 2
-
-### Exercise with Hint
-
-*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
-
-Modify the following code to limit the number of rows printed to 5:
-
-```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
-mtcars
-```
-
-```{r print-limit-hint}
-head(mtcars)
-```
-
-### Quiz
-
-*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
-
-Some questions to verify that you understand the purposes of various base and recommended R packages:
-
-```{r quiz}
-quiz(
-  question("Which package contains functions for installing other R packages?",
-    answer("base"),
-    answer("tools"),
-    answer("utils", correct = TRUE),
-    answer("codetools")
-  ),
-  question("Which of the R packages listed below are used to create plots?",
-    answer("lattice", correct = TRUE),
-    answer("tools"),
-    answer("stats"),
-    answer("grid", correct = TRUE)
-  )
-)
-```
 

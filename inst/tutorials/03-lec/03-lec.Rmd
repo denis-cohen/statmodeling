@@ -14,66 +14,285 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
-## Topic 1
+## Bayesian Fundamentals
+<blockquote>
+<sub>
+In the Bayesian world the unobserved quantities are assigned distributional properties and, therefore, become random variables in the analysis. 
+</sub>
+<br>
 
-### Exercise 
+<sub>
+These distributions come in two basic flavors. If the distribution of the unknown quantity is not conditioned on fixed data, it is called prior distribution because it describes knowledge prior to seeing data. 
+</sub>
+<br>
 
-*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+<sub>
+Alternatively, if the distribution is conditioned on data that we observe, it is clearly updated from the unconditioned state and, therefore, more informed. This distribution is called posterior distribution. [...]
+</sub>
+<br>
 
-Write the R code required to add two plus two:
+<sub>
+The punchline is this: All likelihood-based models are Bayesian models in which the prior distribution is an appropriately selected uniform prior, and as the size of the data gets large they are identical given any finite appropriate prior. So such empirical researchers are really Bayesian; they just do not know it yet.
+</sub>
 
-```{r two-plus-two, exercise=TRUE}
+</blockquote>
 
-```
+<div style="text-align: right"> 
+  <sub><sup>
+    @Gill2013 
+  </sub></sup>
+</div>
 
-### Exercise with Code
+## Prior distribution
+- A distributional characterization of our belief about an unknown quantity (a parameter) prior to seeing the data: $p(\theta)$
+- This includes statements about *density* and *support*
+- *Example:* Prior to an election, we may have a (more or less specific) believe about the results of a party
+    - highest probability density around $20\%$
+    - low probability density outside of $[10\%,30\%]$
+    - zero probability outside of $[0\%,100\%]$
+- The prior distribution can be
+    - substantively informed by previous research or expert assessment
+    - purposefully vague, and thus, rather uninformative
+    - weakly informative
+        
+## Likelihood function
+- An assignment of a parametric form for the data 
+- This is equivalent to stipulating a data generating process
+- This involves the specification of a pdf or pmf: $p(\mathbf{y}|\theta)$
+- Logical inversion: "Which unknown $\theta$ most likely produces the known $\mathbf{y}$?" $\rightarrow$ $L(\theta | \mathbf{y})$
+    
+## Posterior distribution
+- Updating our distributional belief about $\theta$ given the data, $\mathbf{y}$:  $p(\theta | \mathbf{y})$
+- Follows the proportional version of [Bayes' Law](https://en.wikipedia.org/wiki/Bayes%27_theorem): $p(\theta | \mathbf{y}) \propto p(\theta) \times p(\mathbf{y}|\theta)$
+- Yields a weighthed combination of likelihood and prior
+- The prior pulls the posterior density toward the center of gravity of the prior distribution
+- As the data grows large, the likelihood becomes more influential 
+        
 
-*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
+## Example: Flipping a Coin
+Suppose we flip a coin up to $N$ times:
 
-Now write a function that adds any two numbers and then call it:
+- The fairness of a coin can be expressed through a *probability parameter*, $\pi$, that governs the probability that a coin flip produces heads (H) has apposed to tails
+- We start out with the believe that the coin is fair -- that is, we consider it more probable that the coin is fair ($\pi \approx 0.5$) and less probable that it over-produces heads or tails
+- Unbeknownst to us, the coin is far from fair -- it is 4 times as likely to produce heads as it is to produce tails (that is, $\pi=0.8$)
+- We slowly learn about this in the process of flipping the coin and keeping score of the number of flips $n$ and the number of heads $k$...
+<br>
 
-```{r add-function, exercise=TRUE, exercise.lines = 5}
-add <- function() {
+What does this mean mathematically?
+
+- Prior distribution: $p(\pi) \sim \text{beta}(a=5,b=5)$
+- Likelihood: $p(n,k|\pi) = {n \choose k} \pi^k (1-\pi)^{(n-k)}$ &ensp; [binomial pmf]
+- Posterior distribution: $p(\pi|n,k) \sim \text{beta}(a^{\prime}=a+k,b^{\prime}=b+n-k)$ &ensp; [analytical solution]
+
+## Example: Flipping a Coin (Simulation)
+```{r coin-sim1, exercise = FALSE, eval = FALSE}
+S <- 1000L                       # num. simulations
+N <- 1000                        # num. of coin flips
+pi <- .8                         # true parameter
+data <- rbinom(N, 1, pi)         # N coin flips
+a <- b <- 5                      # hyperparameters of the prior distribution
+prior <- rbeta(S, a, b)          # simulated prior distribution
+posterior <- matrix(NA, S, N)    # matrix container for simulations of posterior
+
+for (n in seq_len(N)) {
+  current.sequence <- data[1:n]  # sequence up until nth draw
+  k <- sum(current.sequence)     # number of heads in current sequence
   
+  ## Updating
+  a.prime <- a + k               
+  b.prime <- b + n - k
+  posterior[, n] <- rbeta(S, a.prime, b.prime)
 }
 ```
 
-## Topic 2
-
-### Exercise with Hint
-
-*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
-
-Modify the following code to limit the number of rows printed to 5:
-
-```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
-mtcars
-```
-
-```{r print-limit-hint}
-head(mtcars)
-```
-
-### Quiz
-
-*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
-
-Some questions to verify that you understand the purposes of various base and recommended R packages:
-
-```{r quiz}
-quiz(
-  question("Which package contains functions for installing other R packages?",
-    answer("base"),
-    answer("tools"),
-    answer("utils", correct = TRUE),
-    answer("codetools")
+## Example: Flipping a Coin (Simulation)
+```{r coin-sim2, exercise = FALSE, eval = TRUE, echo = FALSE, fig.align='center', out.width='90%'}
+density.prior <- density(
+  prior,
+  kernel = "gaussian",
+  n = 200
+)
+density.prior$y <- (density.prior$y / max(density.prior$y)) * N
+post.q  <- apply(posterior, 2, quantile, c(.5, .025, .975)) 
+plot(
+  1:N, 1:N,
+  type = 'n',
+  xlab = "Number of Coin Flips",
+  ylab = expression(
+    paste(
+      "Posterior Medians of ",
+      pi, " (with 95% Credible Intervals)",
+      sep = " "
+    )
   ),
-  question("Which of the R packages listed below are used to create plots?",
-    answer("lattice", correct = TRUE),
-    answer("tools"),
-    answer("stats"),
-    answer("grid", correct = TRUE)
-  )
+  ylim = c(0, 1),
+  xlim = c(1, 1000)
+)
+polygon(
+  c(rep(1, length(density.prior$y)), rev(density.prior$y)),
+  c(seq(min(density.prior$x), max(density.prior$x), length.out = length(density.prior$x)), rev(density.prior$x)),
+  col = adjustcolor('red', .2),
+  border = adjustcolor('red', .4)
+)
+abline(
+  h = c(.5, .8),
+  col = "gray80"
+)
+polygon(
+  c(seq_len(N), rev(seq_len(N))),
+  c(post.q[2, ], rev(post.q[3, ])),
+  col = adjustcolor('blue', .4),
+  border = adjustcolor('blue', .2)
+)
+lines(
+  seq_len(N),
+  post.q[1, ],
+  col = adjustcolor('white', .9),
+  lwd = 1.5
 )
 ```
 
+## Markov Chain Monte Carlo (MCMC)
+For complex multi-dimensional posterior distributions, findings analytical solutions through integration becomes cumbersome, if not impossible.
+
+That's where numerical approximation through MCMC comes in:
+
+- MCMC is an iterative computational process that explores and describes a posterior distribution
+- We let *Markov Chains* wander through the sample space, which should ultimately (following an initial warmup period) converge to high-density regions in the underlying posterior distribution
+- The frequency of "steps" (iterations) in a given region of multidimensional parameter space gives a stochastic simulation of the posterior probability density
+- Marginalizing the joint multidimensional posterior distribution w.r.t. to a given a parameter gives the posterior distribution for that parameter
+
+## (Some) MCMC Algorithms
+
+1. **Gibbs Sampler**: Draws iteratively through a complete set of conditional probability statements of each estimated parameter
+2. **Metropolis-Hastings**: Considers a single multidimensional move on each iteration depending on the quality of the proposed candidate draw
+3. **Hamiltonian Monte Carlo (HMC)**
+
+<blockquote>
+<sub>
+The Hamiltonian Monte Carlo algorithm starts at a specified initial set of parameters $\theta$; in Stan, this value is either user-specified or generated randomly. Then, for a given number of iterations, a new momentum vector is sampled and the current value of the parameter $\theta$ is updated using the leapfrog integrator with discretization time $\epsilon$ and number of steps $L$ according to the Hamiltonian dynamics. Then a Metropolis acceptance step is applied, and a decision is made whether to update to the new state $(\theta^{\ast},\rho{\ast})$ or keep the existing state.
+</sub>
+</blockquote>
+
+<div style="text-align: right"> 
+  <sub><sup>
+    Source: [Stan Reference Manual, Section 14.1](https://mc-stan.org/docs/2_19/reference-manual/hamiltonian-monte-carlo.html)
+  </sub></sup>
+</div>
+
+
+## ...
+###############################################################################
+## Data
+###############################################################################
+
+## Load data
+data <- read.dta("ras_min_EU_short.dta", convert.factors=F)
+
+
+
+###############################################################################
+## MCMC Illustration: Updating our knowledge about the parameters of a normal
+###############################################################################
+
+## Let's focus on the variable gov_left (government share of leftist parties)
+## which is approximately normally distributed
+gov.left <- data$gov_left1
+hist(gov.left)
+
+## Let's say that our blind guess for the prior is that the government share
+## of leftist parties is normally distributed with mean theta = 25 and std. 
+## dev. = 10 (which implies precision omega = .01).
+## We further assume that the precision parameter is gamma-distributed with 
+## shape parameter alpha = 10 and rate parameter beta = 1000.
+
+## Function
+drawFromPrior <- function(theta, omega, alpha, beta, n.burn, n.draws){
+  n.chain <- n.burn + n.draws       # length of the chain
+  draws <- matrix(NA, n.chain, 2)   
+  for (i in 1:n.chain){             # save draws of mean and variance parms
+    draws[i, ] <- c(rnorm(1, theta, 1 / sqrt(omega)), # draw from normal
+                    rgamma(1, alpha, beta)) # draw from gamma
+  }
+  draws <- tail(draws, n.draws)     # retain post-burn in draws
+  return(draws)
+}
+
+draws.prior <- drawFromPrior(theta= 25, omega = .01, alpha= 10, beta = 1000,
+                             n.burn = 1000, n.draws = 1000) 
+
+## Plots of Marginal Densities
+par(mfrow = c(1, 2), oma = c(0, 0, 3, 0))
+plot(density(draws.prior[, 1]), 
+     main = expression("Marginal Density of" ~ mu))
+plot(density(draws.prior[, 2]),
+     main = expression("Marginal Density of" ~ tau))
+title("Prior Distribution of Mean and Precision", outer = T)
+
+###############################################################################
+
+## We now update our blind guess with the observed data
+
+## Function
+drawFromPosterior <- function(theta, omega, alpha, beta, 
+                              n.burn, n.draws, data){
+  n.chain <- n.burn + n.draws
+  draws <- matrix(NA, n.chain, 2)
+  
+  n.data <- length(data)     # number of observations
+  x.bar <- mean(data)        # mean of observed data
+  
+  draws[1, 2] <- rgamma(1, alpha, beta) 
+  # random draw from prior dist. of prec- parameter to initialize chain
+  theta.star <- (omega * theta + n.data * draws[1, 2] * x.bar) /
+    (omega + n.data * draws[1, 2]) 
+  # analytical form for posterior mean parameter
+  omega.star <- omega + n.data * draws[1, 2] 
+  # analytical form for posterior precision parameter
+  draws[1, 1] <- rnorm(1, theta.star, 1 / sqrt(omega.star))
+  # random draw from posterior dist of mean parameter
+  
+  for (i in 2:n.chain){ # now draw sequentially from posterior distributions
+    alpha.star <- alpha + n.data / 2
+    # analytical form of posterior shape parameter
+    beta.star <- beta + sum(((data - draws[i - 1, 1])^2) / 2)
+    # analytical form of posterior rate parameter
+    draws[i, 2] <- rgamma(1, alpha.star, beta.star)
+    # random draw from gamma with posterior shape and rate parameters
+    theta.star <- (omega * theta + n.data * draws[i, 2] * x.bar) /
+      (omega + n.data * draws[i, 2])
+    omega.star <- omega + n.data * draws[i, 2]    
+    draws[i, 1] <- rnorm(1, theta.star, 1 / sqrt(omega.star))
+    # random draw from posterior dist of mean parameter
+  }
+  chain <- draws                # no burn-in
+  draws <- tail(draws, n.draws) # omits burn-in draws
+  return(list(chain, draws))
+}
+
+chains.post <- drawFromPosterior(theta= 25, omega = .01, 
+                                 alpha= 10, beta = 1000,
+                                 n.burn = 1000, n.draws = 1000, 
+                                 data = gov.left)[[1]]
+draws.post <- drawFromPosterior(theta= 25, omega = .01, 
+                                alpha= 10, beta = 1000,
+                                n.burn = 1000, n.draws = 1000, 
+                                data = gov.left)[[2]]
+
+## Plots of Marginal Densities and Trace Plots
+par(mfrow = c(2, 2), oma = c(0, 0, 3, 0))
+plot(1:nrow(chains.post), chains.post[, 1], type = "l", lwd=.3,
+     main = expression("Trace Plot for" ~ mu),
+     xlab = "Draws", ylab = expression(mu))
+lines(predict(loess(chains.post[, 1] ~ c(1:nrow(chains.post)), span = .1)), 
+      col='red', lwd=1)
+plot(density(draws.post[, 1]), 
+     main = expression("Marginal Density of" ~ mu))
+plot(1:nrow(chains.post), chains.post[, 2], type = "l", lwd=.3,
+     main = expression("Trace Plot for" ~ tau),
+     xlab = "Draws", ylab = expression(tau))
+lines(predict(loess(chains.post[, 2] ~ c(1:nrow(chains.post)), span = .1)), 
+      col='red', lwd=1)
+plot(density(draws.post[, 2]),
+     main = expression("Marginal Density of" ~ tau))
+title("Posterior Distribution of Mean and Precision", outer = T)

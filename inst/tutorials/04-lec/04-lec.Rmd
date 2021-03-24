@@ -7,73 +7,538 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
+## Reset learnr
 if ("learnr" %in% (.packages()))
   detach(package:learnr, unload = TRUE)
 library(learnr)
+
+## Knitr chunks
 knitr::opts_chunk$set(echo = FALSE)
+
+## Save package names as a vector of strings
+pkgs <-  c("rstan", "rstantools", "coda", "dplyr")
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
+
+## rstan Options
+rstan_options(auto_write = TRUE)             # avoid recompilation of models
+options(mc.cores = parallel::detectCores())  # parallelize across all CPUs
 ```
 
 
-## Topic 1
+## What Is Stan?
 
-### Exercise 
+In the words of the developers:
 
-*Here's a simple exercise with an empty code chunk provided for entering the answer.*
-
-Write the R code required to add two plus two:
-
-```{r two-plus-two, exercise=TRUE}
-
-```
-
-### Exercise with Code
-
-*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
-
-Now write a function that adds any two numbers and then call it:
-
-```{r add-function, exercise=TRUE, exercise.lines = 5}
-add <- function() {
+<blockquote>
+"Stan is a state-of-the-art platform for statistical modeling and high-performance statistical computation. Thousands of users rely on Stan for statistical modeling, data analysis, and prediction in the social, biological, and physical sciences, engineering, and business.
   
+Users specify log density functions in Stan's probabilistic programming language and get:
+  
+- full Bayesian statistical inference with MCMC sampling (NUTS, HMC)
+- approximate Bayesian inference with variational inference (ADVI)
+- penalized maximum likelihood estimation with optimization (L-BFGS)
+  
+</blockquote>
+
+<div style="text-align: right"> 
+  <sub><sup>
+    Source: https://mc-stan.org/ 
+  </sub></sup>
+</div>
+
+
+## Why Stan?
+
+- Open-source software
+- Fast and stable algorithms
+- High flexibility with few limitations
+- Extensive documentation
+    - [User's Guide](https://mc-stan.org/docs/2_19/stan-users-guide/index.html)
+    - [Language Reference Manual](https://mc-stan.org/docs/2_19/reference-manual/index.html)
+    - [Language Functions Reference](https://mc-stan.org/docs/2_19/functions-reference/index.html)
+- Highly transparent development process; see [Stan Development Repository on Github](https://github.com/stan-dev/stan)
+- Very responsive [Development Team](https://mc-stan.org/about/team/)
+- Large and active community in the [Stan Forums](https://discourse.mc-stan.org/) and [Stack OVerflow](https://stackoverflow.com/questions/tagged/stan)
+- Increasing number of [case studies](https://mc-stan.org/users/documentation/case-studies.html), [tutorials](https://mc-stan.org/users/documentation/tutorials.html), [papers and textbooks](https://mc-stan.org/users/documentation/external.html)
+- Compatibility with various editor for syntax highlighting, formatting, and checking (incl. [RStudio](https://www.rstudio.com/) and [Emacs](https://www.gnu.org/software/emacs/))
+
+## Stan Interfaces
+
+- RStan (R)
+- PyStan (Python)
+- CmdStan (shell, command-line terminal)
+- MatlabStan (MATLAB)
+- Stan.jl (Julia)
+- StataStan (Stata)
+- MathematicaStan (Mathematica)
+- ScalaStan (Scala)
+
+## (Some) R packages
+
+- [**rstan**](https://cran.r-project.org/package=rstan): General R Interface to Stan
+- [**shinystan**](https://cran.r-project.org/package=shinystan): Interactive Visual and Numerical Diagnostics and Posterior Analysis for Bayesian Models
+- [**bayesplot**](https://cran.r-project.org/web/packages/bayesplot/index.html): Plotting functions for posterior analysis, model checking, and MCMC diagnostics.
+- [**brms**](https://cran.r-project.org/package=brms): Bayesian Regression Models using 'Stan', covering a growing number of model types
+- [**rstanarm**](https://cran.r-project.org/package=rstanarm): Bayesian Applied Regression Modeling via Stan, with an emphasis on hierarchical/multilevel models
+- [**edstan**](https://cran.r-project.org/package=edstan): Stan Models for Item Response Theory
+- [**rstantools**](https://cran.r-project.org/package=rstantools): Tools for Developing R Packages Interfacing with 'Stan'
+
+## Caveat: Reproducibility 
+
+Under what conditions are estimates reproducable? See [Stan Reference Manual](https://mc-stan.org/docs/2_19/reference-manual/reproducibility-chapter.html), Section 19:
+
+- Stan version
+- Stan interface (RStan, PyStan, CmdStan) and version, plus version of interface language (R, Python, shell)
+- versions of included libraries (Boost and Eigen)
+- operating system version
+- computer hardware including CPU, motherboard and memory
+- C++ compiler, including version, compiler flags, and linked libraries
+- same configuration of call to Stan, including random seed, chain ID, initialization and data
+
+## Bayesian Workflow
+
+1. **Specification**: Specify the full probability model
+    - data
+    - likelihood
+    - priors
+2. **Model Building**: Translate the model into code
+3. **Validation**: Validate the model with fake data
+4. **Fitting**: Fit the model to actual data
+5. **Diagnosis**: Check generic and algithm-specific diagnostics to assess convergence
+6. Posterior Predictive Checks
+7. Model Comparison
+
+<div style="text-align: right"> 
+  <sub><sup>
+    Source: [Jim Savage (2016) A quick-start introduction to Stan for economists. A QuantEcon Notebook.](http://nbviewer.jupyter.org/github/QuantEcon/QuantEcon.notebooks/blob/master/IntroToStan_basics_workflow.ipynb)
+  </sub></sup>
+</div>
+
+# Model Building
+
+## Four Ways to Denote the Model Formula
+
+1. Scalar form: $$y_i = \beta_1 x_{i1} + \beta_2 x_{i2} + \beta_3 x_{i3} + \epsilon_i \text{ for all } i=1,...,N$$
+2. Row-vector form: $$y_i = \mathbf{x_i^{\prime}} \mathbf{\beta} + \epsilon_i  \text{ for all } i=1,...,N$$
+3. Column-vector form: $$\mathbf{y} = \beta_1 \mathbf{x_{1}} + \beta_2 \mathbf{x_{2}} + \beta_3 \mathbf{x_{3}} \mathbf{\epsilon}$$
+4. Matrix form: $$\mathbf{y = X \beta + \epsilon}$$
+
+## Four Ways to Denote the Model Formula
+$$ 	\underbrace{\begin{bmatrix} y_1 \\ \vdots \\  y_{N} \end{bmatrix}}_{N \times 1}
+		=
+		\underbrace{\begin{bmatrix}
+		1 			& x_{1, 2}	 & \cdots &  x_{1, K} \\ 
+		\vdots 		& \vdots  	 & \ddots &  \vdots \\
+		1 			& x_{N, 2}    & \cdots & x_{N, K}
+		\end{bmatrix}}_{N \times K}
+		\underbrace{\begin{bmatrix} \beta_1 \\ \beta_2 \\ \vdots \\ \beta_K \end{bmatrix}}_{K \times 1}
+		+ 
+	\underbrace{\begin{bmatrix} \epsilon_1 \\ \vdots \\ \epsilon_{N} \end{bmatrix}}_{N \times 1}$$
+$$	\underbrace{\begin{bmatrix} y_1 \\ \vdots \\  y_{N} \end{bmatrix}}_{N \times 1}
+	=
+	\underbrace{\begin{bmatrix}
+	\beta_1 \cdot 1	+ \beta_2 \cdot x_{1, 2} + \cdots + \beta_K \cdot x_{1, K} \\
+	\vdots \\
+	\beta_1 \cdot 1	+ \beta_2 \cdot x_{N, 2} + \cdots + \beta_K \cdot x_{N, K} \\
+	\end{bmatrix}}_{N \times 1}
+	+ 
+	\underbrace{\begin{bmatrix} \epsilon_1 \\ \vdots \\ \epsilon_{N} \end{bmatrix}}_{N \times 1}$$
+	
+## Example: Linear Model
+
+* The three parts of every GLM...
+    * family: $\mathbf{y} \sim \text{Normal}(\mu, \sigma)$
+    * (inverse) link function: $\mathbf{y^{\ast}} = \text{id}(\mu) = \mu$
+    * linear component: $\mu = \mathbf{X} \beta$
+* Unknown quantities:
+    * $\beta$, the coefficient vector
+    * $\sigma$, the scale parameter of the normal
+    * $\mu$, the location parameter of the normal
+* Known quantities:
+    * $\mathbf{y}$, the outcome vector
+    * $\mathbf{X}$, the design matrix
+    * the dimensions of $\mathbf{y}_{N \times 1}$ and $\mathbf{X}_{N \times K}$
+    * the dimensions of $\beta_{K \times 1}$, $\sigma$ (a scalar), and $\mu_{N \times 1}$
+
+
+## Stan Program Blocks
+
+1. Functions: Declare user written functions
+2. **Data**: Declare all known quantities
+3. Transformed Data: Transform declared data inputs (once)
+4. **Parameters**: Declare all unknown quantities
+5. Transformed Parameters: Transform declared parameters (each step, each iteration)
+6. **Model**: Transform parameters, specify prior distributions and likelihoods
+7. Generated Quantities (each iteration)
+
+## Program Blocks
+```{r blocks, exercise = FALSE, echo = FALSE, out.width = '72%', fig.align="center"}
+knitr::include_graphics("images/blocks.png")
+```
+
+<br>
+<div style="text-align: right">
+  <sub><sup>
+    Source: http://mlss2014.hiit.fi/mlss_files/2-stan.pdf
+  </sub></sup>
+</div>
+
+## Script for a Stan Model
+
+- start with a blank script in your preferred code editor and save it as "lm.stan" 
+- this will enable syntax highlighting, formatting, and checking in RStudio and Emacs
+- alternatively, you can save your model as a single character string in R (not recommended)
+- always make sure to end your script with a blank line
+
+
+## Data Block
+
+Declare all known quantities, including data types, dimensions, and constraints: 
+
+- $\mathbf{y}_{N \times 1}$
+- $\mathbf{X}_{N \times K}$
+
+```{stan ex1-data1, output.var="ex1-data1", exercise = TRUE}
+data {
+  int<lower=1> N; // num. observations
+  ... declarations ...
 }
 ```
 
-## Topic 2
+## Data Block
 
-### Exercise with Hint
+Declare all known quantities, including data types, dimensions, and constraints: 
 
-*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
+- $\mathbf{y}_{N \times 1}$, the outcome vector
+- $\mathbf{X}_{N \times K}$, the design matrix
 
-Modify the following code to limit the number of rows printed to 5:
-
-```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
-mtcars
+```{stan ex1-data2, output.var="ex1-data2", exercise = FALSE, eval=FALSE}
+data {
+  int<lower=1> N; // num. observations
+  int<lower=1> K; // num. predictors
+  matrix[N,K] x; // design matrix
+  vector[N] y;    // outcome vector
+}
 ```
 
-```{r print-limit-hint}
-head(mtcars)
+## Parameters Block
+
+Declare unknown 'base' quantities, including storage types, dimensions, and constraints: 
+
+- $\beta$, the coefficient vector
+- $\sigma$, the scale parameter of the normal
+
+```{stan ex1-pars1, output.var="ex1-pars1", exercise = TRUE}
+parameters {
+  ... declarations ...
+}
 ```
 
-### Quiz
+## Parameters Block
 
-*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
+Declare unknown 'base' quantities, including storage types, dimensions, and constraints: 
 
-Some questions to verify that you understand the purposes of various base and recommended R packages:
+- $\beta$, the coefficient vector
+- $\sigma$, the scale parameter of the normal
 
-```{r quiz}
-quiz(
-  question("Which package contains functions for installing other R packages?",
-    answer("base"),
-    answer("tools"),
-    answer("utils", correct = TRUE),
-    answer("codetools")
-  ),
-  question("Which of the R packages listed below are used to create plots?",
-    answer("lattice", correct = TRUE),
-    answer("tools"),
-    answer("stats"),
-    answer("grid", correct = TRUE)
+```{stan ex1-pars2, output.var="ex1-pars2", exercise = FALSE, eval = FALSE}
+parameters {
+  vector[K] beta;      // coef vector
+  real<lower=0> sigma; // scale parameter
+}
+```
+
+## Transformed Parameters Block
+
+Declare and specify unknown transformed quantities, including storage types, dimensions, and constraints: 
+
+- $\mu = \mathbf{X} \beta$, the linear prediction
+
+
+```{stan ex1-tpars1, output.var="ex1-tpars1", exercise = TRUE}
+transformed parameters {
+  ... declarations ... statements ....
+}
+```
+
+## Transformed Parameters Block
+
+Declare and specify unknown transformed quantities, including storage types, dimensions, and constraints:
+
+- $\mu = \mathbf{X} \beta$, the linear prediction
+
+
+```{stan ex1-tpars2, output.var="ex1-tpars2", exercise = FALSE, eval = FALSE}
+transformed parameters {
+  vector[N] mu;  // declare
+  mu = x * beta; // assign
+}
+```
+
+## Model Block
+Declare and specify local variables (optional) and specify sampling statements:
+
+- $\beta_k \sim \text{Normal}(0, 10) \text{ for k = 1,...,K}$ 
+- $\sigma \sim \text{Cauchy}^{+}(0, 5)$
+- $\mathbf{y} \sim \text{Normal}(\mu, \sigma)$
+
+```{stan ex1-mod1, output.var="ex1-mod1", exercise = TRUE, eval = FALSE}
+model {
+  // priors
+  ... statements ...
+  
+  // log-likelihood
+  ... statements ...
+}
+```
+
+
+## Model Block
+Declare and specify local variables (optional) and specify sampling statements:
+
+- $\beta_k \sim \text{Normal}(0, 10) \text{ for k = 1,...,K}$ 
+- $\sigma \sim \text{Cauchy}^{+}(0, 5)$
+- $\mathbf{y} \sim \text{Normal}(\mu, \sigma)$
+
+```{stan ex1-mod2, output.var="ex1-mod2", exercise = FALSE, eval = FALSE}
+model {
+  // priors
+  beta ~ normal(0, 10);  // priors for beta
+  sigma ~ cauchy(0, 5);  // prior for sigma
+  
+  // log-likelihood
+  target += normal_lpdf(y | mu, sigma); // likelihood
+}
+```
+
+## Putting It All Together
+```{r ex1-full, output.var="ex1-full", exercise = FALSE, eval = FALSE}
+'data {
+  int<lower=1> N; // num. observations
+  int<lower=1> K; // num. predictors
+  matrix[N,K] x; // design matrix
+  vector[N] y;    // outcome vector
+}
+
+parameters {
+  vector[K] beta;      // coef vector
+  real<lower=0> sigma; // scale parameter
+}
+
+transformed parameters {
+  vector[N] mu;  // declare lin. pred.
+  mu = x * beta; // assign lin. pred.
+}
+
+model {
+  // priors
+  target += normal_lpdf(beta | 0, 10);  // priors for beta
+  target += cauchy_lpdf(sigma |0, 5);   // prior for sigma
+  
+  // log-likelihood
+  target += normal_lpdf(y | mu, sigma); // likelihood
+}' %>%
+writeLines(con = "lm.stan")
+```
+
+## Simulating the DGP in R
+```{r inf-sim1, exercise = FALSE, eval = FALSE}
+set.seed(20210329)
+N <- 1000L                                # num. observations
+K <- 5L                                   # num. predictors
+x <- cbind(                               # design matrix
+  rep(1, N), 
+  matrix(rnorm(N * (K - 1)), N, (K - 1))
   )
-)
+beta <- rnorm(K, 0, 1)                    # coef. vector
+sigma <- 2.5                              # scale parameter
+mu <- x %*% beta                          # linear prediction
+y.sim <- rnorm(N, mu, sigma)              # simulated outcome
 ```
 
+## Setup and Compilation
+```{r inf-setup, exercise = TRUE, eval = TRUE}
+## Setup
+library(rstan)
+rstan_options(auto_write = TRUE)             # avoid recompilation of models
+options(mc.cores = parallel::detectCores())  # parallelize across all CPUs
+Sys.setenv(LOCAL_CPPFLAGS = '-march=native') # improve execution time
+
+## Data (see data block) as list
+standat <- list(
+  N = N,
+  K = K,
+  x = x,
+  y = y.sim
+)
+
+## C++ Compilation
+lm.mod <- stan_model(file = "lm.stan")
+```
+
+## Estimation
+```{r inf-sampl, exercise = FALSE, eval = FALSE}
+lm.est <- sampling(lm.mod,                            # compiled model
+                   data = standat,                    # data input
+                   algorithm = "NUTS",                # algorithm
+                   control = list(                    # control arguments
+                     adapt_delta = .85
+                     ),
+                   save_warmup = FALSE,               # discard warmup sims
+                   sample_file = NULL,                # no sample file
+                   diagnostic_file = NULL,            # no diagnostic file
+                   pars = c("beta", "sigma"),         # select parameters
+                   iter = 2000L,                      # iter per chain
+                   warmup = 1000L,                    # warmup period
+                   thin = 2L,                         # thinning factor
+                   chains = 4L,                       # num. chains
+                   cores = 4L,                        # num. cores
+                   seed = 20190417)                   # seed
+```
+
+## Output Summary
+*Reminder:* Here are the 'true' parameter values:
+```{r inf-out1, exercise = FALSE, eval = TRUE}
+true.pars <- c(beta, sigma)
+names(true.pars) <- c(paste0("beta[", 1:5, "]"), "sigma")
+true.pars
+```
+
+And here are the estimates from our model:
+```{r inf-out2, exercise = FALSE, eval = TRUE}
+lm.est
+```
+
+## Inspecting Our `stanfit` Object
+```{r inf-out3, exercise = FALSE, eval = TRUE}
+str(lm.est)
+```
+
+# Convergence Diagnostics
+
+## Generic Diagnostics: `Rhat` and `n_eff`
+
+1. $\hat{R} < 1.1$: Potential scale reduction statistic (aka Gelman-Rubin convergence diagnostic) 
+$$\small \widehat{Var}(\theta) = (1 - \frac{1}{\mathtt{n_{iter}}})
+    \underbrace{\Bigg(\frac{1}{ \mathtt{n_{chains}} (\mathtt{n_{iter}} - 1)} \sum_{j=1}^{\mathtt{n_{chains}}} \sum_{i=1}^{\mathtt{n_{iter}}} (\theta_{ij} - \bar{\theta_j})^2 \Bigg)}_{\text{Within chain var}} + 
+    \frac{1}{\mathtt{n_{iter}}}  \underbrace{\Bigg(\frac{\mathtt{n_{iter}}}{\mathtt{n_{chains} - 1}} \sum_{j=1}^{\mathtt{n_{chains}}} (\bar{\theta_j} - \bar{\bar{\theta}})^2\Bigg)}_{\text{Between chain var}}$$
+    - low values indicate that chains are stationary (convergence to target distribution within chains)
+    - low values indicate that chains mix (convergence to same target distribution across chains)
+1. $\frac{\mathtt{n_{eff}}}{\mathtt{n_{iter}}} > 0.001$: Effective sample  size
+    - A small effective sample size indicates high autocorrelation within chains
+    - This indicates that chains explore the posterior density very slowly and inefficiently
+
+## Algorithm-specific Diagnostics
+
+In the words of the developers:
+
+<blockquote>
+<sub>
+"Hamiltonian Monte Carlo provides not only state-of-the-art sampling speed, it also provides state-of-the-art diagnostics. Unlike other algorithms, when Hamiltonian Monte Carlo fails it fails sufficiently spectacularly that we can easily identify the problems."
+</sub>
+</blockquote>
+
+<div style="text-align: right"> 
+  <sub><sup>
+    Source: https://github.com/stan-dev/stan/wiki/Stan-Best-Practices 
+  </sub></sup>
+</div>
+
+- Divergent transitions after warmup (validity concern)
+    - increase `adapt_delta` (target acceptance rate)
+    - reparatemterize/optimize your code (see )
+- Maximum treedepth exceeded (efficiency concern)
+    - increase `max_treedepth`
+- Diagnostics summary for `stanfit` object: `check_hmc_diagnostics(object)`
+- For further information, see the [Guide to Stan's warnings](https://mc-stan.org/misc/warnings.html)
+
+## Further Generic Diagnostics
+
+Additional empirical diagnostics (see @Gill2015, Ch. 14.3.3) include
+
+- **Geweke Time-Series Diagnostic**: Compare non-overlapping post-warmup portions of each chain to test within-convergence
+- **Heidelberger and Welch Diagnostic**: Compare early post-warmup portion of each chain with late portion to test within-convergence
+- **Raftery and Lewis Integrated Diagnostic**: Evaluates the full chain of a pilot run (requires that `save_warmup = TRUE`) to estimate minimum required length of warmup and sampling
+
+and are implemented as part of the `coda` package (Output Analysis and Diagnostics for MCMC). 
+
+These can used on `stanfit` objects after storing the posterior simulations as `mcmc.list`objects
+
+## Further Generic Diagnostics
+
+```{r coda, exercise = FALSE, eval = TRUE}
+library(coda)
+
+## Stanfit to mcmc.list (manual)
+lm.mcmc <- lapply(lm.est@sim$samples,                     # List of matrices
+                     function(list) do.call(cbind, list)) 
+lm.mcmc <- lapply(lm.mcmc, as.mcmc)                       # List of mcmc matrices
+lm.mcmc <- as.mcmc.list(lm.mcmc)                          # mcmc list
+
+## Stanfit to mcmc.list (canned solution)
+lm.mcmc <- As.mcmc.list(lm.est,
+                        pars = c("beta", "sigma", "lp__"))
+
+## Diagnostics
+geweke.diag(lm.mcmc, frac1 = .1, frac2 = .5)              # Geweke
+heidel.diag(lm.mcmc, pvalue = .1)                         # Heidelberger-Welch
+# raftery.diag(lm.mcmc,                                   # Raftery-Lewis
+#              q = 0.025, 
+#              r = 0.005, 
+#              s = 0.95, 
+#              converge.eps = 0.001)
+```
+
+
+## Visual Diagnostics Using **shinystan**
+
+```{r shiny, exercise = TRUE}
+library(shinystan)
+launch_shinystan(lm.est)
+```
+
+Additional Functionality:
+
+- `generate_quantity()`: Add a new parameter as a function of one or two existing parameters
+- `deploy_shinystan()`: Deploy a 'ShinyStan' app on [shinyapps.io](https://www.shinyapps.io/)
+Additional Functionality:
+
+
+## Visual Diagnostics Using **bayesplot**
+
+**bayesplot** offers a vast selection of visual diagnostics for `stanfit` objects:
+
+- Diagnostics for No-U-Turn-Sampler (NUTS) 
+    - Divergent transitions
+    - Energy
+    - Bayesian fraction of missing information
+- Generic MCMC diangostics
+   - $\hat{R}$
+   - $\mathtt{n_{eff}}$
+   - Autocorrelation
+   - Mixing (trace plots)
+
+For full functionality, examples, and vignettes:
+
+- [GitHub Examples](https://github.com/stan-dev/bayesplot)
+- [CRAN Vignettes](https://cran.r-project.org/web/packages/bayesplot/vignettes/visual-mcmc-diagnostics.html)
+- `available_mcmc()`function
+
+## **bayesplot** Example: Trace Plot for `sigma`
+
+```{r bayesplot, exercise = FALSE, eval = TRUE, message = FALSE, warning = FALSE, fig.align = "center", out.width='50%'}
+library(bayesplot)
+
+## Extract posterior draws from stanfit object
+lm.post.draws <- extract(lm.est, permuted = FALSE)
+
+## Traceplot
+mcmc_trace(lm.post.draws, pars = c("sigma"))
+```

@@ -1,8 +1,16 @@
 ---
 title: "Lecture: R Math & Programming Refresher"
-output: 
+output:
   learnr::tutorial:
+    progressive: true
+    allow_skip: true
     css: css/learnr-theme.css
+    toc: true
+    toc_depth: 4
+    theme: united
+    toc_float:
+      collapsed: false
+      smooth_scroll: yes
 runtime: shiny_prerendered
 ---
 
@@ -11,69 +19,454 @@ if ("learnr" %in% (.packages()))
   detach(package:learnr, unload = TRUE)
 library(learnr)
 knitr::opts_chunk$set(echo = FALSE)
+
+## Save package names as a vector of strings
+pkgs <-  c()
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
+```
+
+## Outline
+
+### Thing we are going to cover
+
+Given our time constraints, we will be fairly selective in what we cover today.
+
+Specifically, we will focus on those aspects of the R language that will be
+immediately relevant in the pursuit of or our learning objectives:
+
+- data types
+- object types
+- logical and numerical object slicing
+- algebraic operators
+- control structures
+    - `for` loops
+    - nested `for` loops
+    - `apply`, `lapply`, `sapply`
+- functions
+- sequences: `seq`, `seq_len`, `seq_along`
+- probability distributions
+- summary statistics
+
+### Things we going to cover in passing
+
+- visualization, primarily of model results
+- 
+
+### Things we are not going to cover
+
+#### Best practices for reproducible data projects
+
+- R Projects
+- Version control (e.g., Git)
+- Depedency management (e.g., `renv`)
+- Start-up customization (`.Renviron`)
+- Custom project initialization  (`.Rprofile`)
+
+#### `base` vs `tidyverse`
+
+- Base R: Collection of native commands
+    - historical legacies: not necessarily a "clean" language/syntax
+    -
+- `tidyverse`:
+    - an "opinionated collection of R packages" for data visualization, transformation, tidying, and import
+    - more or less uniform syntax
+    - Packages: `dplyr`, `ggplot2`, `tibble`, `readr`, `tidyr`, `purrr`
+- both are valid
+- both are fully compatible with one another
+- you can do amazing things by relying on one, or the other, or both
+- we will use whichever best suits our purposes
+
+#### Further reading
+
+To learn more about the above, check out my [Methods Bites](https://www.mzes.uni-mannheim.de/socialsciencedatalab/) Tutorial [Efficient Data Management in R](https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/efficient-data-r/), co-authored with Cosima Meyer, Marcel Neunhoeffer, and Oliver Rittmann.
+
+
+## Algebraic operators and transformations
+
+### Numeric types
+
+R features two fully compatible (main) *types* (storage modes) for numbers:
+
+- `integer` for integers
+- `double` for real numbers
+
+```{r num_1, include=TRUE}
+x <- 9     # a real number
+y <- 4L    # an integer
+```
+
+```{r num_2, exercise = TRUE, exercise.lines = 1}
+sapply(list(x, y), typeof)
+```
+
+While both are of different storage types, they are both numeric:
+
+```{r num_4, exercise = TRUE, exercise.lines = 1}
+sapply(list(x, y), is.numeric)
+```
+
+### Artihmetic Operators and Common Transformations
+
+```{r ari, eval=FALSE, echo=TRUE}
+x + y     # addition
+x - y     # subtraction
+x * y     # multiplication
+x / y     # division
+x ^ y     # exponentiation
+x %% y    # modulus
+x %/% y   # integer division
+log(x)  # natural logarithm
+exp(x)  # exponential
+sqrt(x) # square root
+```
+
+### Exercise
+1. Generate an integer `a`, assigning the value 2
+1. Generate a real `b`, assigning the value 0.9
+1. Generate a scalar `c`, $c = \log (b^a)$
+1. Print the value of `c`
+1. Ascertain that `c` is a numeric of class double
+
+```{r ariex, exercise = TRUE} 
+a <- 2L
+b <- .9
+```
+
+```{r ariex-solution}
+a <- 2L
+b <- .9
+c <- log(b^a)
+c
+is.double(c)
 ```
 
 
-## Topic 1
+## Boolean, Logical, and Relational Operators
 
-### Exercise 
-
-*Here's a simple exercise with an empty code chunk provided for entering the answer.*
-
-Write the R code required to add two plus two:
-
-```{r 01-lec-two-plus-two, exercise=TRUE}
-
+### Boolean Operators 
+```{r boolean, echo = FALSE, out.width = "100%"}
+knitr::include_graphics("images/transform-logical.png")
 ```
 
-### Exercise with Code
-
-*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
-
-Now write a function that adds any two numbers and then call it:
-
-```{r 01-lec-add-function, exercise=TRUE, exercise.lines = 5}
-add <- function() {
-  
-}
+### Logical and Relational Operators
+```{r logrel, exercise = TRUE}
+3 + 4 == 7              # Does 3 + 4 equal 7?
+2 + 5 < 6               # Does 2 + 5 equal 6?
+3 + 4 <= 2 + 5          # Is 3 + 4 less than/equal to 2 + 5?
+isFALSE(3 + 4 != 2 + 5) # Is it false that 3 + 4 is not equal to 2 + 5?
+3 | 4 >= 2 + 1          # Is 3 OR 4 greater than/equal to 2 + 1?
+3 & 4 >= 2 + 1          # Are 3 AND 4 greater than/equal to 2 + 1?
+3 & 7 %in% c(1:5)       # Are 3 AND 7 included in an integer sequence from 1 to 5?
 ```
 
-## Topic 2
 
-### Exercise with Hint
+## Object Types and Conversions 
 
-*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
-
-Modify the following code to limit the number of rows printed to 5:
-
-```{r 01-lec-print-limit, exercise=TRUE, exercise.eval=TRUE}
-mtcars
+## Characters
+An object of type `character` is a language object
+```{r char_1, include = TRUE}
+start <- "R is so much"
+end <- "fun!"
+sentence <- paste(start, end, sep = " ")
 ```
 
-```{r 01-lec-print-limit-hint}
-head(mtcars)
+Run these three commands and establish their purpose:
+```{r char_2, exercise = TRUE}
+# Before you start, print the sentence in place of this comment
+typeof(sentence)
+nchar(sentence)
+grepl("fun", sentence)
 ```
 
-### Quiz
+```{r char_2-solution}
+sentence
+class(sentence)
+nchar(sentence)
+grepl("fun", sentence)
+```
 
-*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
+## Vectors
+A vector is a serial listing of *atomic* objects 
+(e.g. of type `integer`, `double`, `logical`, or `character`)
+<br>
 
-Some questions to verify that you understand the purposes of various base and recommended R packages:
+Examples:
+```{r vec1_1}
+item <- c("flour", "sugar", "potatoes", "tomatoes", "bananas")
+price <- c(.99, 1.49, 1.99, 2.79, 1.89)
+pricey <- price > 1.5
+```
 
-```{r 01-lec-quiz}
-quiz(
-  question("Which package contains functions for installing other R packages?",
-    answer("base"),
-    answer("tools"),
-    answer("utils", correct = TRUE),
-    answer("codetools")
-  ),
-  question("Which of the R packages listed below are used to create plots?",
-    answer("lattice", correct = TRUE),
-    answer("tools"),
-    answer("stats"),
-    answer("grid", correct = TRUE)
-  )
+```{r vec1_2, exercise = TRUE}
+item
+price 
+pricey
+```
+
+
+## Numeric Vectors and Linear Algebra
+- A length-$N$ numeric vector in R is usually a column vector. So 
+the following is *mostly* of dimensions $3 \times 1$
+```{r vec2_1}
+d <- c(0, 1, 2)
+```
+- Yet sometimes, when (pre-)multiplying other vectors or matrices, R will 
+automatically transpose the vector on the left to ensure conformability:
+```{r vec2_2, include=TRUE, eval=TRUE}
+d %*% d
+```
+
+- So the above yields the inner product $\mathbf{d}^{\prime} \mathbf{d}$,
+a scalar (dimensions $1 \times 1$) and *not* the outer product $\mathbf{d}\mathbf{d}^{\prime}$,
+a matrix of dimensions $3 \times 3$
+
+## Row and Column Vectors as Matrices
+- You can ensure unambigous dimensions by defining vectors as matrices
+
+```{r vec3_1, exercise=TRUE}
+as.matrix(d)
+```
+```{r vec3_2, exercise=TRUE}
+### Note: t() transposes vectors and matrices
+as.matrix(t(d))
+```
+
+## Matrices
+A matrix is a rectangular arrangement of atomic objects
+<br>
+
+Example I:
+```{r mat1_1}
+mat1 <- matrix(seq(-.35, .35, .1), nrow = 2, ncol = 4)
+```
+
+```{r mat1_2, exercise = TRUE}
+mat1 
+```
+
+*Note:* By default, we fill the $8$ elements of the $2 \times 4$ matrix by columns. 
+Specify the option `byrow = TRUE` if you want to fill by rows instead.
+
+## Matrices
+A matrix is a rectangular arrangement of atomic objects
+<br>
+
+Example II:
+```{r mat2_1}
+mat2 <- rbind(item, substr(item, start = 1, stop = 3))
+```
+
+```{r mat2_2, exercise = TRUE}
+mat2
+```
+
+## Matrices
+A matrix is a rectangular arrangement of atomic objects
+<br>
+
+Example III:
+```{r mat3_1}
+mat3 <- cbind(price > 1.5, price < 1)
+```
+
+```{r mat3_2, exercise = TRUE}
+mat3
+```
+
+## Arrays
+An array is a multidimensional arrangement of atomic objects. 
+
+Example: A 3D array of dimensions $3 \times 2 \times 2$
+```{r arr1_1}
+K <- 3L
+L <- 2L
+M <- 2L
+ary3D <- array(rnorm(K*L*M, mean = 0, sd = 1), dim = c(K, L, M))
+```
+
+```{r arr1_2, exercise = TRUE}
+### Try slicing, e.g. ar3D[, 1, 1], ar3D[c(1, 3), , ], etc.
+ary3D
+```
+
+## Arrays
+
+You may think of an array as a generalization of a vectors/matrices to any number of dimensions:
+
+* all elements are of the same storage type
+* fixed dimensional structure
+* any vector or matrix can be stored as an array using `as.array()`
+* without collapsing dimensions
+    + a 1D array can be stored as a vector using `as.vector()`
+    + a 2D array can be stored as a matrix using `as.matrix()`
+
+## Lists
+
+Lists allow you to store objects of various classes, various storage types, and various sizes.
+Very useful, e.g., for returning various outputs from a function.
+
+Example:
+```{r list1_1}
+mylist <- list()
+mylist$char.mat <- matrix(LETTERS, nrow = 2, ncol = 13)
+mylist$vectors <- list()
+mylist$vectors$num.vec1 <- c(1:2)
+mylist$vectors$num.vec2 <- runif(10, min = 0, max = 1)
+mylist$isLame <- TRUE
+```
+
+```{r list1_2, exercise = TRUE, exercise.lines = 2}
+sapply(mylist, class)
+sapply(mylist$vectors, length)
+```
+
+
+### Data Frames
+Data frames are essentially lists of variables of equal length, producing a
+rectangular structure. Unlike matrix columns, data frames columns can be of
+different storage types and classes.  
+
+```{r df}
+groceries <- data.frame(
+  item = c("flour", "sugar", "potatoes", "tomatoes", "bananas"),
+  price = c(.99, 1.49, 1.99, 2.79, 1.89)
 )
 ```
 
+```{r df2, exercise = TRUE}
+groceries
+sapply(groceries, class) # change function argument to "typeof"
+```
+
+
+## Control Structures
+
+### Control Structures in R
+1. if, else, ifelse
+1. for
+1. while
+1. repeat
+1. break
+1. next
+1. return
+
+...we will only focus on a few here.
+
+### for-loop
+```{r for, exercise = TRUE}
+for (i in 1:nrow(groceries)) {
+  print(paste0("Item ", i, ": ", groceries$item[i]))
+}
+```
+
+### while-loop
+Say we only have EUR 5 to spend...
+```{r while-ex, exercise = TRUE}
+i <- 0L
+expenses <- 0.0
+while (expenses <= 5.0) {
+  print(paste0("We've spent EUR ", expenses, " on ", i, " items!"))
+  i <- i + 1L
+  expenses <- expenses + groceries$price[i]
+}
+```
+
+Problem being...
+```{r while, include = FALSE}
+i <- 0L
+expenses <- 0.0
+while (expenses <= 5.0) {
+  print(paste0("We've spent EUR ", expenses, " on ", i, " items!"))
+  i <- i + 1L
+  expenses <- expenses + groceries$price[i]
+}
+```
+```{r while2, exercise = TRUE}
+print(paste0("Total expenses: ", expenses))
+```
+
+### for-loop with break
+```{r break, exercise = TRUE}
+expenses <- 0
+for (i in 1:nrow(groceries)) {
+  expenses <- expenses + groceries$price[i]
+  print(paste0("We've spent EUR ", expenses, " on ", i, " items!"))
+  if (expenses + groceries$price[i + 1] >= 5) {
+    print("No more!")
+    break
+  }
+}
+print(paste0("Final item count: ", i, "; Total expenses: ", expenses))
+```
+
+### if, else
+Let's re-establish which foods are pricey ($\geq 1.50\text{EUR})$ ...
+
+```{r if, exercise = TRUE}
+for (i in 1:nrow(groceries)) {
+  if (groceries$price[i] >= 1.5) {
+    print(paste0("Item ", i, ": Sooooo pricey!"))
+  } else {
+    print(paste0("Item ", i, ": Sooooo cheap!"))
+  } 
+}
+```
+
+### Vectorization: ifelse
+For efficiency gains, we may vectorize the operation:
+
+```{r if2, exercise = TRUE}
+ifelse(groceries$price >= 1.5, "pricey", "cheap")
+```
+
+This returns also a vector.
+
+
+## Writing Simple Functions
+
+### Calculating the mean
+*Reminder* That's what we're looking for... $\bar{x} = \frac{1}{N} \sum_{i=1}^{N} x_i$
+
+1. Complete the function below.
+2. Calculate and display the mean price of items in `groceries`
+
+```{r mean, exercise = TRUE}
+mymean <- function(x, check.input = TRUE) {
+  if (check.input) {
+    if (!(is.numeric(x) & length(x) >= 2L)) stop("x must be a numeric vector")
+  }
+  N <- length(x)
+  mean.x <- ...
+  return(mean.x)
+}
+... # use the function to calculate the mean
+
+```
+
+```{r mean-solution}
+mymean <- function(x, check.input = TRUE) {
+  if (check.input) {
+    if (!(is.numeric(x) & length(x) >= 2L)) stop("x must be a numeric vector")
+  }
+  N <- length(x)
+  mean.x <- 1 / N * sum(x)
+  return(mean.x)
+}
+mymean(groceries$price) # use the function to calculate the mean
+```
+
+*Note:* `x` and `check.input` are **arguments**. The argument `check.input` defaults to `TRUE`.
+Whatever the function returns is called the **value**
+
+## Good Coding Practices
+
+### Style Guide
+
+###

@@ -20,5 +20,7 @@ Imports:
     arm,
     abind,
     rstan,
-    coda
+    coda,
+    foreign,
+    devtools
 RoxygenNote: 7.1.1

@@ -7,10 +7,24 @@ runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
+## Reset learnr
 if ("learnr" %in% (.packages()))
   detach(package:learnr, unload = TRUE)
 library(learnr)
+
+## Knitr chunks
 knitr::opts_chunk$set(echo = FALSE)
+
+## Save package names as a vector of strings
+pkgs <-  c()
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
 ```
 
 
