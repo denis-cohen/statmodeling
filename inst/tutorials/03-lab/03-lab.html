@@ -149,7 +149,7 @@ p(\mathbf{y} | \mathbf{X}, \beta, \tau) = \prod_{i}^{N} \sqrt{\frac{\tau}{2\pi}}
 </div>
 <div id="section-conditional-posteriors" class="section level3">
 <h3>Conditional posteriors</h3>
-<p>Deriving the conditional posteriors for <span class="math inline">\(\beta\)</span> and <span class="math inline">\(tau\)</span> (or its inverse <span class="math inline">\(\tau\)</span>) is quite painful. So let’s just accept the following:</p>
+<p>Deriving the conditional posteriors for <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\sigma^2\)</span> (or its inverse <span class="math inline">\(\tau\)</span>) is quite painful. So let’s just accept the following:</p>
 <p>The conditional posterior for <span class="math inline">\(\beta\)</span> is distributed multivariate normal with updated mean vector <span class="math inline">\(\mathbf{m}^{\ast}\)</span> and updated variance-covariance matrix <span class="math inline">\(\frac{1}{\tau^{\ast}} \mathbf{V}^{\ast}\)</span>:</p>
 <p><span class="math display">\[\beta_k | m, s, \tau^{\ast}, \mathbf{X}, \mathbf{y} \sim \text{MVN}(\mathbf{m}^{\ast}, \frac{1}{\tau^{\ast}} \mathbf{V}^{\ast})\\
 \mathbf{m}^{\ast} = \mathbf{(X^{\prime}X + V^{-1})^{-1} (X^{\prime}y + V^{-1}m)} \\
@@ -216,7 +216,7 @@ b^{\ast} = b + \frac{\mathbf{y^{\prime}y + m^{\prime}V^{-1} m - \mathbf{m}^{\ast
     } else {
       ## Iterations 2+: Update a and b
       a_star &lt;- a + n_data / 2
-      P_star &lt;- as.vector(b + ...)
+      b_star &lt;- as.vector(b + ...)
     }
     
     ## Sample tau

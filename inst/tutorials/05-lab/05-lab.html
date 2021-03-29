@@ -13,7 +13,7 @@
 <meta name="progressive" content="true" />
 <meta name="allow-skip" content="true" />
 
-<title>Lab: Generalized Linear Models</title>
+<title>Lab: Applied Bayesian Statistics Using Stan: Extensions</title>
 
 
 <!-- highlightjs -->
@@ -117,219 +117,357 @@ $(document).ready(function () {
 
 <div class="topics">
 
-<div id="section-quantities-of-interest-with-simulated-uncertainty" class="section level2">
-<h2>Quantities of interest with simulated uncertainty</h2>
-<p>In this lab session, you will get to apply the concepts from the lecture to a logistic regression of individual vote choices for the AfD in 2017.</p>
-<p>The data set <code>gles</code> is once again preloaded; the outcome variable is named <code>vote_afd</code>.</p>
+<div id="section-the-hierarchical-logit-model" class="section level2">
+<h2>The hierarchical logit model</h2>
+<div id="section-prompt" class="section level3">
+<h3>Prompt</h3>
+<p>We will pick things up right where we left off.</p>
+<p>We know want to apply the varying intercept, varying slope logit model to our running example of vote choice for the AfD.</p>
+<p>Specifically, we want to know whether anti-immigration preferences predict voting for the AfD more strongly among respondents in Bundesländer where the immigrant population is large.</p>
 </div>
-<div id="section-exercise-1" class="section level2">
-<h2>Exercise 1</h2>
-<p>Consider the following logistic regression:</p>
-<pre class="r"><code>## Estimate
-mod &lt;- glm(vote_afd ~ la_self + east + fem + age,
-            data = gles,
-            family = binomial(link = &quot;logit&quot;))</code></pre>
-<p>Your task will be to compute the <em>average marginal effect</em> of a one-unit increase in <code>la_self</code> (anti-immigration preferences) on the probability of voting AfD.</p>
-<div id="section-simulate-the-model-coefficients" class="section level3">
-<h3>Simulate the model coefficients</h3>
-<p>To simulate the model coefficients, take <span class="math inline">\(S\)</span> draws from <span class="math inline">\(\text{MVN}(\hat\beta, \hat \Sigma)\)</span>. <span class="math inline">\(S\)</span> should be a large number, at least 1000. Check the dimensions of the resulting object <code>b_sim</code>.</p>
-<p><em>Hints:</em></p>
-<ul>
-<li><code>MASS:mvrnorm()</code> allows you take random draws from a multivariate normal distribution.</li>
-<li><code>coef()</code> allows you to extract the coefficient estimates.</li>
-<li><code>vcov()</code> allows you to extract the estimate for the variance-covariance matrix of the coefficients.</li>
-</ul>
-<div class="tutorial-exercise" data-label="task1-sim" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>S &lt;- 1000L
-b_sim &lt;- ...
-
-# Export newly created objects to global environment
-export(environment())</code></pre>
+<div id="section-an-explicit-multi-level-notation" class="section level3">
+<h3>An explicit multi-level notation</h3>
+<p>To make the multi-level structure of our model explicit, we can use a two-level notation for the linear predictor:</p>
+<p><span class="math display">\[
+\begin{split}
+\eta_{ij} &amp; = \beta_{1j} + \beta_{2j} \mathtt{la\_self}_i  \\
+\beta_{1j} &amp; = \beta_1 + \gamma_{1} \mathtt{bl\_immig}_j + \nu_{j1} \\
+\beta_{2j} &amp; = \beta_2 + \gamma_{2} \mathtt{bl\_immig}_j + \nu_{j2}
+\end{split}
+\]</span> The level-two equations show how we want to use the context-level variable <span class="math inline">\(\mathtt{bl\_immig}_j\)</span> to explain the variability in our varying intercepts and slopes.</p>
+<p>Rearranging into a single equation yields</p>
+<p><span class="math display">\[\begin{split}
+\eta_{ij} &amp; = \gamma_{11} + \gamma_{21} u_j + \eta_{j1} + (\gamma_{12} + \gamma_{22} u_j + \eta_{j2}) x_i + \epsilon_i \\
+\eta_{ij} &amp; = \gamma_{11} + \gamma_{21} u_j + \eta_{j1} + \gamma_{12} x_i + \gamma_{22} u_j x_i + \eta_{j2} x_i  + \epsilon_i \\
+\eta_{ij} &amp; = \gamma_{11} + \underbrace{\gamma_{12} x_i + \gamma_{21} u_j + \gamma_{22} u_j x_i}_{\text{interaction}} + \underbrace{\epsilon_i + \eta_{j1} + \eta_{j2} x_i}_{\text{composite errors}}
+\end{split}\]</span></p>
+<p>This is why we also call this a model with a <em>cross-level interaction</em>.</p>
+</div>
+<div id="section-an-mle-reference-model" class="section level3">
+<h3>An MLE reference model</h3>
+<p>Before we start, fit the same model using MLE estimation with <code>lme4::glmer()</code>.</p>
+<p>Get a <code>summary()</code> of your model. Are there any irregularities you can spot?</p>
+<div class="tutorial-exercise" data-label="glmer" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<div class="tutorial-exercise-support" data-label="task1-sim-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>S &lt;- 1000L
-b_sim &lt;- MASS::mvrnorm(S, coef(mod), vcov(mod))
-dim(b_sim)
+<div class="tutorial-exercise-support" data-label="glmer-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code># Estimate
+glmer_est &lt;- lme4::glmer(
+  vote_afd ~ la_self +
+    bl_immig +
+    bl_immig:la_self +
+    (1 + la_self | bl),
+  data = gles,
+  family = binomial(link = &quot;logit&quot;)
+)
 
-# Export newly created objects to global environment
-export(environment())</code></pre>
+# Print summary
+summary(glmer_est)</code></pre>
 </div>
 </div>
-<div id="section-define-your-covariate-scenarios" class="section level3">
-<h3>Define your covariate scenarios</h3>
-<p>We are interested in the <em>average</em> marginal effect.</p>
-<p>You thus need two data matrices:</p>
+<div id="section-estimation-problems" class="section level3">
+<h3>Estimation problems</h3>
+<p>We can see (at least) two problems:</p>
 <ol style="list-style-type: decimal">
-<li><code>X0</code>: A model matrix with the observed covariate values of all respondents.</li>
-<li><code>X1</code>: Same as above, but each respondent’s value of <code>la_self</code> is increased by 1.</li>
+<li>Convergence failure of MLE</li>
+<li>Singularity: A correlation of <span class="math inline">\(-1.00\)</span> between intercept and slopes indicates that the model cannot adequately estimate the variance-covariance matrix of the random effects</li>
 </ol>
-<p>Define the two matrices.</p>
-<div class="tutorial-exercise" data-label="task1-x" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Export newly created objects to global environment
-export(environment())</code></pre>
+<p>This is not surprising!</p>
+<ul>
+<li>We are running a complex model on a relatively small data set</li>
+<li>The number of groups <em>and</em> the number of observations in some groups (Saarland!) are very low:</li>
+</ul>
+<pre class="r"><code>table(gles$bl)</code></pre>
+<pre><code>## 
+##     Schleswig-Holstein                Hamburg          Niedersachsen 
+##                     44                     28                    134 
+##                 Bremen    Nordrhein-Westfalen                 Hessen 
+##                     12                    206                     71 
+##        Rheinland-Pfalz     Baden-Wuerttemberg                 Bayern 
+##                     62                    141                    194 
+##               Saarland                 Berlin            Brandenburg 
+##                      5                     43                     98 
+## Mecklenburg-Vorpommern                Sachsen         Sachsen-Anhalt 
+##                     39                    113                     55 
+##             Thueringen 
+##                     76</code></pre>
+<p>This even more apparent when we consider the number of AfD voters per Bundesland (Bremen!):</p>
+<pre class="r"><code>tapply(gles$vote_afd, gles$bl, sum)</code></pre>
+<pre><code>##     Schleswig-Holstein                Hamburg          Niedersachsen 
+##                      3                      2                      4 
+##                 Bremen    Nordrhein-Westfalen                 Hessen 
+##                      0                     12                      6 
+##        Rheinland-Pfalz     Baden-Wuerttemberg                 Bayern 
+##                      1                      8                      9 
+##               Saarland                 Berlin            Brandenburg 
+##                      1                      3                     18 
+## Mecklenburg-Vorpommern                Sachsen         Sachsen-Anhalt 
+##                      5                     16                      5 
+##             Thueringen 
+##                      7</code></pre>
+</div>
+<div id="section-compilation" class="section level3">
+<h3>Compilation</h3>
+<pre class="r"><code># Model code
+rslogit_code &lt;- &quot;data {
+  int&lt;lower=1&gt; N;                // num. observations
+  int&lt;lower=1&gt; K;                // num. predictors w. varying coefs
+  int&lt;lower=1&gt; L;                // num. predictors w. fixed coefs
+  int&lt;lower=1&gt; J;                // num. groups
+  int&lt;lower=1, upper=J&gt; jj[N];   // group index
+  matrix[N, K] x;                // matrix varying predictors, incl. intercept
+  matrix[N, L] z;                // matrix varying predictors, excl. intercept (!)
+  int&lt;lower=0, upper=1&gt; y[N];    // outcome vector
+}
+
+transformed data {
+  row_vector[K] zeroes;
+  zeroes = rep_row_vector(0.0, K);
+}
+
+parameters {
+  // Fixed portions
+  vector[K] beta;      // fixed coef predictors w. varying coefs
+  vector[L] gamma;     // fixed coef predictors w. fixed coefs
+  
+  // Random portions
+  vector[K] nu[J];                  // group-specific zero-mean deviations
+  cholesky_factor_corr[K] L_Omega;  // prior correlation of deviations
+  vector&lt;lower=0&gt;[K] tau;           // prior scale of deviations
+}
+
+transformed parameters {
+  // Variance-covariance matrix of random deviatons
+  matrix[K,K] Sigma;
+  Sigma = diag_pre_multiply(tau, L_Omega) * diag_pre_multiply(tau, L_Omega)&#39;;
+}
+
+model {
+  // local variables
+  vector[N] eta;
+  
+  // linear predictor
+  eta = x * beta + z * gamma;               // lin. pred. without random effect
+  for (i in 1:N) {
+    eta[i] = eta[i] + x[i, ] * nu[jj[i]];   // add group-specific random effects
+  }
+  
+  // priors
+  target += normal_lpdf(beta | 0, 2.5);             // priors for beta
+  target += normal_lpdf(gamma | 0, 2.5);            // priors for gamma
+  target += cauchy_lpdf(tau | 0, 2.5);               // prior for scales of nu
+  target += lkj_corr_cholesky_lpdf(L_Omega | K);   // Cholesky LJK corr. prior
+  target += multi_normal_lpdf(nu | zeroes, Sigma); // nu
+
+
+  // log-likelihood
+  target += bernoulli_logit_lpmf(y | eta); // likelihood
+}&quot;
+
+# C++ Compilation
+rslogit_mod &lt;- rstan::stan_model(model_code = rslogit_code)</code></pre>
+</div>
+<div id="section-data" class="section level3">
+<h3>Data</h3>
+<p>In order to specify the model in the form given above, we need two model matrices:</p>
+<ul>
+<li><span class="math inline">\(\mathbf{X}_{N\times2}\)</span> accommodates a leading column of 1’s and <code>la_self</code></li>
+<li><span class="math inline">\(\mathbf{Z}_{N\times2}\)</span> accommodates a <code>bl_immig</code> and the product term <code>bl_immig:la_self</code></li>
+</ul>
+<p>Generate these, and all other required inputs below:</p>
+<div class="tutorial-exercise" data-label="data" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code># Define data objects
+y &lt;- ...
+x &lt;- ...
+z &lt;- ...
+z &lt;- ...
+jj &lt;- ...
+J &lt;- ...
+N &lt;- ...
+K &lt;- ...
+L &lt;- ...
+
+# Bind in a named list
+standat_rslogit &lt;- list(
+  y = y,
+  x = x,
+  z = z,
+  jj = jj,
+  J = J,
+  N = N,
+  K = K,
+  L = L
+)</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
-<div class="tutorial-exercise-support" data-label="task1-x-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>## Observed model matrices
-X1 &lt;- X0 &lt;- model.matrix(~ la_self + east + fem + age, data = gles)
+<div class="tutorial-exercise-support" data-label="data-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code># Define data objects
+y &lt;- gles$vote_afd
+x &lt;- model.matrix(~la_self, data = gles)
+z &lt;- model.matrix(~bl_immig + bl_immig:la_self, data = gles)
+z &lt;- z[, 2:ncol(z)]
+jj &lt;- as.integer(gles$bl)
+J &lt;- length(unique(jj))
+N &lt;- nrow(x)
+K &lt;- ncol(x)
+L &lt;- ncol(z)
 
-# Adjust X1: One unit increase in la_self
+# Bind in a named list
+standat_rslogit &lt;- list(
+  y = y,
+  x = x,
+  z = z,
+  jj = jj,
+  J = J,
+  N = N,
+  K = K,
+  L = L
+)</code></pre>
+</div>
+</div>
+<div id="section-inference" class="section level3">
+<h3>Inference</h3>
+<p>We can fit the model using the following code:</p>
+<pre class="r"><code>rslogit_est &lt;- rstan::sampling(
+  rslogit_mod,               
+  data = standat_rslogit,         
+  algorithm = &quot;NUTS&quot;,
+  control = list(
+    max_treedepth = 15,
+    adapt_delta = 0.9
+  ),
+  pars = c(&quot;beta&quot;, &quot;gamma&quot;, &quot;Sigma&quot;, &quot;nu&quot;),  
+  iter = 8000L,               
+  warmup = 4000L,             
+  thin = 4L,                  
+  chains = 2L,                
+  cores = 2L,                 
+  seed = 20210330)   </code></pre>
+<p>As we know, the model is quite demanding. We are already doing quite a bit to ensure the validity of our estimates. In effort to avoid divergent transitions, non-convergence or poor mixing of chains, or low effective sample sizes due to high autocorrelation, we:</p>
+<ul>
+<li>run our chains for <code>iter = 8000L</code> iterations, of which we discard the first half as warmup.</li>
+<li>increase the algorithm control arguments <code>max_treedepth</code> and <code>adapt_delta</code></li>
+</ul>
+<p>The result is that the model shows no obvious signs of algorithm failure but takes quite some time to run (on my machine, approx. 20 minutes).</p>
+<p>Therefore, we will not run it as part of this exercise; instead, you can directly assess the <code>stanfit</code> object in the next task!</p>
+</div>
+<div id="section-model-results-and-convergence-diagnosis" class="section level3">
+<h3>Model results and convergence diagnosis</h3>
+<p>Run the code to print the model summary. Do the generic diagnostics show any signs of non-convergence?</p>
+<div class="tutorial-exercise" data-label="print" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>print(rslogit_est, 
+      pars = c(&quot;beta&quot;, &quot;gamma&quot;, &quot;Sigma&quot;),
+      digits = 4L)</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<p>Use the <a href="https://mc-stan.org/bayesplot/articles/visual-mcmc-diagnostics.html">bayesplot</a> package to try out some cool visual diagnostics.</p>
+<div class="tutorial-exercise" data-label="visualize" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="20">
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+</div>
+</div>
+<div id="section-quantities-of-interest" class="section level2">
+<h2>Quantities of interest</h2>
+<p>We are now going to calculate our most challenging quantity of interest yet: The <em>conditional average marginal effect</em> of <span class="math inline">\(\mathtt{la\_self}\)</span> on <span class="math inline">\(\Pr(\mathtt{vote\_afd})\)</span>.</p>
+<p>This quantity of interest is vastly similar to the average marginal effect from Lab 2. But since our predictor <span class="math inline">\(\mathtt{la\_self}\)</span> is interacted with the variable <span class="math inline">\(\mathtt{bl\_immig}\)</span>, the marginal effect will change along the scale of <span class="math inline">\(\mathtt{bl\_immig}\)</span>. The general intuition (in the context of OLS models) is explained by <a href="https://www.jstor.org/stable/25791835#metadata_info_tab_contents">Brambor, Clark, and Golder (2006)</a>.</p>
+<p>The conditional average marginal effect for a one unit increase in <span class="math inline">\(\mathtt{la\_self}\)</span> at any given value of <span class="math inline">\(\mathtt{bl\_immig}^{\ast}\)</span> is defined as:</p>
+<p><span class="math display">\[\frac{1}{N} \sum_{i=1}^{N} \left\{ \text{logit}^{-1}(\beta_1 + \beta_2 (\mathtt{la\_self}_i + 1) + \gamma_1 \mathtt{bl\_immig}_{j[i]} + \gamma_2 (\mathtt{la\_self}_i + 1) \times \mathtt{bl\_immig}^{\ast}) \\ - \text{logit}^{-1}(\beta_1 + \beta_2 \mathtt{la\_self}_i  + \gamma_1 \mathtt{bl\_immig}_{j[i]} + \gamma_2 \mathtt{la\_self}_i \times \mathtt{bl\_immig}^{\ast}) \right\}\]</span></p>
+<p>Note that we use a hypothetical value <span class="math inline">\(\mathtt{bl\_immig}^{\ast}\)</span> in the product term but the observed values <span class="math inline">\(\mathtt{bl\_immig}_{j[i]}\)</span> elsewhere. This may seem counterintuitive at first but it is essential to separate <em>effect modification</em> induced by the moderator <span class="math inline">\(\mathtt{bl\_immig}\)</span> from its distinct effect of on the linear predictor.</p>
+<p>Of course, we do not simply want the average marginal value conditional on a single value of <span class="math inline">\(\mathtt{bl\_immig}^{\ast}\)</span> but on a <em>sequence of values</em> of <span class="math inline">\(\mathtt{bl\_immig}^{\ast}\)</span>. This will allow us to see how the marginal effect changes along the values of the moderator.</p>
+<div id="section-calculate-the-qoi" class="section level3">
+<h3>Calculate the QOI</h3>
+<div class="tutorial-exercise" data-label="qoi" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="30">
+<pre class="text"><code># Extract the model parameters
+pars &lt;- rstan::extract(rslogit_est)
+
+# Extract the model matrices from standat_rslogit
+X0 &lt;- X1 &lt;- standat_rslogit$x
+Z0 &lt;- Z1 &lt;- standat_rslogit$z
 X1[, &quot;la_self&quot;] &lt;- X1[, &quot;la_self&quot;] + 1
 
-# Export newly created objects to global environment
-export(environment())</code></pre>
-</div>
-</div>
-<div id="section-get-your-unit-specific-marginal-effects" class="section level3">
-<h3>Get your unit-specific marginal effects</h3>
-<ol style="list-style-type: decimal">
-<li>Calculate vectors of linear predictors for all respondents under both scenarios. <em>Note:</em>
-<ul>
-<li>Your matrix <span class="math inline">\(\beta^\text{sim}\)</span> is of dimensions <span class="math inline">\(S \times K\)</span>.</li>
-<li>Your model matrices will e of dimensions <span class="math inline">\(N \times K\)</span>.</li>
-<li>Transpose and multiply the matrices such that your resulting object should be of dimensions <span class="math inline">\(N \times S\)</span>.</li>
-</ul></li>
-<li>Apply the inverse logit link function (<code>plogis()</code>) to your linear predictors. This transforms the linear predictions to expected values (predicted probabilities).</li>
-<li>Take the difference between the two objects created in step (2) to get your simulated unit-specific marginal effects.</li>
-</ol>
-<div class="tutorial-exercise" data-label="task1-ume" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Export newly created objects to global environment
-export(environment())</code></pre>
-<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
-</div>
-<div class="tutorial-exercise-support" data-label="task1-ume-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Get vectors for the linear predictor under both scenarios
-eta1 &lt;- X1 %*% t(b_sim)
-eta0 &lt;- X0 %*% t(b_sim)
 
-# Get expected values (map onto probability scale)
-ev1 &lt;- plogis(eta1)
-ev0 &lt;- plogis(eta0)
+# Define value sequence for bl_immig (approx range: 1-4)
+bl_immig_vals &lt;- seq(1, 4, 0.1)
 
-# Get unit-specific marginal effect
-me &lt;- ev1 - ev0
+# Initialize container (for posterior median, 2.5 and 97.5 percentiles)
+came &lt;- array(NA, dim = c(length(bl_immig_vals), 3L))
 
-# Export newly created objects to global environment
-export(environment())</code></pre>
-</div>
-</div>
-<div id="section-get-and-summarize-your-average-marginal-effects" class="section level3">
-<h3>Get and summarize your average marginal effects</h3>
-<ol style="list-style-type: decimal">
-<li>Take the mean (average) across all observations to aggregate your unit-level marginal effects into average marginal effects (<em>hint</em>: <code>apply()</code>). The resulting object should be a length-<span class="math inline">\(S\)</span> vector that gives you your simulated sampling distribution of the average marginal effect.</li>
-<li>Summarize the simulated sampling distribution
-<ul>
-<li>Plot the distribution in a histogram.</li>
-<li>Calculate its mean or median (a numerical approximation of the point estimate).</li>
-<li>Calculate its standard deviation (a numerical approximation of the standard error).</li>
-<li>Constructed a simulation-based 95% confidence interval by taking the 2.5% and 97.5% percentiles of the simulated distribution.</li>
-</ul></li>
-<li>Concisely interpret the estimate and its uncertainty.</li>
-</ol>
-<div class="tutorial-exercise" data-label="task1-ame" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Export newly created objects to global environment
-export(environment())</code></pre>
-<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
-</div>
-<div class="tutorial-exercise-support" data-label="task1-ame-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Get average marginal effect
-ame &lt;- apply(me, 2, mean)
-
-## Summarize
-hist(ame, breaks = 50)
-mean(ame)
-median(ame)
-sd(ame)
-quantile(ame, c(.025, .975))
-
-# Export newly created objects to global environment
-export(environment())</code></pre>
-</div>
-</div>
-</div>
-<div id="section-exercise-2" class="section level2">
-<h2>Exercise 2</h2>
-<p>Based on the same model, we now want to visualize the expected values (predicted probabilities) of voting for the AfD along the scale of anti-immigration preferences while keeping all other variables fixed at their sample means or sample proportions.</p>
-<p>For this exercise, we can use the same simulated parameters as before.</p>
-<div id="section-covariate-scenarios-and-quantities-of-interest" class="section level3">
-<h3>Covariate scenarios and quantities of interest</h3>
-<p>As in Lab 1, we want to iteratively update our covariate scenario along a fine-grained sequence of values for <code>la_self</code> in a loop and store our quantity of interest at the current value in a pre-assigned container.</p>
-<p>To do this, follow the following steps:</p>
-<ol style="list-style-type: decimal">
-<li>Define an initial vector <span class="math inline">\(\mathbf{x}\)</span> that holds the sample means of all covariates.</li>
-<li>Define a value sequence <code>la_vals</code> of length <span class="math inline">\(L=101\)</span> that ranges from 0 to 10.</li>
-<li>Define a container matrix of dimensions <span class="math inline">\(L \times S\)</span>.</li>
-<li>In a loop from <span class="math inline">\(1\)</span> to <span class="math inline">\(L\)</span>, do the following at each iteration:
-<ul>
-<li>Overwrite the value of <code>la_self</code> in the covariate scenario with the current value of <code>la_vals</code></li>
-<li>Calculate the simulations of the expected value using the current covariate scenario.</li>
-</ul></li>
-</ol>
-<div class="tutorial-exercise" data-label="task2-x" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Export newly created objects to global environment
-export(environment())</code></pre>
-<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
-</div>
-<div class="tutorial-exercise-support" data-label="task2-x-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Covariate vector (note: we can use X0 for this task)
-x &lt;- apply(X0, 2, mean)
-
-# Value sequence
-L &lt;- 101L
-la_vals &lt;- seq(0, 10, length.out = L)
-
-# Container
-ev_sim &lt;- matrix(NA, L, S)
-
-# Loop
-for (i in seq_along(la_vals)) {
-  # Overwrite element of x
-  x[&quot;la_self&quot;] &lt;- la_vals[i]
+# Start loop
+for (i in seq_along(bl_immig_vals)) {
+    # Adjust the second column of Z
+  Z0[, &quot;bl_immig:la_self&quot;] &lt;- ...
+  Z1[, &quot;bl_immig:la_self&quot;] &lt;- ...
   
-  # Store simulations
-  ev_sim[i, ] &lt;- plogis(b_sim %*% x)
+  # Get unit-specific linear predictors
+  eta0 &lt;- ...
+  eta1 &lt;- .
+  
+  # Get unit-specific conditional marginal effects
+  cme &lt;- plogis(eta1) - plogis(eta0)
+  
+  # Average across observations, take quantiles
+  ...
+}
+
+# Export newly created objects to global environment
+export(environment())</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="qoi-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code># Extract the model parameters
+pars &lt;- rstan::extract(rslogit_est)
+
+# Extract the model matrices from standat_rslogit
+X0 &lt;- X1 &lt;- standat_rslogit$x
+Z0 &lt;- Z1 &lt;- standat_rslogit$z
+X1[, &quot;la_self&quot;] &lt;- X1[, &quot;la_self&quot;] + 1
+
+
+# Define value sequence for bl_immig (approx range: 1-4)
+bl_immig_vals &lt;- seq(1, 4, 0.1)
+
+# Initialize container (for posterior median, 2.5 and 97.5 percentiles)
+came &lt;- array(NA, dim = c(length(bl_immig_vals), 3L))
+
+# Start loop
+for (i in seq_along(bl_immig_vals)) {
+    # Adjust the second column of Z
+  Z0[, &quot;bl_immig:la_self&quot;] &lt;- bl_immig_vals[i] * X0[, &quot;la_self&quot;]
+  Z1[, &quot;bl_immig:la_self&quot;] &lt;- bl_immig_vals[i] * X1[, &quot;la_self&quot;]
+  
+  # Get unit-specific linear predictors
+  eta0 &lt;- X0 %*% t(pars$beta) + Z0 %*% t(pars$gamma)
+  eta1 &lt;- X1 %*% t(pars$beta) + Z1 %*% t(pars$gamma)
+  
+  # Get unit-specific conditional marginal effects
+  cme &lt;- plogis(eta1) - plogis(eta0)
+  
+  # Average across observations, take quantiles
+  came[i, ] &lt;- quantile(apply(cme, 2, mean), c(.5, .025, .975))
 }
 
 # Export newly created objects to global environment
 export(environment())</code></pre>
 </div>
 </div>
-<div id="section-summarize-the-simulated-sampling-distribution-and-visualize-your-finding" class="section level3">
-<h3>Summarize the simulated sampling distribution and visualize your finding!</h3>
-<ol style="list-style-type: decimal">
-<li>To present your finding, first summarize the simulated sampling distribution: At each value of <code>la_vals</code>, calculate the median as well as the 2.5% and 97.5% percentiles.</li>
-<li>Plot the prediction (<span class="math inline">\(y\)</span>-axis) with its simulated 95% confidence intervals against the values of <code>la_vals</code> (<span class="math inline">\(x\)</span>-axis). You can use base plots or <code>ggplot2</code>.</li>
-</ol>
-<div class="tutorial-exercise" data-label="task2-viz" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Export newly created objects to global environment
-export(environment())</code></pre>
-<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
-</div>
-<div class="tutorial-exercise-support" data-label="task2-viz-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Summarize
-ev_sum &lt;- apply(ev_sim, 1, quantile, c(.5, .025, .975))
-
-# Value sequence
-L &lt;- 101L
-la_vals &lt;- seq(0, 10, length.out = L)
-
-# Plot
+<div id="section-visualization" class="section level3">
+<h3>Visualization</h3>
+<div class="tutorial-exercise" data-label="visualize2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="65">
+<pre class="text"><code># Plot
 ## Auxiliary objects
-x_lines &lt;-  seq(0, 10, 2)
-y_lines &lt;- seq(0, .35, .05)
+x_lines &lt;-  seq(1, 4, .5)
+y_lines &lt;- seq(0, .125, .025)
 
 ## Canvas
 plot(
   1,
   1,
   type = &#39;n&#39;,
-  main = paste(&quot;Probability of voting AfD&quot;, 
-               &quot;as a function of anti-immigration preferences&quot;,
+  main = paste(&quot;Conditonal Average Marginal Efffect&quot;,
                sep = &quot;\n&quot;),
   axes = F,
-  xlab = &quot;Anti-immigration preferences&quot;,
-  ylab = &quot;Pr(Vote AfD)&quot;,
+  xlab = &quot;Bundesland-level immigration rate&quot;,
+  ylab = &quot;AME on Pr(Vote AfD)&quot;,
   ylim = range(y_lines),
   xlim = range(x_lines)
 )
@@ -360,30 +498,28 @@ for (x in x_lines)
 
 ## Prediction
 polygon(
-  c(la_vals, rev(la_vals)),
+  c(bl_immig_vals, rev(bl_immig_vals)),
   c(
-    ev_sum[2, ],
-    rev(ev_sum[3, ])
+    came[, 2],
+    rev(came[, 3])
   ),
   col = adjustcolor(&quot;gray30&quot;, alpha.f = .2),
   border = NA
 )
-lines(la_vals,
-      ev_sum[1, ],
+lines(bl_immig_vals,
+      came[, 1],
       lty = 1,
       col = &quot;gray10&quot;,
       lwd = 2)
-lines(la_vals,
-      ev_sum[2, ],
+lines(bl_immig_vals,
+      came[, 2],
       lty = 1,
       col = &quot;gray30&quot;)
-lines(la_vals,
-      ev_sum[3, ],
+lines(bl_immig_vals,
+      came[ ,3],
       lty = 1,
-      col = &quot;gray30&quot;)
-
-# Export newly created objects to global environment
-export(environment())</code></pre>
+      col = &quot;gray30&quot;)</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
 
 <script type="application/shiny-prerendered" data-context="server-start">
@@ -395,7 +531,14 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## ---- CRAN Packages ----
 ## Save package names as a vector of strings
-pkgs <-  c("foreign", "MASS", "ggplot2")
+pkgs <-  c("rstan",
+           "rstantools", 
+           "coda",
+           "dplyr",
+           "lme4", 
+           "ggplot2",
+           "foreign",
+           "bayesplot")
 
 ## Install uninstalled packages
 lapply(pkgs[!(pkgs %in% installed.packages())], 
@@ -409,14 +552,14 @@ lapply(pkgs, library, character.only = TRUE)
 
 
 ## ---- Global learnr Objects ----
-## ---- Global learnr Objects ----
+lab5_url <-
+  "https://github.com/denis-cohen/statmodeling/raw/main/data/lab5.RData"
+load(url(lab5_url))
+
 gles <- 
   read.dta("https://github.com/denis-cohen/statmodeling/raw/main/data/gles.dta")
 gles$vote_afd = ifelse(gles$vote == "AfD", 1L, 0L)
-
-mod <- glm(vote_afd ~ la_self + east + fem + age,
-            data = gles,
-            family = binomial(link = "logit"))
+gles$bl <- droplevels(gles$bl)
 
 ## ---- export function ----
 export <- function(env = environment()) {
@@ -433,8 +576,11 @@ export <- function(env = environment()) {
     print(new_obj)
   }
 }
-
 global_objects <- c(ls(), "global_objects")
+
+## ---- rstan Options ----
+rstan_options(auto_write = TRUE)             # avoid recompilation of models
+options(mc.cores = parallel::detectCores())  # parallelize across all CPUs
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
@@ -448,44 +594,44 @@ session$onSessionEnded(function() {
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-`tutorial-exercise-task1-sim-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-task1-sim-code-editor`)), session)
-output$`tutorial-exercise-task1-sim-output` <- renderUI({
-  `tutorial-exercise-task1-sim-result`()
+`tutorial-exercise-glmer-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-glmer-code-editor`)), session)
+output$`tutorial-exercise-glmer-output` <- renderUI({
+  `tutorial-exercise-glmer-result`()
 })
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-`tutorial-exercise-task1-x-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-task1-x-code-editor`)), session)
-output$`tutorial-exercise-task1-x-output` <- renderUI({
-  `tutorial-exercise-task1-x-result`()
+`tutorial-exercise-data-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-data-code-editor`)), session)
+output$`tutorial-exercise-data-output` <- renderUI({
+  `tutorial-exercise-data-result`()
 })
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-`tutorial-exercise-task1-ume-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-task1-ume-code-editor`)), session)
-output$`tutorial-exercise-task1-ume-output` <- renderUI({
-  `tutorial-exercise-task1-ume-result`()
+`tutorial-exercise-print-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-print-code-editor`)), session)
+output$`tutorial-exercise-print-output` <- renderUI({
+  `tutorial-exercise-print-result`()
 })
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-`tutorial-exercise-task1-ame-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-task1-ame-code-editor`)), session)
-output$`tutorial-exercise-task1-ame-output` <- renderUI({
-  `tutorial-exercise-task1-ame-result`()
+`tutorial-exercise-visualize-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-visualize-code-editor`)), session)
+output$`tutorial-exercise-visualize-output` <- renderUI({
+  `tutorial-exercise-visualize-result`()
 })
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-`tutorial-exercise-task2-x-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-task2-x-code-editor`)), session)
-output$`tutorial-exercise-task2-x-output` <- renderUI({
-  `tutorial-exercise-task2-x-result`()
+`tutorial-exercise-qoi-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-qoi-code-editor`)), session)
+output$`tutorial-exercise-qoi-output` <- renderUI({
+  `tutorial-exercise-qoi-result`()
 })
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-`tutorial-exercise-task2-viz-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-task2-viz-code-editor`)), session)
-output$`tutorial-exercise-task2-viz-output` <- renderUI({
-  `tutorial-exercise-task2-viz-result`()
+`tutorial-exercise-visualize2-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-visualize2-code-editor`)), session)
+output$`tutorial-exercise-visualize2-output` <- renderUI({
+  `tutorial-exercise-visualize2-result`()
 })
 </script>
  <!--html_preserve-->
@@ -495,7 +641,7 @@ output$`tutorial-exercise-task2-viz-output` <- renderUI({
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60]}},"value":[{"type":"character","attributes":{},"value":["assertthat","base","bslib","colorspace","compiler","crayon","datasets","DBI","digest","dplyr","ellipsis","evaluate","fastmap","foreign","generics","ggplot2","glue","graphics","grDevices","grid","gtable","htmltools","htmlwidgets","httpuv","jquerylib","jsonlite","knitr","later","learnr","lifecycle","magrittr","markdown","MASS","methods","mime","munsell","pillar","pkgconfig","promises","purrr","R6","Rcpp","rlang","rmarkdown","rprojroot","sass","scales","shiny","stats","stringi","stringr","tibble","tidyselect","tools","utils","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.2.1","4.0.2","0.2.4","1.4-1","4.0.2","1.4.1","4.0.2","1.1.0","0.6.27","1.0.3","0.3.1","0.14","1.0.1","0.8-80","0.1.0","3.3.2","1.4.2","4.0.2","4.0.2","4.0.2","0.3.0","0.5.1.1","1.5.2","1.5.4","0.1.3","1.7.2","1.31","1.1.0.1","0.10.1","0.2.0","2.0.1","1.1","7.3-51.6","4.0.2","0.10","0.5.0","1.4.7","2.0.3","1.1.1","0.3.4","2.5.0","1.0.5","0.4.10","2.7","2.0.2","0.3.1","1.1.1","1.5.0","4.0.2","1.5.3","1.4.0","3.0.3","1.1.0","4.0.2","4.0.2","0.3.6","2.3.0","0.21","1.8-4","2.2.1"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92]}},"value":[{"type":"character","attributes":{},"value":["assertthat","base","bayesplot","boot","bslib","callr","cli","coda","codetools","colorspace","compiler","crayon","curl","datasets","DBI","digest","dplyr","ellipsis","evaluate","fastmap","foreign","generics","ggplot2","ggridges","glue","graphics","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","inline","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","lme4","loo","magrittr","markdown","MASS","Matrix","matrixStats","methods","mime","minqa","munsell","nlme","nloptr","parallel","pillar","pkgbuild","pkgconfig","plyr","prettyunits","processx","promises","ps","purrr","R6","Rcpp","RcppParallel","rlang","rmarkdown","rprojroot","rstan","rstantools","sass","scales","shiny","splines","StanHeaders","statmod","stats","stats4","stringi","stringr","tibble","tidyselect","tools","utils","V8","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.2.1","4.0.2","1.8.0","1.3-25","0.2.4","3.5.1","2.3.0","0.19-4","0.2-16","1.4-1","4.0.2","1.4.1","4.3","4.0.2","1.1.0","0.6.27","1.0.3","0.3.1","0.14","1.0.1","0.8-80","0.1.0","3.3.2","0.5.3","1.4.2","4.0.2","4.0.2","4.0.2","2.3","0.3.0","0.5.1.1","1.5.2","1.5.4","0.3.16","0.1.3","1.7.2","1.31","1.1.0.1","0.20-41","0.10.1","0.2.0","1.1-25","2.3.1","2.0.1","1.1","7.3-51.6","1.2-18","0.57.0","4.0.2","0.10","1.2.4","0.5.0","3.1-148","1.2.2.2","4.0.2","1.4.7","1.1.0","2.0.3","1.8.6","1.1.1","3.4.4","1.1.1","1.3.4","0.3.4","2.5.0","1.0.5","5.0.2","0.4.10","2.7","2.0.2","2.21.2","2.1.1","0.3.1","1.1.1","1.5.0","4.0.2","2.21.0-7","1.4.35","4.0.2","4.0.2","1.5.3","1.4.0","3.0.3","1.1.0","4.0.2","4.0.2","3.4.0","0.3.6","2.3.0","0.21","1.8-4","2.2.1"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>
@@ -510,7 +656,7 @@ output$`tutorial-exercise-task2-viz-output` <- renderUI({
 
 <!-- begin doc-metadata -->
 <div id="doc-metadata">
-<h2 class="title toc-ignore" style="display:none;">Lab: Generalized Linear Models</h2>
+<h2 class="title toc-ignore" style="display:none;">Lab: Applied Bayesian Statistics Using Stan: Extensions</h2>
 </div>
 <!-- end doc-metadata -->
 

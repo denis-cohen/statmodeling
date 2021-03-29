@@ -416,6 +416,10 @@ pricey</code></pre>
 </ul>
 <div id="section-example-a-3d-array-of-dimensions-3-times-2-times-2" class="section level4">
 <h4>Example: A 3D array of dimensions <span class="math inline">\(3 \times 2 \times 2\)</span></h4>
+<pre class="r"><code>K &lt;- 3L
+L &lt;- 2L
+M &lt;- 2L
+ary3D &lt;- array(rnorm(K*L*M, mean = 0, sd = 1), dim = c(K, L, M))</code></pre>
 <div class="tutorial-exercise" data-label="arr1_2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>### Try slicing, e.g. ar3D[, 1, 1], ar3D[c(1, 3), , ], etc.
 ary3D</code></pre>
@@ -715,7 +719,7 @@ for (i in seq_len(nrow(groceries))) {
 <li><code>vapply()</code> allows you to specify which type of eligible output you want.</li>
 </ul>
 <div class="tutorial-exercise" data-label="lapply" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code>lapply(groceries, names)
+<pre class="text"><code>lapply(groceries, is.numeric)
 sapply(groceries, is.numeric)
 vapply(groceries, is.numeric, logical(1))
 vapply(groceries, is.numeric, numeric(1))
@@ -819,7 +823,7 @@ hist(
   seed = 20210325L
 ) {
   # Set seed
-  set.seed(20210325L)
+  set.seed(seed)
   
   # Initialize container
   samples &lt;- matrix(NA, nrow = n_obs, ncol = n_means)

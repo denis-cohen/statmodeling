@@ -93,7 +93,7 @@ $$\tau \sim \mathbf{\Gamma}(a = 20, b = 200)$$
 
 ### Conditional posteriors
 
-Deriving the conditional posteriors for $\beta$ and $tau$ (or its inverse $\tau$) is quite painful. So let's just accept the following:
+Deriving the conditional posteriors for $\beta$ and $\sigma^2$ (or its inverse $\tau$) is quite painful. So let's just accept the following:
 
 The conditional posterior for $\beta$ is distributed multivariate normal with updated mean vector $\mathbf{m}^{\ast}$ and updated variance-covariance matrix $\frac{1}{\tau^{\ast}} \mathbf{V}^{\ast}$:
 
@@ -168,7 +168,7 @@ lm_gibbs <- function(m_scalar,
     } else {
       ## Iterations 2+: Update a and b
       a_star <- a + n_data / 2
-      P_star <- as.vector(b + ...)
+      b_star <- as.vector(b + ...)
     }
     
     ## Sample tau

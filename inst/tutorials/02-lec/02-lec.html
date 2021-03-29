@@ -338,13 +338,13 @@ $(document).ready(function () {
 <p>As <span class="math inline">\(\Delta_d \rightarrow 0\)</span>, this becomes <span class="math inline">\(\frac{\partial \mathbb{E}[y|d, \mathbf{x}]}{\partial d}\)</span>.</p>
 <p>For the linear model, this is mathematically straightforward:</p>
 <p><span class="math display">\[\frac{\partial (\alpha + \tau d + \mathbf{x}_i^{\prime} \beta)}{\partial d} = \tau\]</span></p>
-<p>For all other GLM, we rely on <em>normalized first differences</em> for a freely chosen shift <span class="math inline">\(Delta_d\)</span>.</p>
+<p>For all other GLM, we rely on <em>normalized first differences</em> for a freely chosen shift <span class="math inline">\(\Delta_d\)</span>.</p>
 <p>For instance, the marginal effect in a probit model for a <em>standard deviation increase</em> in <span class="math inline">\(d\)</span> is given by</p>
 <p><span class="math display">\[\frac{\mathbb{E}[y|d + \text{sd}(d), \mathbf{x}] - \mathbb{E}[y|d, \mathbf{x}]}{\text{sd}(d)} = \frac{\Phi(\alpha + \tau (d + \text{sd}(d)) + \mathbf{x}_i^{\prime} \beta) - \Phi(\alpha + \tau d + \mathbf{x}_i^{\prime} \beta)}{\text{sd}(d)}\]</span> As with first differences, the marginal effect is thus sensitive to the choice of covariates <span class="math inline">\(\mathbf{x}\)</span>!</p>
 </div>
 <div id="section-average-quantities-of-interest" class="section level3">
 <h3>Average quantities of interest</h3>
-<p>One problem with the sensitivity of first differences and marginal effects to the choice of <span class="math inline">\(\mathbf{x}\)</span> is that makes these quantities of interest dependent on subjective judgment.</p>
+<p>The sensitivity of first differences and marginal effects to the choice of <span class="math inline">\(\mathbf{x}\)</span> is problematic because makes these quantities of interest dependent on subjective judgment.</p>
 <p>For instance, the estimates of these quantities may differ dramatically depending on whether we set all variables in <span class="math inline">\(\mathbf{x}\)</span> to their sample means, sample minimums, or sample maximums.</p>
 <p>A remedy is the <em>observed values approach</em> (<a href="https://onlinelibrary.wiley.com/doi/full/10.1111/j.1540-5907.2012.00602.x">Hanmer and Kalkan 2013</a>), which involves two steps:</p>
 <ol style="list-style-type: decimal">
@@ -382,7 +382,7 @@ $(document).ready(function () {
 <h2>The simulation approach</h2>
 <div id="section-inferential-uncertainty-vs-fundamental-uncertainty" class="section level3">
 <h3>Inferential uncertainty vs fundamental uncertainty</h3>
-<p><a href="https://gking.harvard.edu/files/gking/files/making.pdf">King et al. (2000)</a>) distinguish <em>inferential uncertainty</em> and <em>fundamental uncertainty</em>.</p>
+<p><a href="https://gking.harvard.edu/files/gking/files/making.pdf">King et al. (2000)</a> distinguish <em>inferential uncertainty</em> and <em>fundamental uncertainty</em>.</p>
 <ul>
 <li><em>Inferential uncertainty</em> describes the problem that we never know our parameters exactly.
 <ul>
@@ -426,7 +426,7 @@ $(document).ready(function () {
 </div>
 <div id="section-the-algorithm" class="section level3">
 <h3>The algorithm</h3>
-<p>The algorithm presented by <a href="https://gking.harvard.edu/files/gking/files/making.pdf">King et al. (2000)</a>) contains five steps:</p>
+<p>The algorithm presented by <a href="https://gking.harvard.edu/files/gking/files/making.pdf">King et al. (2000)</a> contains five steps:</p>
 <ol style="list-style-type: decimal">
 <li>Simulate the sampling distribution of the model parameters by taking <span class="math inline">\(S\)</span> draws from <span class="math inline">\(\beta \sim \text{MVN}(\hat\beta, \hat \Sigma)\)</span></li>
 <li>Choose a vector <span class="math inline">\(\mathbf{x}\)</span> or matrix <span class="math inline">\(\mathbf{X}\)</span>.</li>

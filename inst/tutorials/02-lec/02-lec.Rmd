@@ -260,7 +260,7 @@ For the linear model, this is mathematically straightforward:
 
 $$\frac{\partial (\alpha + \tau d + \mathbf{x}_i^{\prime} \beta)}{\partial d} = \tau$$
 
-For all other GLM, we rely on *normalized first differences* for a freely chosen shift $Delta_d$.
+For all other GLM, we rely on *normalized first differences* for a freely chosen shift $\Delta_d$.
 
 For instance, the marginal effect in a probit model for a *standard deviation increase* in $d$ is given by
 
@@ -269,7 +269,7 @@ As with first differences, the marginal effect is thus sensitive to the choice o
 
 ### Average quantities of interest
 
-One problem with the sensitivity of first differences and marginal effects to the choice of $\mathbf{x}$ is that makes these quantities of interest dependent on subjective judgment.
+The sensitivity of first differences and marginal effects to the choice of $\mathbf{x}$ is problematic because makes these quantities of interest dependent on subjective judgment.
 
 For instance, the estimates of these quantities may differ dramatically depending on whether we set all variables in $\mathbf{x}$ to their sample means, sample minimums, or sample maximums.
 
@@ -311,7 +311,7 @@ The answers are simple:
 
 ### Inferential uncertainty vs fundamental uncertainty
 
-[King et al. (2000)](https://gking.harvard.edu/files/gking/files/making.pdf)) distinguish *inferential uncertainty* and *fundamental uncertainty*.
+[King et al. (2000)](https://gking.harvard.edu/files/gking/files/making.pdf) distinguish *inferential uncertainty* and *fundamental uncertainty*.
 
 - *Inferential uncertainty*  describes the problem that we never know our parameters exactly.
     - Instead, we estimate them with some uncertainty that is represented in their respective *sampling distribution*.
@@ -353,7 +353,7 @@ So how can we get there?
 
 ### The algorithm
 
-The algorithm presented by [King et al. (2000)](https://gking.harvard.edu/files/gking/files/making.pdf)) contains five steps:
+The algorithm presented by [King et al. (2000)](https://gking.harvard.edu/files/gking/files/making.pdf) contains five steps:
 
 1. Simulate the sampling distribution of the model parameters by taking $S$ draws from $\beta \sim \text{MVN}(\hat\beta, \hat \Sigma)$
 2. Choose a vector $\mathbf{x}$ or matrix $\mathbf{X}$.

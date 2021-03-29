@@ -134,9 +134,8 @@ $(document).ready(function () {
 <div id="section-likelihood-function" class="section level3">
 <h3>Likelihood function</h3>
 <ul>
-<li>An assignment of a parametric form for the outcome variable <span class="math inline">\(y\)</span>.</li>
+<li>Specification of a pdf or pmf: <span class="math inline">\(p(\mathbf{y}|\theta)\)</span>.</li>
 <li>Also called the data generating process (or the generative model) for <span class="math inline">\(y\)</span>.</li>
-<li>Involves the specification of a pdf or pmf: <span class="math inline">\(p(\mathbf{y}|\theta)\)</span>.</li>
 <li>Logical inversion: “Which unknown <span class="math inline">\(\theta\)</span> most likely produces the known <span class="math inline">\(\mathbf{y}\)</span>?” <span class="math inline">\(\rightarrow\)</span> <span class="math inline">\(L(\theta | \mathbf{y})\)</span>.</li>
 <li>The notational distinction between <span class="math inline">\(p(\mathbf{y}|\theta)\)</span> and <span class="math inline">\(L(\theta | \mathbf{y})\)</span> is purely conceptual. <span class="math inline">\(p(\mathbf{y}|\theta) = L(\theta | \mathbf{y})\)</span>.</li>
 <li>We will use <span class="math inline">\(p(\mathbf{y}|\theta)\)</span>.</li>
@@ -409,7 +408,7 @@ lines(
 <li>We don’t know how (un)popular the AfD is in the German electorate</li>
 <li>But we know that individual support is measured on a -5 to 5 scale</li>
 <li>Our prior belief for <span class="math inline">\(\mu\)</span> should thus be agnostic as to whether people like or dislike the AfD, but sufficiently vague to allow for the possibility that we may be wrong: <span class="math inline">\(\mu \sim \text{N}(\theta = 0, \sigma^2 = 10)\)</span></li>
-<li>Our prior belief for <span class="math inline">\(\sigma = \frac{1}{\tau}\)</span> will also be vague: <span class="math inline">\(\tau \sim \Gamma(\alpha = 20, \beta = 200)\)</span></li>
+<li>Our prior belief for <span class="math inline">\(\sigma^2 = \frac{1}{\tau}\)</span> will also be vague: <span class="math inline">\(\tau \sim \Gamma(\alpha = 20, \beta = 200)\)</span></li>
 <li>We have no prior belief about the dependence of both parameters and hence specify independent prior distributions</li>
 </ul></li>
 </ul>
@@ -471,7 +470,7 @@ draw_from_prior &lt;-
                 tau = tau))
   }</code></pre>
 </details>
-<div class="tutorial-exercise" data-label="prior-sim" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="30">
+<div class="tutorial-exercise" data-label="prior-sim" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="20">
 <pre class="text"><code># Apply function
 draws_prior &lt;-
   draw_from_prior(

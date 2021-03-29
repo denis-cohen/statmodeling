@@ -170,9 +170,8 @@ The punchline is this: All likelihood-based models are Bayesian models in which 
 
 ### Likelihood function
 
-- An assignment of a parametric form for the outcome variable $y$.
+- Specification of a pdf or pmf: $p(\mathbf{y}|\theta)$.
 - Also called the data generating process (or the generative model) for $y$.
-- Involves the specification of a pdf or pmf: $p(\mathbf{y}|\theta)$.
 - Logical inversion: "Which unknown $\theta$ most likely produces the known $\mathbf{y}$?" $\rightarrow$ $L(\theta | \mathbf{y})$.
 - The notational distinction between $p(\mathbf{y}|\theta)$ and $L(\theta | \mathbf{y})$ is purely conceptual. $p(\mathbf{y}|\theta) = L(\theta | \mathbf{y})$.
 - We will use $p(\mathbf{y}|\theta)$.
@@ -593,7 +592,7 @@ The Hamiltonian Monte Carlo algorithm starts at a specified initial set of param
     - We don't know how (un)popular the AfD is in the German electorate
     - But we know that individual support is measured on a -5 to 5 scale
     - Our prior belief for $\mu$ should thus be agnostic as to whether people like or dislike the AfD, but sufficiently vague to allow for the possibility that we may be wrong: $\mu \sim \text{N}(\theta = 0, \sigma^2 = 10)$
-    - Our prior belief for $\sigma = \frac{1}{\tau}$ will also be vague: $\tau \sim \Gamma(\alpha = 20, \beta = 200)$
+    - Our prior belief for $\sigma^2 = \frac{1}{\tau}$ will also be vague: $\tau \sim \Gamma(\alpha = 20, \beta = 200)$
     - We have no prior belief about the dependence of both parameters and hence specify independent prior distributions
     
 ### Analytical preliminaries: $\mu$
@@ -670,7 +669,7 @@ draw_from_prior <-
   }
 ```
 </details>
-```{r prior-sim, exercise=TRUE, exercise.lines = 30, fig.align='center', fig.width = 9, fig.height=5}
+```{r prior-sim, exercise=TRUE, exercise.lines = 20, fig.align='center', fig.width = 9, fig.height=5}
 # Apply function
 draws_prior <-
   draw_from_prior(

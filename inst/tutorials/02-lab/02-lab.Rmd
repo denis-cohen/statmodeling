@@ -112,6 +112,7 @@ export(environment())
 We are interested in the *average* marginal effect. 
 
 You thus need two data matrices:
+
 1. `X0`: A model matrix with the observed covariate values of all respondents.
 1. `X1`: Same as above, but each respondent's value of `la_self` is increased by 1.
 
@@ -170,10 +171,10 @@ export(environment())
 
 1. Take the mean (average) across all observations to aggregate your unit-level marginal effects into average marginal effects (*hint*: `apply()`). The resulting object should be a length-$S$ vector that gives you your simulated sampling distribution of the average marginal effect.
 2. Summarize the simulated sampling distribution
-  - Plot the distribution in a histogram.
-  - Calculate its mean or median (a numerical approximation of the point estimate).
-  - Calculate its standard deviation (a numerical approximation of the standard error).
-  - Constructed a simulation-based 95% confidence interval by taking the 2.5% and 97.5% percentiles of the simulated distribution.
+    - Plot the distribution in a histogram.
+    - Calculate its mean or median (a numerical approximation of the point estimate).
+    - Calculate its standard deviation (a numerical approximation of the standard error).
+    - Constructed a simulation-based 95% confidence interval by taking the 2.5% and 97.5% percentiles of the simulated distribution.
 3. Concisely interpret the estimate and its uncertainty.
 
 ```{r task1-ame, exercise = TRUE}

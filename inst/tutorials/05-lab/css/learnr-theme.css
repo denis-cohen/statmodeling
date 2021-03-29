@@ -1,0 +1,113 @@
+:root {
+  #FFFFFF: #FFFFFF;
+  #007696: #007696;
+  --mzes-gold: #d1a354;
+  #D1E6EC: #D1E6EC;
+  #d9d4cd: #d9d4cd;
+}
+
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
+@import url(https://fonts.googleapis.com/css?family=Fira+Mono);
+
+body {
+  background-color: #FFFFFF;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 12;
+}
+
+em {
+    font-family: 'Source Sans Pro', sans-serif;
+    color: slategrey;
+}
+
+.ace-tm {
+    background-color: #FFFFFF;
+    color: black;
+}
+
+.panel, pre {
+    border-radius: 0;
+    border-color: #D1E6EC;
+    background-color: #FFFFFF;
+}
+
+.panel-default > .panel-heading {
+    color: #007696;
+    background-color: #FFFFFF;
+    border-color: #D1E6EC;
+}
+
+.topicsList .topic {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 40px;
+    font-size: 15px;
+    padding-left: 10px;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: 2px 80px;
+    background-position: left 100%;
+        background-position-y: 100%;
+    background-image: url(images/topicProgress.png);
+    border-bottom: 1px solid slategrey;
+    -webkit-transition-property: background-position;
+    transition-property: background-position;
+    -webkit-transition-duration: 0.25s;
+    transition-duration: 0.25s;
+}
+
+.topicsList .topic.current {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #007696;
+    color: #FFFFFF;
+    border: 0px;
+}
+
+code {
+    font-family: 'Fira Mono', monospace;
+    color: #d1a354;
+    background-color: #FFFFFF;
+    font-size: 12px;
+}
+
+a {
+    font-family: 'Montserrat', sans-serif;
+    color: slategrey;
+    text-decoration: none;
+}
+
+.btn-primary, .btn-success, .btn-info {
+    color: #FFFFFF;
+    background-color: #007696;
+    background-image: none;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.btn-default {
+    color: #FFFFFF;
+    background-color: #007696;
+    background-image: none;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.btn-primary.disabled, .btn-primary:disabled, .btn-primary.disabled:hover, .btn-primary:disabled:hover, .btn-success.disabled, .btn-success:disabled, .btn-success.disabled:hover, .btn-success:disabled:hover, .btn-info.disabled, .btn-info:disabled, .btn-info.disabled:hover, .btn-info:disabled:hover {
+    background-color: #D1E6EC;
+}
+.btn.disabled, .btn[disabled], fieldset[disabled] .btn {
+    cursor: not-allowed;
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+h2 {
+  color: #007696;
+  font-family: 'Montserrat', sans-serif;
+}
+
+h3 {
+  color: #007696;
+  font-family: 'Montserrat', sans-serif;
+}

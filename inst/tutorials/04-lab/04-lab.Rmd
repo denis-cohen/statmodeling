@@ -1,0 +1,352 @@
+---
+title: "Lab: Applied Bayesian Statistics Using Stan: Basics"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    css: css/learnr-theme.css
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+## --- learnr ---
+if ("learnr" %in% (.packages()))
+  detach(package:learnr, unload = TRUE)
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+
+## ---- CRAN Packages ----
+## Save package names as a vector of strings
+pkgs <-  c("rstan", "rstantools", "coda", "dplyr", "foreign")
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
+
+## ---- GitHub Packages ----
+devtools::install_github("denis-cohen/regplane3D")
+library(regplane3D)
+
+## ---- Global learnr Objects ----
+gles <- 
+  read.dta("https://github.com/denis-cohen/statmodeling/raw/main/data/gles.dta")
+
+lm_code <- 
+"data {
+  int<lower=1> N; // num. observations
+  int<lower=1> K; // num. predictors
+  matrix[N, K] x; // design matrix
+  vector[N] y;    // outcome vector
+}
+
+parameters {
+  vector[K] beta;      // coef vector
+  real<lower=0> sigma; // scale parameter
+}
+
+transformed parameters {
+  vector[N] mu;  // declare lin. pred.
+  mu = x * beta; // assign lin. pred.
+}
+
+model {
+  // priors
+  target += normal_lpdf(beta | 0, 10);  // priors for beta
+  target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
+  
+  // log-likelihood
+  target += normal_lpdf(y | mu, sigma); // likelihood
+}"
+
+## ---- rstan Options ----
+rstan_options(auto_write = TRUE)             # avoid recompilation of models
+options(mc.cores = parallel::detectCores())  # parallelize across all CPUs
+
+## ---- export function ----
+export <- function(env = environment()) {
+  invisible({
+    global_obj <- eval(global_objects, envir = globalenv())
+    local_obj <- ls(envir = env)
+    new_obj <- local_obj[!(local_obj %in% global_obj)]
+    sapply(new_obj, function(x) {
+      assign(x, get(eval(x, envir = env), envir = env), envir = globalenv())
+    })
+  })
+  if (!is.null(new_obj)){
+    print("Exported objects:")
+    print(new_obj)
+  }
+}
+global_objects <- c(ls(), "global_objects")
+```
+
+
+## Exercise
+
+### Context
+
+We now return to our example from Labs 1 and 3: A regression of AfD support on pro-redistribution and anti-immigration preferences.
+
+Unlike Lab 3, we now want to use our posterior draws to generate substantively meaningful quantities of interest: A Bayesian version of the 3D visualization from Lab 1.
+
+
+### Data
+
+The object `gles` and the Stan program `lm_mod` are pre-loaded in the exercise chunk below.
+
+Generate all required data inputs and collect them in an appropriately named list that matches the declared names in your Stan `data` block.
+
+Please make sure to include `se_self` and `la_self` and the corresponding product term and at least one additional covariate.
+
+```{r data, exercise=TRUE}
+# Define data
+...
+
+# Data as list
+standat <- list(...)
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+```{r data-solution}
+# Define data
+y <- gles$sup_afd
+x <- model.matrix( ~ se_self +
+                     la_self +
+                     se_self:la_self +
+                     age +
+                     fem +
+                     east,
+                   data = gles)
+N <- nrow(x)
+K <- ncol(x)
+
+# Data as list
+standat <- list(
+  N = N,
+  K = K,
+  x = x,
+  y = y
+)
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+### Compilation
+
+Now, compile your Stan program from the character string `lm_code`.
+
+```{r compilation, exercise=TRUE}
+lm_mod <- ...
+
+# Export to global environment (make available in other exercise chunks)
+assign("lm_mod", lm_mod, envir = globalenv())
+```
+
+```{r compilation-solution}
+lm_mod <- rstan::stan_model(model_code = lm_code)
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+### Inference
+
+Estimate your model and store the `stanfit` object
+
+```{r estimation, exercise=TRUE}
+lm_est <- ...
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+```{r estimation-solution}
+lm_est <- rstan::sampling(
+  lm_mod,                   
+  data = standat,       
+  algorithm = "NUTS",       
+  pars = c("beta", "sigma"),
+  iter = 2000L,             
+  warmup = 1000L,           
+  thin = 2L,                
+  chains = 2L,              
+  cores = 2L,               
+  seed = 20210329)
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+### Model summary
+
+Print your model summary and see if `Rhat` shows any signs of non-convergence.
+
+```{r summary, exercise=TRUE}
+
+```
+
+```{r summary-solution}
+print(lm_est, digits = 3L)      
+```
+
+
+### Extract your post-warm-up samples
+
+Now, things are about to get interesting.
+
+Extract the posterior draws of your model parameters. Store the draws for `beta`
+in a separate object. Check the dimensions of that object. What do the rows and
+columns contain?
+
+```{r extraction, exercise=TRUE}
+beta_draws <- ...
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+```{r extraction-solution}
+posterior_draws <- rstan::extract(lm_est)
+beta_draws <- posterior_draws$beta
+str(beta_draws)
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+### Calculate the full posterior distribution of your quantity of interest
+
+We have 1000 posterior draws of each model coefficient (taken from two chains à
+1000 post-warm-up draws thinned by a factor of 2).
+
+Now, we want to use these to obtain the full posterior distribution of our
+quantity of interest.
+
+For reference, here is how we calculated our quantity of interest in Lab 1:
+
+```{r qoi-lab1, echo = TRUE, eval = FALSE}
+# Define value sequences
+se_vals <- seq(0, 10, .25)
+la_vals <- seq(0, 10, .25)
+
+# Initialize container
+pred <- array(NA, dim = c(length(se_vals), length(la_vals), 3L))
+
+# Nested loop for point estimates and confidence bounds
+for (i in seq_along(se_vals)) {
+  for (j in seq_along(la_vals)) {
+    x_star <- c(1, se_vals[i], la_vals[j], se_vals[i] * la_vals[j])
+    std_err <- sqrt(as.vector(t(x_star) %*% Sigma %*% x_star))
+    pred[i, j, 1] <- x_star %*% b
+    pred[i, j, 2] <- pred[i, j, 1] + qnorm(.025) * std_err
+    pred[i, j, 3] <- pred[i, j, 1] + qnorm(.975) * std_err
+  }
+}
+```
+
+Three things will be different this time around:
+
+1. We do not want point estimates and confidence bounds, but the full posterior. Adjust the dimensions of the container `pred` accordingly.
+1. Previously, all elements of `x_star` (except the leading 1) changed at each iteration of the loop. Now, we must hold our background covariates constant at some value, e.g., at their sample mean. Make sure to change the correct elements of `x_star` at each iteration while holding all others constant.
+1. Previously `x_star %*% b` was a simple inner product of two $K$-length vectors. Now we must multiply an $S \times K$ matrix ($S$ draws for $K$ coefficients) with a $K$-length vector $x^{\ast}$ (remember that the arguments must be conformable).
+
+Let's give it a try:
+
+```{r qoi-posterior, exercise=TRUE}
+...
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+```{r qoi-posterior-solution}
+# Define value sequences
+se_vals <- seq(0, 10, .25)
+la_vals <- seq(0, 10, .25)
+
+# Initialize container
+pred <- array(NA, dim = c(length(se_vals),
+                          length(la_vals),
+                          nrow(beta_draws)))
+
+# Get a template vector of sample means
+x_tmp <- apply(x, 2, mean)
+
+# Inspect which element holds which predictor
+names(x_tmp)
+
+# Get the names or indices of elements you want to change
+x_index <- c("se_self", "la_self", "se_self:la_self")
+
+# Nested loop for point estimates and confidence bounds
+for (i in seq_along(se_vals)) {
+  for (j in seq_along(la_vals)) {
+    # Copy and modify x
+    x_star <- x_tmp
+    x_star[x_index] <- c(se_vals[i], la_vals[j], se_vals[i] * la_vals[j])
+    
+    ## Store S draws of qoi in pred[i, j, ]
+    pred[i, j, ] <- beta_draws %*% x_star
+  }
+}
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+### Summarize the posterior distribution of your QOI
+
+The object `pred` now holds $S$ posterior draws for the expected value of AfD
+Support at each combination of `se_vals` and `la_vals`.
+
+Let's summarize the posterior distribution. For each expected values, take the
+50%, 2.5% and 97.5% percentiles.
+This is a quantile-based summary of the posterior distribution that gives us
+the posterior median and the 95% credible interval.
+
+*Hint:* You can use `apply()` on an array, too! Just set the `MARGIN` argument
+to those dimensions you would like to retain. But beware: The dimensions of
+the resulting object may be different from what you would intuitively expect.
+
+```{r qoi-summary, exercise=TRUE}
+pred_summary <- ...
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+```{r qoi-summary-solution}
+pred_summary <- apply(pred, 1:2, quantile, c(.5, .025, .975))
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+### Visualization
+
+You guessed it: We can now use `regplane3D::plane3D()` on `pred_summary` to
+visualize our expected values, much like we did yesterday in Lab 1.
+
+```{r viz, exercise=TRUE, fig.align='center', fig.width = 9, fig.height=6}
+# Change array dimensions to make them compatible with plane3D()
+pred_summary <- aperm(pred_summary, perm = c(2, 3, 1))
+
+regplane3D::plane3D(
+  z = pred_summary,
+  x = se_vals,
+  y = la_vals,
+  main = "Expected AfD Support \n by Redistribution and Immigration Preferences",
+  zlab = "Support AfD",
+  xlab = "Pro-Redistribution",
+  ylab = "Anti-Immigration",
+  xnlines = 6L,
+  ynlines = 6L
+)
+```

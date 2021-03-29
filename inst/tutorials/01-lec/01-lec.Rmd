@@ -513,7 +513,7 @@ You may think of an array as a generalization of a matrix to any number of dimen
 
 #### Example: A 3D array of dimensions $3 \times 2 \times 2$
 
-```{r arr1_1}
+```{r arr1_1, echo = T}
 K <- 3L
 L <- 2L
 M <- 2L
@@ -837,7 +837,7 @@ Use `lapply()`, `sapply()`, or `vapply()` to apply functions element-wise (e.g.,
 - `vapply()` allows you to specify which type of eligible output you want.
 
 ```{r lapply, exercise = TRUE}
-lapply(groceries, names)
+lapply(groceries, is.numeric)
 sapply(groceries, is.numeric)
 vapply(groceries, is.numeric, logical(1))
 vapply(groceries, is.numeric, numeric(1))
@@ -931,7 +931,7 @@ simulate_clt <- function(
   seed = 20210325L
 ) {
   # Set seed
-  set.seed(20210325L)
+  set.seed(seed)
   
   # Initialize container
   samples <- matrix(NA, nrow = n_obs, ncol = n_means)
