@@ -1,0 +1,25 @@
+Package: statmodeling
+Type: Package
+Title: Exercises, Functions, and Data for the Workshop "Statistical Modeling with R and Stan"
+Version: 0.1.0
+Author: Denis Cohen
+Maintainer: Denis Cohen <denis.cohen@mzes.uni-mannheim.det>
+Description: Statistical models are widely used in the social sciences for measurement, prediction, and hypothesis testing. While popular statistical software packages cover a growing number of pre-implemented model types, the diversification of substantive research domains and the increasing complexity of data structures drive persistently high demand for custom modeling solutions. Implementing such custom solutions requires that researchers build their own models and use them to obtain reliable estimates of quantities of substantive interest. Bayesian methods offer a powerful and versatile infrastructure for these tasks. Yet, seemingly high entry costs still deter many social scientists from fully embracing Bayesian methods.
+    To push past these initial hurdles and to equip participants with the required skills for custom statistical modeling, this two-day workshop offers an advanced introduction to statistical modeling using R and Stan. Following a targeted review of the underlying mechanics of generalized linear models and core concepts of Bayesian inference, the course introduces participants to Stan, a platform for statistical modeling and Bayesian statistical inference. Participants will get an overview of the programming language, the R interface RStan, and the workflow for Bayesian model building, inference, and convergence diagnosis. Applied exercises provide participants with the chance to write an run various model types and to process the resulting estimates into publication-ready graphs.
+Depends: R (>= 3.5.0)
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+VignetteBuilder:
+    knitr
+Imports:
+    learnr,
+    dplyr,
+    lme4,
+    rstan,
+    coda,
+    foreign,
+    devtools,
+    MASS,
+    plot3D
+RoxygenNote: 7.1.1

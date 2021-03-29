@@ -1,0 +1,383 @@
+---
+title: "Lab: Bayesian Fundamentals"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    css: css/learnr-theme.css
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+## --- learnr ---
+if ("learnr" %in% (.packages()))
+  detach(package:learnr, unload = TRUE)
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+
+## ---- CRAN Packages ----
+## Save package names as a vector of strings
+pkgs <-  c("foreign", "MASS", "coda")
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
+
+## ---- GitHub Packages ----
+
+
+## ---- Global learnr Objects ----
+gles <- 
+  read.dta("https://github.com/denis-cohen/statmodeling/raw/main/data/gles.dta")
+
+## ---- export function ----
+export <- function(env = environment()) {
+  invisible({
+    global_obj <- eval(global_objects, envir = globalenv())
+    local_obj <- ls(envir = env)
+    new_obj <- local_obj[!(local_obj %in% global_obj)]
+    sapply(new_obj, function(x) {
+      assign(x, get(eval(x, envir = env), envir = env), envir = globalenv())
+    })
+  })
+  if (!is.null(new_obj)){
+    print("Exported objects:")
+    print(new_obj)
+  }
+}
+
+global_objects <- c(ls(), "global_objects")
+```
+
+## A Gibbs sampler for the linear model
+
+### Prompt
+
+In this exercise, we return to the linear model from Lab 1.
+
+Your task is to 
+
+1. implement a Gibbs sampler for the linear model,
+1. apply it to the regression of AfD support on pro-redistribution and anti-immigration preferences,
+1. Interpret your model coefficients in terms of posterior summaries, and
+1. diagnose whether your posterior draws show any signs of non-convergence.
+
+
+### Likelihood
+
+The likelihood of the multivariate linear model is given by
+
+$$
+p(\mathbf{y} | \mathbf{X}, \beta, \tau) = \prod_{i}^{N} \sqrt{\frac{\tau}{2\pi}} \exp\left(-\frac{\tau(y_i - \mathbf{x}_i^{\prime}\beta)^2}{2}\right)
+$$
+
+### Priors
+
+For every element $\beta_k$ of the length-$K$ vector $\mathbf{\beta}$, we specify a normal prior in terms of mean $m = 0$ and precision $p = 0.1$: 
+
+$$\beta_k \sim N(m = 0, \frac{1}{p} = 10) \text{ for } k = 1,...,K$$ 
+
+These are independent normal priors, which is equivalent to a variance-covariance matrix with zero-covariance on the off-diagonals. Thus, we can also write
+
+$$\beta \sim \text{MVN}(\textbf{m}, \mathbf{V})$$
+
+Where $\mathbf{m}$ is a length-$K$ vector of identical prior means and variance-covariance matrix $\mathbf{V} = \mathbf{P}^{-1}$, where $\mathbf{P} = \mathbf{I}_k\mathbf{p}$ is a $K \times K$ matrix with identical precision priors $p$ on the diagonal.
+
+As before, the prior distribution for $\tau$ is given by a Gamma distribution with shape parameter $a = 20$ and rate parameter $b = 200$:
+
+$$\tau \sim \mathbf{\Gamma}(a = 20, b = 200)$$
+
+### Conditional posteriors
+
+Deriving the conditional posteriors for $\beta$ and $tau$ (or its inverse $\tau$) is quite painful. So let's just accept the following:
+
+The conditional posterior for $\beta$ is distributed multivariate normal with updated mean vector $\mathbf{m}^{\ast}$ and updated variance-covariance matrix $\frac{1}{\tau^{\ast}} \mathbf{V}^{\ast}$:
+
+$$\beta_k | m, s, \tau^{\ast}, \mathbf{X}, \mathbf{y} \sim \text{MVN}(\mathbf{m}^{\ast}, \frac{1}{\tau^{\ast}} \mathbf{V}^{\ast})\\
+\mathbf{m}^{\ast} = \mathbf{(X^{\prime}X + V^{-1})^{-1} (X^{\prime}y + V^{-1}m)} \\
+\mathbf{V}^{\ast} = \mathbf{(X^{\prime}X + V^{-1})^{-1}}$$
+
+The conditional posterior for $\tau$ is Gamma-distributed with updated shape parameter $a^{\ast}$ and updated rate parameter $b^{\ast}$:
+
+
+$$\tau^{\ast} | a, b, \beta^{\ast}, \mathbf{X}, \mathbf{y} \sim \mathbf{\Gamma}(a^{\ast}, b^{\ast})\\
+a^{\ast} = a + \frac{N}{2} \\
+b^{\ast} = b + \frac{\mathbf{y^{\prime}y + m^{\prime}V^{-1} m - \mathbf{m}^{\ast\prime} V^{\ast-1} \mathbf{m}^{\ast}}}{2} $$
+
+This may look convoluted, so make sure that your code assigns all quantities to clearly named objects and that you distinguish between hyperparameters (without an asterisk) and updated parameters (with an asterisk).
+
+### Modify function
+
+Modify the function below such that your Gibbs sampler draws from the posterior distributions of the coefficient vector $\beta$ and the precision parameter $\tau$.
+
+Note that I have already changed some parts:
+
+- hyper parameters have already been changed to Latin letters
+- arguments have been updated
+- definition of vector $\mathbf{m}$ and matrix $\mathbf{P}$ from scalars $m$ and $p$
+- initialization of containers updated
+- `as.vector(...)` added where needed 
+
+Once you're done `export()` your function to test it in the next step! You can always go back, change it, and re-export it.
+
+```{r modify-function, exercise = TRUE, exercise.lines = 70}
+lm_gibbs <- function(m_scalar,
+                     p_scalar,
+                     a,
+                     b,
+                     n_warmup,
+                     n_draws,
+                     y,
+                     X,
+                     seed = 20210329,
+                     keep_warmup = TRUE) {
+  # Set seed
+  set.seed(seed)
+  
+  # Length of chain
+  len_chain <- n_warmup + n_draws
+  
+  # Get vector m, matrix P (note: P = V^(-1))
+  m <- rep(m_scalar, ncol(X))
+  P <- diag(rep(p_scalar, ncol(X))) 
+  
+  # Neither m_star nor V_star are conditioned on a_star, b_star, or tau
+  # So we only need to define these once. As we also need the inverse of
+  # V_star, we can store it in an object named P_star.
+  V_star <- ...
+  P_star <- ...
+  m_star <- as.vector(...)
+  
+  # Data characteristics
+  n_data <- length(y)  
+
+  # Initialize containers
+  beta <- matrix(NA, len_chain, ncol(X))
+  tau <- rep(NA, len_chain)
+  
+  # Run Gibbs sampler
+  for (i in seq_len(len_chain)) {
+    if (i == 1) {
+      ## Iteration 1: Initialize from prior
+      a_star <- a
+      b_star <- b
+    } else {
+      ## Iterations 2+: Update a and b
+      a_star <- a + n_data / 2
+      P_star <- as.vector(b + ...)
+    }
+    
+    ## Sample tau
+    tau[i] <- rgamma(1, a_star, b_star)
+    
+    ## Sample mu
+    beta[i, ] <- MASS::mvrnorm(1, ...)
+  }
+  
+  ## Conditionally discard warmup-draws
+  if (!keep_warmup) {
+    tau <- tau[(n_warmup + 1):len_chain]
+    beta <- beta[(n_warmup + 1):len_chain, ]
+  }
+  
+  ## Return output
+  return(list(beta = beta,
+              tau = tau))
+}
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+```{r modify-function-solution}
+lm_gibbs <- function(m_scalar,
+                     p_scalar,
+                     a,
+                     b,
+                     n_warmup,
+                     n_draws,
+                     y,
+                     X,
+                     seed = 20210329,
+                     keep_warmup = TRUE) {
+  # Set seed
+  set.seed(seed)
+  
+  # Length of chain
+  len_chain <- n_warmup + n_draws
+  
+  # Get vector m, matrix P (note: P = V^(-1))
+  m <- rep(m_scalar, ncol(X))
+  P <- diag(rep(p_scalar, ncol(X)))
+  
+  # Neither m_star nor V_star are conditioned on a_star, b_star, or tau
+  # So we only need to define these once. As we also need the inverse of
+  # V_star, we can store it in an object named P_star.
+  V_star <- solve(t(X) %*% X + P)
+  P_star <- solve(V_star)
+  m_star <- as.vector(V_star %*% (t(X) %*% y + P %*% m))
+  
+  # Data characteristics
+  n_data <- length(y)  
+
+  # Initialize containers
+  beta <- matrix(NA, len_chain, ncol(X))
+  tau <- rep(NA, len_chain)
+  
+  # Note that neither 
+  
+  # Run Gibbs sampler
+  for (i in seq_len(len_chain)) {
+    if (i == 1) {
+      ## Iteration 1: Initialize from prior
+      a_star <- a
+      b_star <- b
+    } else {
+      ## Iterations 2+: Update a and b
+      a_star <- a + n_data / 2
+      b_star <- as.vector(b +
+                            0.5 * (y %*% y +
+                                     m %*% P %*% m  -
+                                     m_star %*% P_star %*% m_star))
+    }
+    
+    ## Sample tau
+    tau[i] <- rgamma(1, a_star, b_star)
+
+    ## Sample mu
+    beta[i, ] <- MASS::mvrnorm(1, m_star, V_star / tau[i])
+  }
+  
+  ## Conditionally discard warmup-draws
+  if (!keep_warmup) {
+    tau <- tau[(n_warmup + 1):len_chain]
+    beta <- beta[(n_warmup + 1):len_chain, ]
+  }
+  
+  ## Return output
+  return(list(beta = beta,
+              tau = tau))
+}
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+### Data
+
+To run our model, we need to define our data objects, $\mathbf{y}$ and $\mathbf{X}$.
+
+```{r data, exercise=TRUE}
+# Define data
+y <- ...
+X <- ...
+
+# Export newly created objects to global environment
+export(environment())
+```
+
+```{r data-solution}
+# Define data
+y <- gles$sup_afd
+X <- model.matrix( ~ se_self +
+                     la_self +
+                     se_self:la_self,
+                   data = gles)
+
+# Export newly created objects to global environment
+export(environment())
+``` 
+
+### Run your model
+
+Time to test your model!
+
+Run the model with the required inputs. Use `mean()`, `sd()`, and/or `quantile()`
+perhaps in conjunction with `apply()`, to get summaries of your posterior samples.
+
+Compare your Bayesian estimates to those from an OLS model via `lm()`.
+
+```{r apply-model, exercise=TRUE}
+lm_draws <- lm_gibbs(...)
+```
+
+```{r apply-model-solution}
+# Run model
+lm_draws <- lm_gibbs(
+  m_scalar = 0,
+  p_scalar = .01,
+  a = 20,
+  b = 200,
+  n_warmup = 5000,
+  n_draws = 10000,
+  y = y,
+  X = X,
+  seed = 20210329,
+  keep_warmup = FALSE
+)
+
+# Summarize posterior distributions
+beta <- apply(lm_draws$beta, 2, function (x) c(mean = mean(x), sd = sd(x)))
+round(beta, 4)
+sigma2 <- c(mean = mean(1 / lm_draws$tau), sd = sd(1 / lm_draws$tau))
+round(sqrt(sigma2), 4)
+
+# Compare to lm() estimates
+lm_ols <- lm(sup_afd ~ se_self +
+               la_self +
+               se_self:la_self,
+             data = gles)
+summary(lm_ols)
+``` 
+
+### Diagnose your model
+
+Run and store multiple chains, save them as `mcmc` objects, and calculate the
+Gelman-Rubin diagnostic based on the post-warmup draws. You can run
+additional diagnostics if you like.
+
+*Note:*
+
+- First paste your parameters into a matrix (e.g., `do.call(cbind, ...)`).
+- Then save the matrix `as.mcmc(...)`.
+- Then collect your `mcmc` objects in an `mcmc.list`.
+
+```{r diagnose-model, exercise=TRUE}
+
+```
+
+```{r diagnose-model-solution}
+# Define 4 seeds
+seeds <- sample(10001:99999, 4)
+
+# Run the model with different seeds,collapse to matrix, store as mcmc
+lm_draws_multiple_chains <- lapply(seeds,
+                                   function(seed) {
+                                     as.mcmc(do.call(
+                                       cbind,
+                                       lm_gibbs(
+                                         m_scalar = 0,
+                                         p_scalar = .01,
+                                         a = 20,
+                                         b = 200,
+                                         n_warmup = 5000,
+                                         n_draws = 10000,
+                                         y = y,
+                                         X = X,
+                                         seed = seed,
+                                         keep_warmup = FALSE
+                                       )
+                                     ))
+                                   })
+
+# Store as mcmc.list
+lm_draws_multiple_chains <- mcmc.list(lm_draws_multiple_chains)
+
+# Diagnose
+coda::gelman.diag(lm_draws_multiple_chains)
+coda::traceplot(lm_draws_multiple_chains)
+``` 

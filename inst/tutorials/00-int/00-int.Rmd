@@ -1,0 +1,115 @@
+---
+title: "Statistical Modeling with R and Stan"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    css: css/learnr-theme.css
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+if ("learnr" %in% (.packages()))
+  detach(package:learnr, unload = TRUE)
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+
+## Save package names as a vector of strings
+pkgs <-  c()
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
+```
+
+## Hi, I'm Denis!
+
+- Postdoctoral Fellow, Data and Methods Unit, MZES
+- Ph.D. Humboldt University (2018)
+
+Here are some of the things I work on:
+
+- Party competition:
+    - *The Centre-Right versus the Radical Right: the Role of Migration Issues and Economic Grievances* (with Tarik Abou-Chadi and Markus Wagner)
+    - *Does Accommodation Work? Mainstream Party Strategies and the Success of Radical Right Parties* (with Werner Krause and Tarik Abou-Chadi)
+    - *Getting the most out of comparative vote-switching data: A new framework for studying dynamic multiparty competition* (with Werner Krause and Tarik Abou-Chadi)
+- Far-right voting:
+    - *Between strategy and protest: How policy demand, political dissatisfaction and strategic incentives matter for far-right voting*
+    - *Ökonomisches Risiko und die elektorale Anziehungskraft der AfD*
+    - *Economic Risk, Anti-Immigration Preferences and Voting for the Radical Right*
+- The political economy of spatial inequalities:
+    - *The Political Economy of Rental Housing* (with Tarik Abou-Chadi and Thomas Kurer)
+    - *Regional Labor Markets and the Politics of Resentment* (with Sergi Pardos-Prado)
+    - *Political Reactions to Local Housing Market Dynamics* (grant proposal)
+- Methods:
+    - [*Methods Bites: Blog of the MZES Social Science Data Lab*](https://www.mzes.uni-mannheim.de/socialsciencedatalab/) (with Cosima Meyer and Julian Bernauer)
+    - *Applied Causal Inference (with R)* (with Paul C. Bauer)
+    - *When (not) to trust the overlap in confidence intervals: A practical guide.*
+- Software:
+    - [`regplane3D`](https://github.com/denis-cohen/regplane3D): Plotting Regression Predictions in 3D
+    - [`flex_bib`](https://github.com/paulcbauer/flex_bib): Flexibly generate multiple bibliographies in RMarkdown (with Paul C. Bauer)
+
+
+## So, who are you?
+
+Briefly tell me:
+
+1. Your program, year, and main research interest/thesis title.
+1. Why you chose to attend this class.
+1. If you could successfully install Stan and get it to run...
+
+<center>
+  <img src="https://media1.giphy.com/media/SWzXMmicVNZl6QdVLw/giphy.gif"/>
+</center>
+
+
+## Statistical Modeling with R and Stan
+
+### Primary Learning Objectives
+
+1. Understand generalized linear models as a common theoretical framework for statistical models
+1. Understand how to process estimates from generalized linear models into substantively meaningful quantities of interest *without* relying on pre-implemented software
+1. Understand how to use distributional summaries as a flexible framework for reporting inferential uncertainty
+1. *Applied* Bayesian statistics: Learn how to translate formal statistical models into code using Stan
+
+### Secondary Learning Objectives
+
+1. Bump up your programming skills
+1. Bump up your understanding of probability theory
+1. *Theoretical* Bayesian statistics: Learn about fundamentals concepts of Bayesian statistics
+
+## Schedule
+
+| Session | Time                           | Topics                                                                                                     |
+|:-------:|:-------------------------------|:-----------------------------------------------------------------------------------------------------------|
+| 1       | Day 1, 09:00-11:00             | **R Math & Programming Refresher**                                                                         |
+| 2       | Day 1, 11:00-13:00             | **Generalized Linear Models**                                                                              |
+| 3       | Day 1, 14:00-16:00             | **Bayesian Fundamentals**                                                                                  |
+| 4       | Day 2, 09:00-11:00             | **Applied Bayesian Statistics Using Stan: Basics**                             |
+| 5       | Day 2, 11:00-13:00             | **Applied Bayesian Statistics Using Stan: Extensions**                 |
+| 6       | Day 2, 14:00-16:00             | **Applied Bayesian Statistics Using Stan: Advanced Modeling**                     |
+
+## Structure of our sessions
+
+We have 120 minutes per session. We will flexibly divide each session into the following sequence:
+
+1. Lecture
+2. Hands-on exercises (breakout rooms, in teams of three)
+3. Discussing solutions to exercises
+4. Breaks
+
+## Feedback
+
+While bits and pieces of the teaching materials existed before, much of this workshop is a first. 
+
+Feel free to share your feedback at any time, especially when you have suggestions that we can accommodate on the fly.
+
+## Questions?
+
+
+
+
