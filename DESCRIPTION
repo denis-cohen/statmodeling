@@ -21,5 +21,9 @@ Imports:
     foreign,
     devtools,
     MASS,
-    plot3D
+    shinystan,
+    rstantools,
+    bayesplot
+Remotes: 
+    denis-cohen/regplane3D
 RoxygenNote: 7.1.1

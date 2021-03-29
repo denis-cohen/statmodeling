@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## ---- CRAN Packages ----
 ## Save package names as a vector of strings
-pkgs <-  c("rstan", "rstantools", "coda", "dplyr")
+pkgs <-  c("rstan", "rstantools", "coda", "dplyr", "shinystan")
 
 ## Install uninstalled packages
 lapply(pkgs[!(pkgs %in% installed.packages())], 
@@ -384,7 +384,7 @@ model {
     - Must use double quotation marks `"` around the strong to avoid that the [transposition operator](https://mc-stan.org/docs/2_26/functions-reference/transposition-operator.html) `'` breaks the string
 - Upsides: Works with the interactive `learnr` tutorials in our workshop!
 
-```{r ex1-full, exercise = TRUE}
+```{r ex1-full, exercise = TRUE, exercise.lines = 30}
 # Save as character
 lm_code <- 
 "data {
@@ -421,7 +421,7 @@ writeLines(lm_code, con = "lm.stan")
 
 ### Simulate the data-generating process in R
 
-```{r inf-sim1, exercise=TRUE}
+```{r inf-sim1, exercise=TRUE, exercise.lines = 20}
 # Set seed
 set.seed(20210329)
 
@@ -466,7 +466,7 @@ lm_mod <- rstan::stan_model(model_code = lm_code)
 
 ### Estimation
 
-```{r inf-sampl, exercise = TRUE}
+```{r inf-sampl, exercise = TRUE , exercise.lines = 17}
 lm_val <- rstan::sampling(
   lm_mod,                     # compiled model
   data = standat_val,             # data input
@@ -523,7 +523,7 @@ The outcome variable contains squared distances of respondents' left-right self-
 
 ### Getting actual data
 
-```{r inf-dat, exercise = TRUE}
+```{r inf-dat, exercise = TRUE, exercise.lines = 30}
 ## Retrieve and manage data
 bw_ajps19 <-
   read.table(
@@ -556,7 +556,7 @@ standat_inf <- list(
 
 ### Inference
 
-```{r inf-real, exercise = TRUE}
+```{r inf-real, exercise = TRUE, exercise.lines = 17}
 lm_inf <- rstan::sampling(
   lm_mod,                     # compiled model
   data = standat_inf,             # data input
@@ -636,14 +636,13 @@ In the words of the developers:
 
 ```{r shiny, exercise = TRUE}
 library(shinystan)
-launch_shinystan(lm_est)
+launch_shinystan(lm_inf)
 ```
 
 Additional Functionality:
 
 - `generate_quantity()`: Add a new parameter as a function of one or two existing parameters
 - `deploy_shinystan()`: Deploy a 'ShinyStan' app on [shinyapps.io](https://www.shinyapps.io/)
-Additional Functionality:
 
 
 ### Visual diagnostics using **bayesplot**
