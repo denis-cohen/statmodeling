@@ -137,9 +137,9 @@ $(document).ready(function () {
 \]</span> The level-two equations show how we want to use the context-level variable <span class="math inline">\(\mathtt{bl\_immig}_j\)</span> to explain the variability in our varying intercepts and slopes.</p>
 <p>Rearranging into a single equation yields</p>
 <p><span class="math display">\[\begin{split}
-\eta_{ij} &amp; = \gamma_{11} + \gamma_{21} u_j + \eta_{j1} + (\gamma_{12} + \gamma_{22} u_j + \eta_{j2}) x_i + \epsilon_i \\
-\eta_{ij} &amp; = \gamma_{11} + \gamma_{21} u_j + \eta_{j1} + \gamma_{12} x_i + \gamma_{22} u_j x_i + \eta_{j2} x_i  + \epsilon_i \\
-\eta_{ij} &amp; = \gamma_{11} + \underbrace{\gamma_{12} x_i + \gamma_{21} u_j + \gamma_{22} u_j x_i}_{\text{interaction}} + \underbrace{\epsilon_i + \eta_{j1} + \eta_{j2} x_i}_{\text{composite errors}}
+\eta_{ij} &amp; = \gamma_{11} + \gamma_{21} \mathtt{bl\_immig}_j + \nu_{j1} + (\gamma_{12} + \gamma_{22} \mathtt{bl\_immig}_j + \nu_{j2}) x_i + \epsilon_i \\
+\eta_{ij} &amp; = \gamma_{11} + \gamma_{21} \mathtt{bl\_immig}_j + \nu_{j1} + \gamma_{12} x_i + \gamma_{22} \mathtt{bl\_immig}_j x_i + \nu_{j2} x_i  + \epsilon_i \\
+\eta_{ij} &amp; = \gamma_{11} + \underbrace{\gamma_{12} x_i + \gamma_{21} \mathtt{bl\_immig}_j + \gamma_{22} \mathtt{bl\_immig}_j x_i}_{\text{interaction}} + \underbrace{\epsilon_i + \nu_{j1} + \nu_{j2} x_i}_{\text{composite errors}}
 \end{split}\]</span></p>
 <p>This is why we also call this a model with a <em>cross-level interaction</em>.</p>
 </div>
