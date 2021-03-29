@@ -76,7 +76,7 @@ options(mc.cores = parallel::detectCores())  # parallelize across all CPUs
 
 We will pick things up right where we left off.
 
-We know want to apply the varying intercept, varying slope logit model to our running example of vote choice for the AfD.
+We now want to apply the varying intercept, varying slope logit model to our running example of vote choice for the AfD.
 
 Specifically, we want to know whether anti-immigration preferences predict voting for the AfD more strongly among respondents in Bundesländer where the immigrant population is large.
 
@@ -321,6 +321,8 @@ Use the [bayesplot](https://mc-stan.org/bayesplot/articles/visual-mcmc-diagnosti
 ```
 
 ## Quantities of interest
+
+### Conditional average marginal effects
 
 We are now going to calculate our most challenging quantity of interest yet: The *conditional average marginal effect* of $\mathtt{la\_self}$ on  $\Pr(\mathtt{vote\_afd})$.
 

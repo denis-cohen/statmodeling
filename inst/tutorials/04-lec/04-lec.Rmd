@@ -159,7 +159,7 @@ knitr::include_graphics("images/workflow.png")
 
 Our knowledge of generalized linear models gives us *almost everything we need!
 
-#### Probability model for the data
+### Probability model for the data
 
 First, let's recap the three parts of every GLM in the context of the linear model:
 
@@ -171,7 +171,7 @@ The *family* specifies the probability model (a.k.a. likelihood, data-generating
 
 *Note:* Mimicking the convention in both R and Stan, we parameterize the normal distribution in terms of its mean and *standard deviation* (not variance)!
 
-#### Known and unknown quantities
+### Known and unknown quantities
 
 * Parameters (unknown, random quantities):
     * $\beta$, the coefficient vector
@@ -183,7 +183,7 @@ The *family* specifies the probability model (a.k.a. likelihood, data-generating
     * the dimensions of $\mathbf{y}_{N \times 1}$ and $\mathbf{X}_{N \times K}$
     * the dimensions of $\beta_{K \times 1}$, $\sigma$ (a scalar), and $\mu_{N \times 1}$
     
-#### Priors
+### Priors
 
 What is still missing are prior distributions for the unknown quantities.
 
@@ -237,7 +237,7 @@ polygon(
 
 ## Model building
 
-#### Stan Program Blocks
+### Stan Program Blocks
 
 1. Functions: Declare user written functions
 2. **Data**: Declare all known quantities
@@ -247,7 +247,7 @@ polygon(
 6. **Model**: Transform parameters, specify prior distributions and likelihoods
 7. Generated Quantities (each iteration)
 
-#### Program Blocks
+### Program Blocks
 
 ```{r blocks, exercise = FALSE, echo = FALSE, out.width = '72%', fig.align="center"}
 knitr::include_graphics("images/blocks.png")
@@ -260,7 +260,7 @@ knitr::include_graphics("images/blocks.png")
   </sub></sup>
 </div>
 
-#### Script for a Stan program
+### Script for a Stan program
 
 *Writing scripts for Stan programs*
 
@@ -281,7 +281,7 @@ knitr::include_graphics("images/blocks.png")
 - `// this is a comment`
 
 
-#### Data block
+### Data block
 
 Declare all known quantities, including data types, dimensions, and constraints: 
 
@@ -305,7 +305,7 @@ data {
 }
 ```
 
-#### Parameters block
+### Parameters block
 
 Declare unknown 'base' quantities, including storage types, dimensions, and constraints: 
 
@@ -326,7 +326,7 @@ parameters {
 }
 ```
 
-#### Transformed parameters block
+### Transformed parameters block
 
 Declare and specify unknown transformed quantities, including storage types, dimensions, and constraints: 
 
@@ -347,7 +347,7 @@ transformed parameters {
 }
 ```
 
-#### Model block
+### Model block
 
 Declare and specify local variables (optional) and specify sampling statements:
 
@@ -665,7 +665,7 @@ For full functionality, examples, and vignettes:
 - [CRAN Vignettes](https://cran.r-project.org/web/packages/bayesplot/vignettes/visual-mcmc-diagnostics.html)
 - `available_mcmc()`function
 
-##### Example: Trace plot for `sigma`
+### Example: Trace plot for sigma
 
 ```{r bayesplot, exercise = FALSE, eval = TRUE, message = FALSE, warning = FALSE, fig.align = "center", out.width='50%'}
 library(bayesplot)
@@ -692,23 +692,30 @@ Then what?
 
 Gelman et al. (2020) have some answers:
 
-1. Check for model misspecification
-    - Is the probability model correctly specified?
-    - Are constraints set adequately?
-    - Do your priors allow for posterior density in regions where you'd expect it?
-    - Are your parameters statistically identified?
-1. When a complex model fails: Reduce complexity
-    - Suppose you fit a mixture model with two equations, a constrained probabilistic mixing parameter, and various random effects in each equation
-    - Fit each equation separately without the random effects
-    - Fit the mixture model without the random effects
-    - Fit each equation with random effects
-1. Be time-efficient
-    - Test the model on small sets of well-behaved simulated data
-    - Test the model using short runs
-1. [Efficiency tuning](https://mc-stan.org/docs/2_26/stan-users-guide/optimization-chapter.html)
-    - Vectorize. E.g., use matrix multiplication instead of loops through matrix rows.
-    - Reparameterize. There are some common suggestions (more in the next session).
-    - Standardize data inputs. Increases the chances that your parameters will be on similar scales (which may speed up computation).
-    - *Alternatively:* Use weakly informative data-dependent priors.
-    - Make priors more informative (if defensible): Can prevent chains from wandering far off the target distribution.
-    - Paralellize: Markov chains are independent. Let them run at the same time (if your CPUs allow for it)!
+### Check for model misspecification
+
+- Is the probability model correctly specified?
+- Are constraints set adequately?
+- Do your priors allow for posterior density in regions where you'd expect it?
+- Are your parameters statistically identified?
+
+### When a complex model fails: Reduce complexity
+
+- Suppose you fit a mixture model with two equations, a constrained probabilistic mixing parameter, and various random effects in each equation
+- Fit each equation separately without the random effects
+- Fit the mixture model without the random effects
+- Fit each equation with random effects
+
+### Be time-efficient
+
+- Test the model on small sets of well-behaved simulated data
+- Test the model using short runs
+
+### [Efficiency tuning](https://mc-stan.org/docs/2_26/stan-users-guide/optimization-chapter.html)
+
+- Vectorize: Use matrix multiplication instead of loops through matrix rows.
+- Reparameterize. There are some common suggestions (more in the next session).
+- Standardize data inputs. Increases the chances that your parameters will be on similar scales (which may speed up computation).
+- *Alternatively:* Use weakly informative data-dependent priors.
+- Make priors more informative (if defensible): Can prevent chains from wandering far off the target distribution.
+- Parallelize: Markov chains are independent. Let them run at the same time (if your CPUs allow for it)!

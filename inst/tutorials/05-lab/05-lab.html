@@ -122,7 +122,7 @@ $(document).ready(function () {
 <div id="section-prompt" class="section level3">
 <h3>Prompt</h3>
 <p>We will pick things up right where we left off.</p>
-<p>We know want to apply the varying intercept, varying slope logit model to our running example of vote choice for the AfD.</p>
+<p>We now want to apply the varying intercept, varying slope logit model to our running example of vote choice for the AfD.</p>
 <p>Specifically, we want to know whether anti-immigration preferences predict voting for the AfD more strongly among respondents in Bundesländer where the immigrant population is large.</p>
 </div>
 <div id="section-an-explicit-multi-level-notation" class="section level3">
@@ -368,12 +368,15 @@ standat_rslogit &lt;- list(
 </div>
 <div id="section-quantities-of-interest" class="section level2">
 <h2>Quantities of interest</h2>
+<div id="section-conditional-average-marginal-effects" class="section level3">
+<h3>Conditional average marginal effects</h3>
 <p>We are now going to calculate our most challenging quantity of interest yet: The <em>conditional average marginal effect</em> of <span class="math inline">\(\mathtt{la\_self}\)</span> on <span class="math inline">\(\Pr(\mathtt{vote\_afd})\)</span>.</p>
 <p>This quantity of interest is vastly similar to the average marginal effect from Lab 2. But since our predictor <span class="math inline">\(\mathtt{la\_self}\)</span> is interacted with the variable <span class="math inline">\(\mathtt{bl\_immig}\)</span>, the marginal effect will change along the scale of <span class="math inline">\(\mathtt{bl\_immig}\)</span>. The general intuition (in the context of OLS models) is explained by <a href="https://www.jstor.org/stable/25791835#metadata_info_tab_contents">Brambor, Clark, and Golder (2006)</a>.</p>
 <p>The conditional average marginal effect for a one unit increase in <span class="math inline">\(\mathtt{la\_self}\)</span> at any given value of <span class="math inline">\(\mathtt{bl\_immig}^{\ast}\)</span> is defined as:</p>
 <p><span class="math display">\[\frac{1}{N} \sum_{i=1}^{N} \left\{ \text{logit}^{-1}(\beta_1 + \beta_2 (\mathtt{la\_self}_i + 1) + \gamma_1 \mathtt{bl\_immig}_{j[i]} + \gamma_2 (\mathtt{la\_self}_i + 1) \times \mathtt{bl\_immig}^{\ast}) \\ - \text{logit}^{-1}(\beta_1 + \beta_2 \mathtt{la\_self}_i  + \gamma_1 \mathtt{bl\_immig}_{j[i]} + \gamma_2 \mathtt{la\_self}_i \times \mathtt{bl\_immig}^{\ast}) \right\}\]</span></p>
 <p>Note that we use a hypothetical value <span class="math inline">\(\mathtt{bl\_immig}^{\ast}\)</span> in the product term but the observed values <span class="math inline">\(\mathtt{bl\_immig}_{j[i]}\)</span> elsewhere. This may seem counterintuitive at first but it is essential to separate <em>effect modification</em> induced by the moderator <span class="math inline">\(\mathtt{bl\_immig}\)</span> from its distinct effect of on the linear predictor.</p>
 <p>Of course, we do not simply want the average marginal value conditional on a single value of <span class="math inline">\(\mathtt{bl\_immig}^{\ast}\)</span> but on a <em>sequence of values</em> of <span class="math inline">\(\mathtt{bl\_immig}^{\ast}\)</span>. This will allow us to see how the marginal effect changes along the values of the moderator.</p>
+</div>
 <div id="section-calculate-the-qoi" class="section level3">
 <h3>Calculate the QOI</h3>
 <div class="tutorial-exercise" data-label="qoi" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="30">
