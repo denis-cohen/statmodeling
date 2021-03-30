@@ -94,7 +94,7 @@ As `rstan` users, however, the question with many of these tasks is whether we c
     - ..we could have equally defined `mu` as a temporary local variable in the `model block`, where it would have been discarded after each iteration...
     - ...and recovered it in R per $\mathbf{X\beta}$ if necessary.
 - Quantities of interest:
-    - We can use the `generated quantites` block to calculate quantities of interest or to implement posterior predictive checks.
+    - We can use the `generated quantities` block to calculate quantities of interest or to implement posterior predictive checks.
     - But we can do this just as well in R using the posterior draws and the data.
     
 ### My recommendation
