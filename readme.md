@@ -1,5 +1,6 @@
-Statistical Modeling with R and Stan
-================
+
+# Statistical Modeling with R and Stan
+
 Denis Cohen  
 <denis.cohen@mzes.uni-mannheim.de>
 
@@ -59,27 +60,70 @@ applied exercises.
 | Session | Topics                                                                                                      |
 | :-----: | :---------------------------------------------------------------------------------------------------------- |
 |    1    | **R Math & Programming Refresher**                                                                          |
-|         | 1. Good coding practices                                                                                   |
-|         | 2. Object types and conversions; slicing and indexing                                                      |
-|         | 3. Control structures                                                                                      |
-|         | 4. Probability distributions                                                                               |
-|         | 5. Linear algebra                                                                                          |
+|         | 1\. Good coding practices                                                                                   |
+|         | 2\. Object types and conversions; slicing and indexing                                                      |
+|         | 3\. Control structures                                                                                      |
+|         | 4\. Probability distributions                                                                               |
+|         | 5\. Linear algebra                                                                                          |
 |    2    | **Generalized Linear Models**                                                                               |
-|         | 1. GLM basics: Systematic component, link function, family/likelihood                                      |
-|         | 2. The simulation approach                                                                                 |
-|         | 3. Quantities of interest (definition, calculation, simulation)                                            |
+|         | 1\. GLM basics: Systematic component, link function, family/likelihood                                      |
+|         | 2\. The simulation approach                                                                                 |
+|         | 3\. Quantities of interest (definition, calculation, simulation)                                            |
 |    3    | **Bayesian Fundamentals**                                                                                   |
-|         | 1. Fundamental concepts: Prior distribution, likelihood, posterior distribution                            |
-|         | 2. MCMC Algorithms                                                                                         |
-|    4    | **Applied Bayesian Statistics Using Stan: Basics**                              |
-|         | 1. Stan: Language, documentation, and core program blocks                                                  |
-|         | 2. The Bayesian workflow                                                                                   |
-|    5    | **Applied Bayesian Statistics Using Stan: Extensions**                  |
-|         | 1. Optional Stan program blocks: Functions, transformed data, transformed parameters, generated quantities |
-|         | 2. Efficiency tuning                                                                                       |
-|         | 3. Processing posterior draws in Stan and R                                                                |
+|         | 1\. Fundamental concepts: Prior distribution, likelihood, posterior distribution                            |
+|         | 2\. MCMC Algorithms                                                                                         |
+|    4    | **Applied Bayesian Statistics Using Stan: Basics**                                                          |
+|         | 1\. Stan: Language, documentation, and core program blocks                                                  |
+|         | 2\. The Bayesian workflow                                                                                   |
+|    5    | **Applied Bayesian Statistics Using Stan: Extensions**                                                      |
+|         | 1\. Optional Stan program blocks: Functions, transformed data, transformed parameters, generated quantities |
+|         | 2\. Efficiency tuning                                                                                       |
+|         | 3\. Processing posterior draws in Stan and R                                                                |
 |    6    | **Applied Bayesian Statistics Using Stan: Advanced Modeling**                                               |
 
+## Using the workshop materials
+
+The workshop materials come as
+[`learnr`](https://rstudio.github.io/learnr/) tutorials wrapped in an R
+package. To download, install, and use the interactive materials, run
+the following code:
+
+``` r
+## Detach if loaded
+if ("statmodeling" %in% (.packages())) {
+  detach(package:statmodeling, unload = TRUE)
+}
+
+# Uninstall if installed
+if ("statmodeling" %in% installed.packages()) {
+  remove.packages("statmodeling")
+}
+
+# Install if not installed
+if (!("devtools" %in% installed.packages())) {
+  install.packages("devtools")
+}
+
+# Load from GitHub
+library(devtools)
+devtools::install_github("denis-cohen/statmodeling")
+
+# Load to library
+library(statmodeling)
+
+# Run tutorials
+learnr::run_tutorial("00-int", package = "statmodeling")
+learnr::run_tutorial("01-lec", package = "statmodeling")
+learnr::run_tutorial("01-lab", package = "statmodeling")
+learnr::run_tutorial("02-lec", package = "statmodeling")
+learnr::run_tutorial("02-lab", package = "statmodeling")
+learnr::run_tutorial("03-lec", package = "statmodeling")
+learnr::run_tutorial("03-lab", package = "statmodeling")
+learnr::run_tutorial("04-lec", package = "statmodeling")
+learnr::run_tutorial("04-lab", package = "statmodeling")
+learnr::run_tutorial("05-lec", package = "statmodeling")
+learnr::run_tutorial("05-lab", package = "statmodeling")
+```
 
 ## About the Instructor
 
