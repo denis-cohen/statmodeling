@@ -96,9 +96,9 @@ The level-two equations show how we want to use the context-level variable $\mat
 Rearranging into a single equation yields
 
 $$\begin{split}
-\eta_{ij} & = \gamma_{11} + \gamma_{21} \mathtt{bl\_immig}_j + \nu_{j1} + (\gamma_{12} + \gamma_{22} \mathtt{bl\_immig}_j + \nu_{j2}) \mathtt{la\_self}_i + \epsilon_i \\
-\eta_{ij} & = \gamma_{11} + \gamma_{21} \mathtt{bl\_immig}_j + \nu_{j1} + \gamma_{12} \mathtt{la\_self}_i + \gamma_{22} \mathtt{bl\_immig}_j \mathtt{la\_self}_i + \nu_{j2} \mathtt{la\_self}_i  + \epsilon_i \\
-\eta_{ij} & = \gamma_{11} + \underbrace{\gamma_{12} \mathtt{la\_self}_i + \gamma_{21} \mathtt{bl\_immig}_j + \gamma_{22} \mathtt{bl\_immig}_j \mathtt{la\_self}_i}_{\text{interaction}} + \underbrace{\epsilon_i + \nu_{j1} + \nu_{j2} \mathtt{la\_self}_i}_{\text{composite errors}}
+\eta_{ij} & = \beta_1 + \gamma_{1} \mathtt{bl\_immig}_j + \nu_{j1} + (\beta_2 + \gamma_{2} \mathtt{bl\_immig}_j + \nu_{j2}) \mathtt{la\_self}_i + \epsilon_i \\
+\eta_{ij} & = \beta_1 + \gamma_{1} \mathtt{bl\_immig}_j + \nu_{j1} + \beta_2 \mathtt{la\_self}_i + \gamma_{2} \mathtt{bl\_immig}_j \mathtt{la\_self}_i + \nu_{j2} \mathtt{la\_self}_i  + \epsilon_i \\
+\eta_{ij} & = \beta_1 + \underbrace{\beta_2 \mathtt{la\_self}_i + \gamma_{1} \mathtt{bl\_immig}_j + \gamma_{2} \mathtt{bl\_immig}_j \mathtt{la\_self}_i}_{\text{interaction}} + \underbrace{\epsilon_i + \nu_{j1} + \nu_{j2} \mathtt{la\_self}_i}_{\text{composite errors}}
 \end{split}$$
 
 This is why we also call this a model with a *cross-level interaction*.

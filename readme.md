@@ -53,33 +53,38 @@ workshop*. Should you encounter problems, feel free to send me an email.
 
 # Course Structure
 
-The workshop consists of six sessions of up to 120 minutes each. Each
-session starts with a lecture-style input talk, followed by lab-style
-applied exercises.
+The workshop consists of five sessions. Each session starts with a
+lecture-style input talk, followed by lab-style applied exercises.
 
 | Session | Topics                                                                                                      |
 | :-----: | :---------------------------------------------------------------------------------------------------------- |
 |    1    | **R Math & Programming Refresher**                                                                          |
-|         | 1\. Good coding practices                                                                                   |
+|         | 1\. Data types                                                                                              |
 |         | 2\. Object types and conversions; slicing and indexing                                                      |
-|         | 3\. Control structures                                                                                      |
-|         | 4\. Probability distributions                                                                               |
-|         | 5\. Linear algebra                                                                                          |
+|         | 3\. Probability distributions                                                                               |
+|         | 4\. Linear algebra                                                                                          |
+|         | 5\. Control structures                                                                                      |
+|         | 6\. Programming                                                                                             |
 |    2    | **Generalized Linear Models**                                                                               |
-|         | 1\. GLM basics: Systematic component, link function, family/likelihood                                      |
-|         | 2\. The simulation approach                                                                                 |
-|         | 3\. Quantities of interest (definition, calculation, simulation)                                            |
+|         | 1\. GLM basics: Systematic component, link function, likelihood function                                    |
+|         | 2\. GLM typology                                                                                            |
+|         | 3\. The simulation approach                                                                                 |
+|         | 4\. Quantities of interest (definition, calculation, simulation)                                            |
 |    3    | **Bayesian Fundamentals**                                                                                   |
 |         | 1\. Fundamental concepts: Prior distribution, likelihood, posterior distribution                            |
-|         | 2\. MCMC Algorithms                                                                                         |
+|         | 2\. Analytical Bayes                                                                                        |
+|         | 3\. MCMC Algorithms                                                                                         |
+|         | 4\. Gibbs sampler implementation                                                                            |
+|         | 4\. Convergence diagnostics                                                                                 |
 |    4    | **Applied Bayesian Statistics Using Stan: Basics**                                                          |
 |         | 1\. Stan: Language, documentation, and core program blocks                                                  |
 |         | 2\. The Bayesian workflow                                                                                   |
-|    5    | **Applied Bayesian Statistics Using Stan: Extensions**                                                      |
+|         | 3\. Linear model implementation                                                                             |
+|    5    | **Applied Bayesian Statistics Using Stan: Extensions and Advanced Modeling**                                |
 |         | 1\. Optional Stan program blocks: Functions, transformed data, transformed parameters, generated quantities |
 |         | 2\. Efficiency tuning                                                                                       |
-|         | 3\. Processing posterior draws in Stan and R                                                                |
-|    6    | **Applied Bayesian Statistics Using Stan: Advanced Modeling**                                               |
+|         | 3\. Hierarchical logistic model implementation                                                              |
+|         | 4\. Processing posterior draws in Stan and R                                                                |
 
 ## Using the workshop materials
 
