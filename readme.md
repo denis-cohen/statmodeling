@@ -1,8 +1,8 @@
 
-# Statistical Modeling with R and Stan
+# Advanced Bayesian Statistical Modeling in R and Stan
 
 Denis Cohen  
-<denis.cohen@mzes.uni-mannheim.de>
+<denis.cohen@uni-mannheim.de>
 
 ## Abstract
 
@@ -18,18 +18,17 @@ methods offer a powerful and versatile infrastructure for these tasks.
 Yet, seemingly high entry costs still deter many social scientists from
 fully embracing Bayesian methods.
 
-To push past these initial hurdles and to equip participants with the
-required skills for custom statistical modeling, this two-day workshop
-offers an advanced introduction to statistical modeling using R and
-Stan. Following a targeted review of the underlying mechanics of
-generalized linear models and core concepts of Bayesian inference, the
-course introduces participants to Stan, a platform for statistical
-modeling and Bayesian statistical inference. Participants will get an
-overview of the programming language, the R interface RStan, and the
-workflow for Bayesian model building, inference, and convergence
-diagnosis. Applied exercises provide participants with the chance to
-write an run various model types and to process the resulting estimates
-into publication-ready graphs.
+This workshop offers an advanced introduction to Bayesian statistical
+modeling to push past these initial hurdles and equip participants with
+the required skills for custom statistical modeling. Following a
+targeted review of the underlying mechanics of generalized linear models
+and core concepts of Bayesian inference, the course introduces
+participants to Stan, a platform for statistical modelling and Bayesian
+statistical inference. Participants will get an overview of the
+programming language, the R interface RStan, and the workflow for
+Bayesian model building, inference, and convergence diagnosis. Applied
+exercises allow participants to write and run various model types and to
+process the resulting estimates into publication-ready graphs.
 
 ## Prerequisites
 
@@ -41,10 +40,10 @@ is recommended.
 This workshop requires installations of recent versions of
 [`R`](https://cran.r-project.org/mirrors.html) and
 [`RStudio`](https://rstudio.com/products/rstudio/download/#download). On
-Day 2 of the workshop, we will use [`Stan`](https://mc-stan.org/) via
-its R interface `RStan`. Setting up `RStan` can be somewhat
-time-consuming as it requires the installation of a C++ compiler.
-Workshop participants should follow [these
+In the second half of the workshop, we will use
+[`Stan`](https://mc-stan.org/) via its R interface `RStan`. Setting up
+`RStan` can be somewhat time-consuming as it requires the installation
+of a C++ compiler. Workshop participants should follow [these
 instructions](https://github.com/stan-dev/rstan/wiki/RStan-Getting-Started)
 on the Stan Development Team’s GitHub to install and configure the
 [`rstan`](https://cran.r-project.org/web/packages/rstan/index.html)
@@ -53,38 +52,65 @@ workshop*. Should you encounter problems, feel free to send me an email.
 
 # Course Structure
 
-The workshop consists of five sessions. Each session starts with a
-lecture-style input talk, followed by lab-style applied exercises.
+The workshop consists of five sessions à 180 minutes. Each session
+starts with a lecture-style input talk, followed by lab-style applied
+exercises.
 
-| Session | Topics                                                                                                      |
-| :-----: | :---------------------------------------------------------------------------------------------------------- |
-|    1    | **R Math & Programming Refresher**                                                                          |
-|         | 1\. Data types                                                                                              |
-|         | 2\. Object types and conversions; slicing and indexing                                                      |
-|         | 3\. Probability distributions                                                                               |
-|         | 4\. Linear algebra                                                                                          |
-|         | 5\. Control structures                                                                                      |
-|         | 6\. Programming                                                                                             |
-|    2    | **Generalized Linear Models**                                                                               |
-|         | 1\. GLM basics: Systematic component, link function, likelihood function                                    |
-|         | 2\. GLM typology                                                                                            |
-|         | 3\. The simulation approach                                                                                 |
-|         | 4\. Quantities of interest (definition, calculation, simulation)                                            |
-|    3    | **Bayesian Fundamentals**                                                                                   |
-|         | 1\. Fundamental concepts: Prior distribution, likelihood, posterior distribution                            |
-|         | 2\. Analytical Bayes                                                                                        |
-|         | 3\. MCMC Algorithms                                                                                         |
-|         | 4\. Gibbs sampler implementation                                                                            |
-|         | 4\. Convergence diagnostics                                                                                 |
-|    4    | **Applied Bayesian Statistics Using Stan: Basics**                                                          |
-|         | 1\. Stan: Language, documentation, and core program blocks                                                  |
-|         | 2\. The Bayesian workflow                                                                                   |
-|         | 3\. Linear model implementation                                                                             |
-|    5    | **Applied Bayesian Statistics Using Stan: Extensions and Advanced Modeling**                                |
-|         | 1\. Optional Stan program blocks: Functions, transformed data, transformed parameters, generated quantities |
-|         | 2\. Efficiency tuning                                                                                       |
-|         | 3\. Hierarchical logistic model implementation                                                              |
-|         | 4\. Processing posterior draws in Stan and R                                                                |
+| Session | Topics                                                                                                                                                                                                                                   |
+|:-------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|    1    | **R Math & Programming Refresher**                                                                                                                                                                                                       |
+|         | ***Session contents:***                                                                                                                                                                                                                  |
+|         | \- Data types                                                                                                                                                                                                                            |
+|         | \- Object types and conversions; slicing and indexing                                                                                                                                                                                    |
+|         | \- Probability distributions                                                                                                                                                                                                             |
+|         | \- Linear algebra                                                                                                                                                                                                                        |
+|         | \- Control structures                                                                                                                                                                                                                    |
+|         | \- Programming                                                                                                                                                                                                                           |
+|         | ***Suggested readings:***                                                                                                                                                                                                                |
+|         | \- Wickham, H. (2019). Advanced R. CRC press. Available online: <https://adv-r.hadley.nz/>                                                                                                                                               |
+|         | \- Gill, J. (2006). Essential Mathematics for Political and Social Research. Cambridge: Cambridge University Press.                                                                                                                      |
+|    2    | **Generalized Linear Models & Simulation-based Approaches to Inferential Uncertainty**                                                                                                                                                   |
+|         | ***Session contents:***                                                                                                                                                                                                                  |
+|         | \- GLM basics: Systematic component, link function, likelihood function                                                                                                                                                                  |
+|         | \- GLM typology                                                                                                                                                                                                                          |
+|         | \- The simulation approach: Quasi-Bayesian Monte Carlo simulation of model parameters                                                                                                                                                    |
+|         | \- Quantities of interest (definition, calculation, simulation)                                                                                                                                                                          |
+|         | ***Suggested readings:***                                                                                                                                                                                                                |
+|         | \- Gill, J., & Torres, M. (2019). Generalized Linear Models: A Unified Approach (Vol. 134). SAGE Publications.                                                                                                                           |
+|         | \- King, G., Tomz, M., & Wittenberg, J. (2000). Making the Most of Statistical Analyses: Improving Interpretation and Presentation. American Journal of Political Science, 44(2), 341–355.                                               |
+|         | \- Gelman, A., & Hill, J. (2007). Data Analysis Using Regression and Multilevel/Hierarchical Models. Cambridge: Cambridge University Press.                                                                                              |
+|    3    | **Bayesian Fundamentals**                                                                                                                                                                                                                |
+|         | ***Session contents:***                                                                                                                                                                                                                  |
+|         | \- Fundamental concepts: Prior distribution, likelihood, posterior distribution                                                                                                                                                          |
+|         | \- Analytical Bayes                                                                                                                                                                                                                      |
+|         | \- MCMC Algorithms                                                                                                                                                                                                                       |
+|         | \- Gibbs sampler implementation                                                                                                                                                                                                          |
+|         | \- Convergence diagnostics                                                                                                                                                                                                               |
+|         | ***Suggested readings:***                                                                                                                                                                                                                |
+|         | \- Gelman, A., Carlin, J. B., Stern, H. S., & Rubin, D. B. (2014). Bayesian data analysis (Vol. 2).                                                                                                                                      |
+|         | \- Gill, J. (2015). Bayesian Methods. A Social and Behavioral Sciences Approach (3rd ed.). Boca Raton, FL: CRC Press.                                                                                                                    |
+|         | \- Gill, J., & Heuberger, S. (2020). Bayesian Modeling and Inference: A Postmodern Perspective. In L. Curini & R. Franzese (Eds.), The SAGE Handbook of Research Methods in Political Science and International Relations (pp. 961–984). |
+|    4    | **Applied Bayesian Statistics Using Stan: Basics & Workflow**                                                                                                                                                                            |
+|         | ***Session contents:***                                                                                                                                                                                                                  |
+|         | \- Stan: Language and documentation                                                                                                                                                                                                      |
+|         | \- Core program blocks: Data, parameters, model                                                                                                                                                                                          |
+|         | \- The Bayesian workflow I: Model specification, model building, validation, fitting, diagnosis                                                                                                                                          |
+|         | \- Linear model implementation                                                                                                                                                                                                           |
+|         | ***Suggested readings:***                                                                                                                                                                                                                |
+|         | \- Gelman, A., Vehtari, A., Simpson, D., Margossian, C. C., Carpenter, B., Yao, Y., … Modrák, M. (2020). Bayesian workflow. ArXiv. Available online: <https://arxiv.org/abs/2011.01808>                                                  |
+|         | \- Nicenboim, B., Schad, D., & Vasishth, S. (2022). An Introduction to Bayesian Data Analysis for Cognitive Science. Retrieved from <https://vasishth.github.io/bayescogsci/book/>                                                       |
+|         | \- Stan Documentation. Available online: <https://mc-stan.org/users/documentation/>                                                                                                                                                      |
+|    5    | **Applied Bayesian Statistics Using Stan: Extensions and Advanced Modeling**                                                                                                                                                             |
+|         | ***Session contents:***                                                                                                                                                                                                                  |
+|         | \- Optional program blocks: Functions, transformed data, transformed parameters, generated quantities                                                                                                                                    |
+|         | \- Efficiency tuning: Data pre-processing, reparameterization, NUTS control arguments                                                                                                                                                    |
+|         | \- Hierarchical logistic model implementation                                                                                                                                                                                            |
+|         | \- The Bayesian workflow II: Posterior predictive checks, model comparison                                                                                                                                                               |
+|         | \- Processing posterior draws in Stan and R into substantively meaningful quantities                                                                                                                                                     |
+|         | ***Suggested readings:***                                                                                                                                                                                                                |
+|         | \- Gelman, A., Vehtari, A., Simpson, D., Margossian, C. C., Carpenter, B., Yao, Y., … Modrák, M. (2020). Bayesian workflow. ArXiv. Available online: <https://arxiv.org/abs/2011.01808>                                                  |
+|         | \- Nicenboim, B., Schad, D., & Vasishth, S. (2022). An Introduction to Bayesian Data Analysis for Cognitive Science. Retrieved from <https://vasishth.github.io/bayescogsci/book/>                                                       |
+|         | \- Stan Documentation. Available online: <https://mc-stan.org/users/documentation/>                                                                                                                                                      |
 
 ## Using the workshop materials
 
@@ -130,18 +156,24 @@ learnr::run_tutorial("05-lec", package = "statmodeling")
 learnr::run_tutorial("05-lab", package = "statmodeling")
 ```
 
+Those who prefer working on the lab exercises outside of the interactive
+`learnr` environment (i.e., in a regular R session) can use the `Rmd`
+files supplied in the folder `lab-materials`, which contains both
+exercises and solutions.
+
 ## About the Instructor
 
 Denis Cohen is a postdoctoral fellow in the Data and Methods Unit at the
 [Mannheim Centre for European Social Research
 (MZES)](https://www.mzes.uni-mannheim.de/), [University of
-Mannheim](https://www.uni-mannheim.de/), co-organizer of the [MZES
-Social Science Data
-Lab](https://www.mzes.uni-mannheim.de/socialsciencedatalab/page/events/),
-and co-editor of the blog [Methods
-Bites](https://www.mzes.uni-mannheim.de/socialsciencedatalab/). His
-research focus lies at the intersection of political preference
-formation, electoral behavior, and political competition. His
-methodological interests include quantitative approaches to the analysis
-of clustered data, measurement models, data visualization, strategies
-for causal identification, and Bayesian statistics.
+Mannheim](https://www.uni-mannheim.de/). He is also lead organizer of
+the [MZES Social Science Data
+Lab](https://www.mzes.uni-mannheim.de/socialsciencedatalab/page/events/)
+and lead editor of the blog [Methods
+Bites](https://www.mzes.uni-mannheim.de/socialsciencedatalab/). A
+political scientist by training, his substantive work focuses on the
+political economy of spatial inequalities, political preferences and
+voting behavior, strategic elite behavior, and political competition in
+consolidated multiparty democracies. His methodological interests
+include advanced statistical modeling, georeferenced data, data
+visualization, and causal inference.

@@ -44,9 +44,11 @@ X <- model.matrix(~ se_self + la_self + se_self:la_self, data = gles)
 ## Doing OLS by hand
 
 We have all used the ordinary least squares estimator for linear regression.
-But have yo ever implemented it by hand? This will be your task for this exercise! At the same time, it will be a segue into Session 2 of our workshop, which focuses on generalized linear models.
+But have you ever implemented it by hand? This will be your task for this exercise!
 
-Note that we will not *derive* the OLS estimator by hand. You will get the derivation and translate it into R code.
+At the same time, this exercise will be a segue into Session 2 of our workshop, which focuses on generalized linear models.
+
+Note that we will not *derive* the OLS estimator by hand. Instead, you will get the derivation and translate it into R code.
 
 The exercise consists of two parts:
 
@@ -64,18 +66,16 @@ The exercise consists of two parts:
 
 ### Notes
 
-- This exercise may be challenging at times, but I have supplied
-numerous hints for you. 
-- If you get stuck, feel free to step outside the breakout room and ask me for additional hints in the Zoom meeting.
+- This exercise may be challenging at times, but I have supplied numerous hints for you. 
+- If you get stuck, feel free ask me for additional hints.
 - You can view the solutions, though I suggest you try to figure it out on your own first. 
-- If serial tasks rely on objects you are prompted to generate, the correct objects will be pre-loaded in all subsequent steps.
+- If serial tasks rely on objects you are prompted to generate, the correct objects will be pre-loaded in all subsequent steps (provided you work in the `learnr` environment).
 
 ## The linear model
 
 The linear model is a special case of generalized linear models (more on this in the next session).
 
-The OLS estimator for multivariate regression analyses requires
-calculations in matrix form. 
+The OLS estimator for multivariate regression analyses requires calculations in matrix form. 
 
 ### Model specification:
 
@@ -122,7 +122,7 @@ $$\underbrace{\begin{bmatrix} y_1 \\ \vdots \\  y_{N} \end{bmatrix}}_{N \times 1
 ### Inputs (data)
 
 1. A length-$N$ outcome vector $\mathbf{y}$
-1. An $N \times K$ model matrix $\mathbf{X}$ (contains a leading column of 1's to multiply the intercept)
+1. An $N \times K$ model matrix $\mathbf{X}$, which contains a leading column of 1's to multiply the intercept
 
 ### Primary outputs (estimands, parameters)
 
@@ -146,13 +146,14 @@ Some things to note:
 
 ### Context
 
-The exercise chunk has pre-loaded the data frame `gles`, which contains three variables from the 2017 German Longitudinal Election Study. We want to model respondents' support for the AfD (`sup_afd`, measured on an 11-point scale ranging from -5 to 5) as a function of respondents' pro-redistribution preferences (`se_self`), anti-immigration preferences (`la_self`), including a multiplicative interaction term for the two predictors (`se_self:la_self`). 
+The exercise chunk has pre-loaded the data frame `gles`, which contains three variables from the 2017 German Longitudinal Election Study. We want to model respondents' support for the AfD (`sup_afd`, measured on an 11-point scale ranging from -5 to 5) as a function of respondents' pro-redistribution preferences (`se_self`) and anti-immigration preferences (`la_self`), including a multiplicative interaction term for the two predictors (`se_self:la_self`). 
 
-Both `se_self` and `la_self` are measured on 11-point scales. `se_self` ranges from values (0) "less taxes and deductions, even if
-that means less social spending" to (10) "more social spending, even if that means
-more taxes and deductions". `la_self` ranges from values (0) "facilitate immigration" to (10) "restrict immigration".
+Both `se_self` and `la_self` are measured on 11-point scales:
 
-The model formula is thus given by
+- `se_self` ranges from values (0) "less taxes and deductions, even if that means less social spending" to (10) "more social spending, even if that means more taxes and deductions". 
+- `la_self` ranges from values (0) "facilitate immigration" to (10) "restrict immigration".
+
+The model formula is given by
 $$\mathtt{sup\_afd} = \beta_1 + \beta_2 \mathtt{se\_self} + \beta_3 \mathtt{la\_self} + \beta_4 \mathtt{se\_self \times la\_self} + \epsilon$$
 
 ### Prompt
@@ -242,7 +243,7 @@ How can we get it's standard error? In OLS models, the variance of an expected v
 
 $$\mathbf{x}^{\ast \prime} \hat{\mathbf{\Sigma}} \mathbf{x}^{\ast}$$
 
-It's square root gives the standard error.
+Its square root gives the standard error.
 
 ### Step 1: Define value sequences for the predictors
 
@@ -344,8 +345,7 @@ for (i in seq_along(se_vals)) {
 
 ## Visualization
 
-Time for some shameless self-promotion: We are going to use my `regplane3D` package to visualize the expected values of AfD support as a joint function of socio-economic
-and immigration preferences.
+Time for some shameless self-promotion: We are going to use my `regplane3D` package to visualize the expected values of AfD support as a joint function of socio-economic and immigration preferences.
 
 ```{r viz-setup}
 b <- solve(t(X) %*% X) %*% t(X) %*% y
@@ -382,7 +382,7 @@ regplane3D::plane3D(
 )
 ```
 
-So, which conclusions can we draw?
+So, which substantive conclusions can we draw?
 
 ## Bonus: Validity checks
 
@@ -391,7 +391,7 @@ Let's check if we got everything right!
 Estimate the model via `lm()` and extract the coefficient vector and the variance-covariance matrix of the coefficients.
 
 Then, use `all.equal()` with the option `check.attributes = FALSE` to check if our estimates differ from those generated via `lm()`.
-Note that you must supply identical object types, so convert `b` to as `vector`.
+Note that you must supply identical object types, so convert `b` to a `vector`.
 
 ```{r valid-1-setup}
 b <- solve(t(X) %*% X) %*% t(X) %*% y

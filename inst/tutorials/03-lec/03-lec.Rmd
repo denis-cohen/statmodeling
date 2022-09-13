@@ -850,7 +850,7 @@ draws_posterior <-
     omega = .1,
     alpha = 20,
     beta = 200,
-    n_warmup = 1000,
+    n_warmup = 100,
     n_draws = 1000,
     data = gles$sup_afd,
     keep_warmup = TRUE
@@ -861,27 +861,44 @@ draws_posterior <- simplify2array(draws_posterior)
 draws_posterior[, 2] <- 1 / draws_posterior[, 2]
 
 # Plot
-
-for (i in 1:nrow(draws_posterior)) {
+for (i in seq_len(nrow(draws_posterior))) {
   if (i == 1) {
     plot(
       draws_posterior[i, 1],
       draws_posterior[i, 2],
-      pch = 19,
+      pch = 23,
       xlim = range(draws_posterior[, 1]),
       ylim = range(draws_posterior[, 2]),
       main = "Exploration of the joint posterior",
       xlab = expression(mu),
       ylab = expression(sigma),
-      col = "gray60"
+      col = NA,
+      bg = adjustcolor("red", alpha.f = 0.25)
     )
   } else {
-    segments(draws_posterior[i - 1, 1],
-             draws_posterior[i - 1, 2],
-             draws_posterior[i, 1],
-             draws_posterior[i, 2],
-             col = adjustcolor("gray10", alpha.f = 0.075),
-             lwd = 3)
+    segments(
+      draws_posterior[i - 1, 1],
+      draws_posterior[i - 1, 2],
+      draws_posterior[i - 1, 1],
+      draws_posterior[i, 2],
+      col = adjustcolor("gray10", alpha.f = 0.05),
+      lwd = 3
+    )
+    segments(
+      draws_posterior[i - 1, 1],
+      draws_posterior[i, 2],
+      draws_posterior[i, 1],
+      draws_posterior[i, 2],
+      col = adjustcolor("gray10", alpha.f = 0.05),
+      lwd = 3
+    )
+    points(
+      draws_posterior[i, 1],
+      draws_posterior[i, 2],
+      pch = 21,
+      col = NA,
+      bg = adjustcolor("gray10", alpha.f = 0.25)
+    )
   }
 }
 ```

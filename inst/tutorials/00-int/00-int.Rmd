@@ -36,30 +36,30 @@ Here are some of the things I work on:
 - Party competition:
     - *The Centre-Right versus the Radical Right: the Role of Migration Issues and Economic Grievances* (with Tarik Abou-Chadi and Markus Wagner)
     - *Does Accommodation Work? Mainstream Party Strategies and the Success of Radical Right Parties* (with Werner Krause and Tarik Abou-Chadi)
-    - *Getting the most out of comparative vote-switching data: A new framework for studying dynamic multiparty competition* (with Werner Krause and Tarik Abou-Chadi)
+    - *Getting the most out of comparative vote-switching data: A new framework for studying dynamic multiparty competition* (with Werner Krause and Tarik Abou-Chadi) [`rstan`]
 - Far-right voting:
-    - *Between strategy and protest: How policy demand, political dissatisfaction and strategic incentives matter for far-right voting*
+    - *Between strategy and protest: How policy demand, political dissatisfaction and strategic incentives matter for far-right voting* [`rstan`]
     - *Ökonomisches Risiko und die elektorale Anziehungskraft der AfD*
-    - *Economic Risk, Anti-Immigration Preferences and Voting for the Radical Right*
+    - *Economic Risk, Anti-Immigration Preferences and Voting for the Radical Right* [`rstan`]
 - The political economy of spatial inequalities:
     - *The Political Economy of Rental Housing* (with Tarik Abou-Chadi and Thomas Kurer)
+    - *Preferences for rent control: Between political geography and political economy* [`brms`]
+    - *The housing crisis on social media: Housing markets and the subnational diversification of policy supply* (with Tim Allinger and Andreas Küpfer) [`rstan`]
     - *Regional Labor Markets and the Politics of Resentment* (with Sergi Pardos-Prado)
-    - *Political Reactions to Local Housing Market Dynamics* (grant proposal)
 - Methods:
     - [*Methods Bites: Blog of the MZES Social Science Data Lab*](https://www.mzes.uni-mannheim.de/socialsciencedatalab/) (with Cosima Meyer and Julian Bernauer)
-    - *Applied Causal Inference (with R)* (with Paul C. Bauer)
+    - *Estimating legislator-level issue salience and issue positions from political text* (with Andreas Küpfer) [`rstan`]
+    - *Simulating party shares* (with Chris Hanretty) [`cmdstanr`]
     - *When (not) to trust the overlap in confidence intervals: A practical guide.*
-- Software:
-    - [`regplane3D`](https://github.com/denis-cohen/regplane3D): Plotting Regression Predictions in 3D
-    - [`flex_bib`](https://github.com/paulcbauer/flex_bib): Flexibly generate multiple bibliographies in RMarkdown (with Paul C. Bauer)
+    - *Applied Causal Inference (with R)* (with Paul C. Bauer)
 
 
 ## So, who are you?
 
 Briefly tell me:
 
-1. Your program, year, and main research interest/thesis title.
-1. Why you chose to attend this class.
+1. Your position and main research interest/thesis title.
+1. Why you chose to attend this workshop series.
 1. If you could successfully install Stan and get it to run...
 
 <center>
@@ -67,7 +67,7 @@ Briefly tell me:
 </center>
 
 
-## Statistical Modeling with R and Stan
+## Advanced Bayesian Statistical Modeling with R and Stan
 
 ### Primary Learning Objectives
 
@@ -84,27 +84,38 @@ Briefly tell me:
 
 ## Schedule
 
+### Sessions
+
 | Session | Time                           | Topics                                                                                                     |
 |:-------:|:-------------------------------|:-----------------------------------------------------------------------------------------------------------|
-| 1       | Day 1, 09:00-11:00             | **R Math & Programming Refresher**                                                                         |
-| 2       | Day 1, 11:00-13:00             | **Generalized Linear Models**                                                                              |
-| 3       | Day 1, 14:00-16:00             | **Bayesian Fundamentals**                                                                                  |
-| 4       | Day 2, 09:00-11:00             | **Applied Bayesian Statistics Using Stan: Basics**                             |
-| 5       | Day 2, 11:00-13:00             | **Applied Bayesian Statistics Using Stan: Extensions**                 |
-| 6       | Day 2, 14:00-16:00             | **Applied Bayesian Statistics Using Stan: Advanced Modeling**                     |
+| 1       | 2022-09-22                     | **R Math & Programming Refresher**                                                                         |
+| 2       | 2022-09-29                     | **Generalized Linear Models & Simulation-based Approaches to Inferential Uncertainty**                                                                              |
+| 3       | 2022-10-06                     | **Bayesian Fundamentals**                                                                                  |
+| 4       | 2022-10-13                     | **Applied Bayesian Statistics Using Stan: Basics & Workflow**                             |
+| 5       | 2022-10-20                     | **Applied Bayesian Statistics Using Stan: Extensions and Advanced Modeling**                 |
+| 6       | tbd                     | **Applied Bayesian Statistics Using Stan: Custom Modeling Solutions** [workshop for work-in-progress; optional, mandatory for CDSS]                |
+
+### Accreditation for CDSS members
+
+You can earn ECTS points for participation in this class. For doing so, you must develop and apply a custom modeling solution in `rstan` and:
+
+- Present your idea or preliminary implementation in a workshop for work-in-progress (Session 6), to be scheduled toward the end of the semester
+- Submit by January 31, 2023, one of the following:
+  1. [4 ECTS] A technical report (max. 2,000 words), deriving, validating, and applying a custom Stan model
+  2. [6 ECTS] A research note (max. 4,000 words + max. 1,000 words supplementary materials), embedding the derivation, validation, and application of a custom Stan model in a substantive or methodological contribution
+  
+Non-CDSS members can participate, too, of course.
+
 
 ## Structure of our sessions
 
-We have 120 minutes per session. We will flexibly divide each session into the following sequence:
+We have 180 minutes per session. We will flexibly divide each session into the following sequence:
 
 1. Lecture
-2. Hands-on exercises (breakout rooms, in teams of three)
-3. Discussing solutions to exercises
-4. Breaks
+2. Lab: Hands-on exercises (in small teams), solutions to exercises
+3. Breaks (after +/- 90min, after lecture/before lab)
 
 ## Feedback
-
-While bits and pieces of the teaching materials existed before, much of this workshop is a first. 
 
 Feel free to share your feedback at any time, especially when you have suggestions that we can accommodate on the fly.
 

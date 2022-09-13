@@ -147,9 +147,7 @@ immediately relevant in the pursuit of or our learning objectives:
     - `apply`, `lapply`, `sapply`
 - functions
 
-### Things we are not going to cover
-
-### Best practices for reproducible data projects
+### Things we are not going to cover: Best practices for reproducible data projects
 
 - R Projects
 - Version control (e.g., Git)
@@ -163,7 +161,7 @@ immediately relevant in the pursuit of or our learning objectives:
     - `blogdown`
     - ...
     
-### Base R vs tidyverse
+### Things we are not going to cover: Base R vs tidyverse
 
 - Base R: Collection of native commands
     - historical legacies: not necessarily a "clean" language/syntax
@@ -174,8 +172,8 @@ immediately relevant in the pursuit of or our learning objectives:
 - both are valid
 - both are fully compatible with one another
 - both are fully compatible with external packages
-- you can do amazing things by relying on one, or the other, or both
-- we will use whichever best suits our purposes
+- you can do amazing things by relying on one, on the other, or on both
+- we will use whichever best suits our purposes (here: mostly base R)
 
 ### Further reading
 
@@ -279,7 +277,7 @@ is.double(c)
 
 ### Commands
 
-For common probability distributions, R features the following four commands:
+For common probability distributions, R features the following four commands (where `dist` is a placeholder):
 
 1. `ddist(x)`: Probability density/mass function (pdf/pmf). Takes a value $x$ and returns the probability density/mass $P(X=x)$.  
 1. `pdist(x)`: Cumulative distribution function (CDF). Takes a value $x$ and returns the cumulative probability $P(X \leq x)$.
@@ -517,12 +515,12 @@ You may think of an array as a generalization of a matrix to any number of dimen
 K <- 3L
 L <- 2L
 M <- 2L
-ary3D <- array(rnorm(K*L*M, mean = 0, sd = 1), dim = c(K, L, M))
+arrayy3D <- array(rnorm(K*L*M, mean = 0, sd = 1), dim = c(K, L, M))
 ```
 
 ```{r arr1_2, exercise = TRUE}
-### Try slicing, e.g. ar3D[, 1, 1], ar3D[c(1, 3), , ], etc.
-ary3D
+### Try slicing, e.g. array3D[, 1, 1], array3D[c(1, 3), , ], etc.
+arrayy3D
 ```
 
 
@@ -608,7 +606,7 @@ is.matrix(s)
 dim(s)
 ```
 
-...`s` will be stored as a matrix. This can be annoying, because it prevents you from using `s` for simple tasks like scalar multiplication:
+...`s` will be stored as a matrix of dimensions $1 \times 1$. This can be annoying, because it prevents you from using `s` for simple tasks like scalar multiplication:
 
 $$ 7 \begin{bmatrix} 1 & 3 \\ 2 & 4\end{bmatrix} = \begin{bmatrix} 7 & 21 \\ 14 & 28\end{bmatrix}$$
 
@@ -628,7 +626,7 @@ s * m
 
 ### Vectors
 
-Whereas the mathematical concept of a scalar is stored a `vector` object in R, the mathematical concept of a vector *sometimes* requires the object type `matrix`.
+Whereas the mathematical concept of a scalar is stored as a `vector` object in R, the mathematical concept of a vector *sometimes* requires the object type `matrix`.
 
 We usually distinguish row and column vectors in linear algebra. Row vectors are matrices of dimensions $1 \times K$ whereas column vectors are matrices of dimensions $K \times 1$.
 
@@ -662,7 +660,7 @@ a_prime
 
 ### Summary
 
-- Scalars are vectors and sometimes matrices.
+- Scalars are vectors, and sometimes matrices.
 - Vectors are column vectors, but sometimes act like row vectors, and can be defined as matrices.
 - Matrices are, in fact, matrices.
 
@@ -690,7 +688,7 @@ mat1
 
 ### Indexing by names
 
-When objects contain attributes such as `names()` (`list`, `data.frame`), `rownames()` and `colnames()` (`matrix`), or `dimnames()`, we can also index by names:
+When objects contain attributes such as `names()` (`list`, `data.frame`), `rownames()` and `colnames()` (`matrix`), or `dimnames()` (`array`), we can also index by character names:
 
 #### Naming and slicing a vector
 
@@ -723,6 +721,7 @@ my_list[["vectors"]]
 my_list[[2]]
 my_list$vectors
 ```
+
 Due to the rectangular structure of data frames, we can also index both dimensions as we would usually do with matrices:
 
 ```{r slice-6, exercise = TRUE}
@@ -986,7 +985,7 @@ simulate_clt <- function(
 - no meaningful names for function, arguments, and objects
 - lots of redundancy and repetition
 - no control and information over output
-- no seed
+- no seed $\rightarrow$ output not reproducible
 
 ```{r function-bad, echo = TRUE}
 clt.function <- function(data,n1,n2) {c(mean(apply(replicate(n1,sample(data,n2)),2,mean)),
