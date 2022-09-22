@@ -1,0 +1,133 @@
+---
+title: "Lab: Generalized Linear Models"
+---
+
+```{r setup, include=FALSE}
+## ---- CRAN Packages ----
+## Save package names as a vector of strings
+pkgs <-  c("foreign", "MASS", "ggplot2")
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
+
+## ---- Global Objects ----
+gles <- 
+  read.dta("https://github.com/denis-cohen/statmodeling/raw/main/data/gles.dta")
+```
+
+
+## Quantities of interest with simulated uncertainty
+
+In this lab session, you will get to apply the concepts from the lecture to a logistic regression of individual vote choices for the AfD in 2017. 
+
+The data set `gles` is once again preloaded; the outcome variable is named `vote_afd`.
+
+
+## Exercise 1
+
+Consider the following logistic regression:
+
+```{r task1, echo = TRUE}
+## Estimate
+mod <- glm(vote_afd ~ la_self + east + fem + age,
+            data = gles,
+            family = binomial(link = "logit"))
+```
+
+Your task will be to compute the *average marginal effect* of a one-unit increase in `la_self` (anti-immigration preferences) on the probability of voting AfD.
+
+### Simulate the model coefficients
+
+To simulate the model coefficients, take $S$ draws from $\text{MVN}(\hat\beta, \hat \Sigma)$. $S$ should be a large number, at least 1000. Check the dimensions of the resulting object `b_sim`.
+
+*Hints:* 
+
+- `MASS:mvrnorm()` allows you take random draws from a multivariate normal distribution.
+- `coef()` allows you to extract the coefficient estimates.
+- `vcov()` allows you to extract the estimate for the variance-covariance matrix of the coefficients.
+
+```{r task1-sim, exercise = TRUE}
+S <- 1000L
+b_sim <- ...
+```
+
+### Define your covariate scenarios
+
+We are interested in the *average* marginal effect. 
+
+You thus need two data matrices:
+
+1. `X0`: A model matrix with the observed covariate values of all respondents.
+1. `X1`: Same as above, but each respondent's value of `la_self` is increased by 1.
+
+Define the two matrices.
+
+```{r task1-x, exercise = TRUE}
+
+```
+
+### Get your unit-specific marginal effects
+
+1. Calculate vectors of linear predictors for all respondents under both scenarios. *Note:* 
+      - Your matrix $\beta^\text{sim}$ is of dimensions $S \times K$. 
+      - Your model matrices will e of dimensions $N \times K$. 
+      - Transpose and multiply the matrices such that your resulting object should be of dimensions $N \times S$.
+2. Apply the inverse logit link function (`plogis()`) to your linear predictors. This transforms the linear predictions to expected values (predicted probabilities).
+3. Take the difference between the two objects created in step (2) to get your simulated unit-specific marginal effects.
+
+```{r task1-ume, exercise = TRUE}
+
+```
+
+### Get and summarize your average marginal effects
+
+1. Take the mean (average) across all observations to aggregate your unit-level marginal effects into average marginal effects (*hint*: `apply()`). The resulting object should be a length-$S$ vector that gives you your simulated sampling distribution of the average marginal effect.
+2. Summarize the simulated sampling distribution
+    - Plot the distribution in a histogram.
+    - Calculate its mean or median (a numerical approximation of the point estimate).
+    - Calculate its standard deviation (a numerical approximation of the standard error).
+    - Constructed a simulation-based 95% confidence interval by taking the 2.5% and 97.5% percentiles of the simulated distribution.
+3. Concisely interpret the estimate and its uncertainty.
+
+```{r task1-ame, exercise = TRUE}
+
+```
+
+## Exercise 2
+
+Based on the same model, we now want to visualize the expected values (predicted probabilities) of voting for the AfD along the scale of anti-immigration preferences while keeping all other variables fixed at their sample means or sample proportions.
+
+For this exercise, we can use the same simulated parameters as before.
+
+
+### Covariate scenarios and quantities of interest
+
+As in Lab 1, we want to iteratively update our covariate scenario along a fine-grained sequence of values for `la_self` in a loop and store our quantity of interest at the current value in a pre-assigned container.
+
+To do this, follow the following steps:
+
+1. Define an initial vector $\mathbf{x}$ that holds the sample means of all covariates.
+1. Define a value sequence `la_vals` of length $L=101$ that ranges from 0 to 10.
+1. Define a container matrix of dimensions $L \times S$.
+1. In a loop from $1$ to $L$, do the following at each iteration:
+    - Overwrite the value of `la_self` in the covariate scenario with the current value of `la_vals`
+    - Calculate the simulations of the expected value using the current covariate scenario.
+
+```{r task2-x, exercise = TRUE}
+
+```
+
+### Summarize the simulated sampling distribution and visualize your finding!
+
+1. To present your finding, first summarize the simulated sampling distribution: At each value of `la_vals`, calculate the median as well as the 2.5% and 97.5% percentiles.
+2. Plot the prediction ($y$-axis) with its simulated 95% confidence intervals against the values of `la_vals` ($x$-axis). You can use base plots or `ggplot2`.
+
+
+```{r task2-viz, exercise = TRUE}
+
+```
