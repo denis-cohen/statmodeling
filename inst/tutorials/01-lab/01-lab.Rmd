@@ -299,11 +299,11 @@ Hints:
 
 - Your outer loop should loop through the elements of `se_vals` (see `seq_along()`).
 - Your inner loop should loop through the elements of `la_vals` (see `seq_along()`).
-- Define (overwrite) the vector `x_star` at each iteration of the loop. Remember that our model matrix has four columns -- you will need a corresponding element 
-    1. ones multiplying the intercept
-    1. values of `se_self`
-    1. values of `la_self`
-    1. values of the product term `se_self:la_self`
+- Define (overwrite) the vector `x_star` at each iteration of the loop. Remember that our model matrix has four columns -- you will need a corresponding vector element in `x_star`:
+    1. a 1 to multiply the intercept
+    1. the $i^{\text{th}}$ value of `se_self`
+    1. the $j^{\text{th}}$ value of `la_self`
+    1. the product of the $i^{\text{th}}$ value of `se_self` and the $j^{\text{th}}$ value of `la_self`
 - Define (overwrite) the vector `std_error` at each iteration of the loop. Remember: You want this to be a *scalar*!
 
 ```{r proc3-1-setup}

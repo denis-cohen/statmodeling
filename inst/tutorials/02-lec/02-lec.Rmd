@@ -50,9 +50,9 @@ All generalized linear models have three characteristic parts:
 
 #### Family
 
-- The family stipulates a stochastic process that can plausibly generate an outcome $Y$
+- The family stipulates a stochastic process that can plausibly generate an outcome $y$
 - This means we choose a pdf or pmf for $y$ given some parameters: $y_i \sim \text{f}(\theta_i, \psi)$
-- The choice usually depends on the distributional properties of $Y$
+- The choice usually depends on the distributional properties of $y$
 - A.k.a. the data-generating process or the likelihood
 
 
@@ -73,7 +73,7 @@ Putting it all together, a GLM is given by
 
 $$y_i \sim \text{f}(\theta_i = g^{-1}(\mathbf{x}_i^{\prime} \beta), \psi)$$
 
-where $\psi$ is an auxiliary parameter that will sometimes be estimated (e.g., $\sigma^2$ in the linear model).
+where $\psi$ is an auxiliary parameter that will sometimes be estimated (e.g., $\sigma^2$ in the linear model) and sometimes be fixed.
 
 Every generalized linear model is a *special case* of this general framework.
 
@@ -85,9 +85,9 @@ Every generalized linear model is a *special case* of this general framework.
 
 #### The three parts:
 
-- Family: $$y_i \sim \text{N}(\mu_i, \sigma^2)$$
-- Linear component: $$y_i = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\mu_i} + \underbrace{\epsilon}_{\sim \text{N}(0, \sigma^2)}$$
-- Inverse link function: $$\mu_i = \text{id}(\mu_i)$$
+- Family: $$y_i \sim \text{N}(\eta_i, \sigma^2)$$
+- Linear component: $$y_i = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon}_{\sim \text{N}(0, \sigma^2)}$$
+- Inverse link function: $$\eta_i = \text{id}(\eta_i)$$
 
 Thus, the linear model is given by
 
@@ -108,7 +108,7 @@ Thus, the probit model is given by
 
 $$y_i \sim \text{Bernoulli}(\Phi(\mathbf{x}_i^{\prime} \beta))$$
 
-where the $\beta$ vector is being estimated. $\Phi$ is the standard normal CDF.
+where the $\beta$ vector is being estimated. $\Phi$ is the standard normal CDF. Note that the standard normal CDF follows from fixing the variance of the error term, $\epsilon \sim \text{N}(0, 1)$.
 
 ### Example 3: The logit model
 
@@ -128,7 +128,7 @@ where the $\beta$ vector is being estimated. $\frac{\exp(\cdot)}{1 + \exp(\cdot)
 
 As you can see, the *assumed* distribution of the error term on the latent variable $y_i^{\ast}$ dictates our choice of the inverse link function.
 
-As the error distribution is fixed and its parameter are not being estimated, it is, however, not in itself of substantive interest.
+As the error distribution is fixed and its parameters are not being estimated, it is not in itself of substantive interest.
 
 ## GLM Typology
 
@@ -161,7 +161,7 @@ Things get a bit more intricate when we model multivariate outcomes, e.g., discr
 
 Multi-categorical discrete choice outcomes typically require that we stipulate a *categorical distribution* which requires choice-specific probability parameters $\theta_{ij} = \Pr(Y_i = j)$.
 
-A model that accommodates this while using a single univariate linear predictor $\eta_i$ is the *ordered logit model*, which can be used for modeling ordered outcomes with $J$ categories:
+A model that accommodates this while using a single univariate linear predictor $\eta_i$ is the *ordered logit model*, which can be used for modeling ordered outcomes with $J$ categories.
 
 #### Family
 
@@ -198,7 +198,7 @@ The linear predictor is $\eta_{ij} = \mathbf{x}_i^{\prime}\beta_j + \mathbf{z}_{
 
 The link function is the *softmax* function, a multivariate generalization of the inverse logit function:
 
-$$\Pr(y_i = j) = \text{softmax}(\eta_{ij})_k = \frac{\exp (\eta_{ij})}{\sum_{j=1}^{J} \exp(\eta_{ij})}$$
+$$\Pr(y_i = j) = \text{softmax}(\eta_{ij}) = \frac{\exp (\eta_{ij})}{\sum_{j=1}^{J} \exp(\eta_{ij})}$$
 
 ### Multiple families
 
@@ -221,7 +221,7 @@ A generalization of this are *two-part models*. Instead of estimating one set of
 
 An example is a *hurdle model*. Unlike a left-censored tobit model, this model allows for the possibility that different sets of parameters govern the data-generating process for $\Pr(y > y_L)$ and a normal data-generating process for the variation in $y$ given $y > y_L$.
 
-#### Finite mixtures of identical families
+### Finite mixtures of identical families
 
 A different intuition underlies finite mixture models. Rather than stipulating different *families* depending on the observed values of each unit, finite mixture models stipulate that substantively different data generating processes of the *same family* may generate the observed outcomes of all observations.
 
@@ -230,7 +230,7 @@ A different intuition underlies finite mixture models. Rather than stipulating d
 
 ### Expected values
 
-- The *expected value* tells you the where to expect the *conditional mean* of $Y$ given some covariate values $\mathbf{x}$ on the scale of $Y$.
+- The *expected value* tells you where to expect the *conditional mean* of $y$ given some covariate values $\mathbf{x}$ on the scale of $y$.
 - For most (but not all) GLM, the expected value is directly given by our estimate of the parameter $\theta_i = g^{-1}(\mathbf{x}_i^{\prime} \beta)$:
     - Linear model: $\mathbb{E}[y|\mathbf{x}] = \mathbf{x}_i^{\prime} \beta$ ("predicted value") 
     - Probit model: $\mathbb{E}[y|\mathbf{x}] = \Phi(\mathbf{x}_i^{\prime} \beta)$ ("predicted probability")
@@ -280,7 +280,7 @@ A remedy is the *observed values approach* ([Hanmer and Kalkan 2013](https://onl
 
 So for instance, the average first difference for a binary variable $d$ in a probit model is given by
 
-$$\frac{1}{N} \sum_{i=1}^{N}\Phi(\alpha + \tau (1) + \mathbf{x}_i^{\prime} \beta) - \Phi(\alpha + \tau (0) + \mathbf{x}_i^{\prime} \beta)$$
+$$\frac{1}{N} \sum_{i=1}^{N}\Phi(\alpha + \tau \times 1 + \mathbf{x}_i^{\prime} \beta) - \Phi(\alpha + \tau \times 0 + \mathbf{x}_i^{\prime} \beta)$$
 
 Analogously, the average marginal effect for a one unit increase in a continuous variable $d$ is given by
 
@@ -368,5 +368,5 @@ In some instances involving non-symmetrical transformations, we need to go the e
 
 We will *not* cover any such examples. So in our upcoming applied logistic regression example, we can produce inferential uncertainty with the simpler three-step algorithm. 
 
-You can easily see why this the case: The expected value of a Bernoulli distribution with parameter $\pi$ is $\pi$ itself: $\mathbb{E}[\text{Bernoulli}(\pi)] = \pi$. So drawing many 0's and 1's in step 4 just to average them back to a proportion that will be (approximately) equal to $\pi$ does not change anything.
+You can easily see why this the case: The expected value of a Bernoulli distribution with parameter $\pi$ is $\pi$ itself: $\mathbb{E}[\text{Bernoulli}(\pi)] = \pi$. So drawing many 0's and 1's in step 4 just to average them back to a proportion that will be (approximately) equal to $\pi$ is redundant.
 

@@ -100,7 +100,7 @@ Briefly tell me:
 You can earn ECTS points for participation in this class. For doing so, you must develop and apply a custom modeling solution in `rstan` and:
 
 - Present your idea or preliminary implementation in a workshop for work-in-progress (Session 6), to be scheduled toward the end of the semester
-- Submit by January 31, 2023, one of the following:
+- Submit, by January 31, 2023, one of the following:
   1. [4 ECTS] A technical report (max. 2,000 words), deriving, validating, and applying a custom Stan model
   2. [6 ECTS] A research note (max. 4,000 words + max. 1,000 words supplementary materials), embedding the derivation, validation, and application of a custom Stan model in a substantive or methodological contribution
   

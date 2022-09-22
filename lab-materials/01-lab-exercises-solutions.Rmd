@@ -174,7 +174,7 @@ Let's translate this into R! Hints:
 
 - `t()` transposes matrices/vectors
 - `solve()` inverts matrices
-- `%*%` multiplies matrices vectors
+- `%*%` multiplies matrices/vectors
 
 
 ```{r coef-est}

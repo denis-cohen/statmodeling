@@ -214,8 +214,8 @@ $$p(\mathbf{y}|\mu, \sigma) = \prod_{i=1}^{N} \frac{1}{\sigma \sqrt{2 \pi}} e^{-
 
 Suppose we flip a coin up to $N$ times:
 
-- The fairness of a coin can be expressed through a *probability parameter*, $\pi$, that governs the probability that a coin flip produces heads (H) has apposed to tails
-- We start out with the believe that the coin is fair -- that is, we consider it more probable that the coin is fair ($\pi \approx 0.5$) and less probable that it over-produces heads or tails
+- The fairness of a coin can be expressed through a *probability parameter*, $\pi$, that governs the probability that a coin flip produces heads (H) has opposed to tails
+- We start out with the believe that the coin is fair -- that is, we consider it more probable that the coin is fair ($\pi \approx 0.5$) and less probable that it systematically over-produces either heads or tails
 - Unbeknownst to us, the coin is far from fair -- it is 4 times as likely to produce heads as it is to produce tails (that is, $\pi=0.8$)
 - We slowly learn about this in the process of flipping the coin and keeping score of the number of flips $n$ and the number of heads $k$...
 
@@ -333,7 +333,7 @@ As you see, our posterior has the exact same form as our prior. It is a beta dis
 - $a^{\prime} = a+k-1$
 - $b^{\prime} = b+n-k-1$
 
-This property is called *conjugacy*: Prior and posterior are in the same family.
+This property is called *conjugacy*: Prior and posterior are of the same family.
 
 Now, take a moment to think about our analytical solution for the updated parameters. What does it take for the data to dominate the prior? What if the prior is weak? What if the prior is strong?
 
@@ -532,10 +532,10 @@ lines(
 
 ### The limits of analytical Bayesian inference
 
-- Bayesian inference involves finding a *joint* posterior for *all* parameters in a model. We thus have a *multi-dimensional* parameter space.
+- Even in only slightly more intricate applications, Bayesian inference involves finding a *joint* posterior for *all* parameters in a model, i.e., finding a *multi-dimensional* parameter space.
 - Inference on single parameters from a joint multi-dimensional parameter space requires that we retrieve the marginal posterior distribution from the joint posterior distribution.
 - Marginalizing the joint multidimensional posterior distribution w.r.t. to a given a parameter gives the posterior distribution for that parameter. This requires *integrating* out all other parameters.
-- For instance, when our joint posterior is $p(\alpha,\beta, \gamma)$, we need to obtain each marginal posterior akin to $p(\alpha) = \int_{\beta} \int_{\gamma} p(\alpha,\beta, \gamma) d\beta d\gamma$
+- For instance, when our joint posterior in a three-dimensional parameter space is $p(\alpha,\beta, \gamma)$, we need to obtain each marginal posterior akin to $p(\alpha) = \int_{\beta} \int_{\gamma} p(\alpha,\beta, \gamma) d\beta d\gamma$
 - For complex multi-dimensional posterior distributions, findings analytical solutions through integration becomes cumbersome, if not outright impossible.
 
 ### Numerical approximation via MCMC
@@ -581,8 +581,8 @@ The Hamiltonian Monte Carlo algorithm starts at a specified initial set of param
 
 ### In a nutshell
 
-- We want to perform inference on a variable $\mathbf{y}$, of which we have $N$ observations.
-- We stipulate that the data-generating process that produces $\mathbf{y}$ is normal: $\mathbf{y} \sim \text{N}(\mu, \sigma^2)$.
+- We want to perform inference on a variable $y$, of which we have $N$ observations.
+- We stipulate that the data-generating process that produces $y$ is normal: $\mathbf{y} \sim \text{N}(\mu, \sigma^2)$.
 - For reasons of convenience, we parameterize the variance of this normal distribution in terms of its precision $\tau = \frac{1}{\sigma^2}$, not in terms of its standard deviation or variance.
 
 ### Application
@@ -591,14 +591,18 @@ The Hamiltonian Monte Carlo algorithm starts at a specified initial set of param
 - Let's pretend our prior belief is completely naive: 
     - We don't know how (un)popular the AfD is in the German electorate
     - But we know that individual support is measured on a -5 to 5 scale
-    - Our prior belief for $\mu$ should thus be agnostic as to whether people like or dislike the AfD, but sufficiently vague to allow for the possibility that we may be wrong: $\mu \sim \text{N}(\theta = 0, \sigma^2 = 10)$
+    - Our prior belief for $\mu$ should thus be agnostic as to whether people like or dislike the AfD and sufficiently vague to allow for the possibility that we may be wrong: $\mu \sim \text{N}(\theta = 0, \sigma^2 = 10)$
     - Our prior belief for $\sigma^2 = \frac{1}{\tau}$ will also be vague: $\tau \sim \Gamma(\alpha = 20, \beta = 200)$
     - We have no prior belief about the dependence of both parameters and hence specify independent prior distributions
     
 ### Analytical preliminaries: $\mu$
 
 
-Our prior belief that $\mu$ is distributed normal with mean $\theta = 0$ and precision $\omega = .1$, i.e., $\mu \sim \text{N}(0, 10)$. Hence, the prior pdf is given by:
+Our prior belief is that $\mu$ is distributed normal with mean $\theta = 0$ and precision $\omega = .1$:  
+
+$$\mu \sim \text{N}(0, 10)$$
+
+The prior pdf is given by:
 
 $$
 p(\mu | \theta, \omega) = \sqrt{\frac{\omega}{2 \pi}} \exp \left (-\frac{\omega (\mu - \theta)^2}{2} \right)
@@ -913,7 +917,7 @@ However, even with appropriately specified models and algorithms, we can never k
 
 *Important:* Convergence diagnostics cannot show or prove convergence. They can only show signs of non-convergence!
 
-To be conclude that the post-warmup draws of our sampler in fact explore the target distribution, we want to show at least two things:
+To conclude that the post-warmup draws of our sampler in fact explore the target distribution, we want to show at least two things:
 
 1. Every chain is in a stationary state (i.e., does not "wander off" the target distribution)
 1. Multiple independent chains are in the same stationary state (i.e., no convergence to different target distributions given identical data)
