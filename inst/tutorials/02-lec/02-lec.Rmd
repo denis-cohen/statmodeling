@@ -53,12 +53,12 @@ All generalized linear models have three characteristic parts:
 - The family stipulates a stochastic process that can plausibly generate an outcome $y$
 - This means we choose a pdf or pmf for $y$ given some parameters: $y_i \sim \text{f}(\theta_i, \psi)$
 - The choice usually depends on the distributional properties of $y$
-- A.k.a. the data-generating process or the likelihood
+- Aliases: data-generating process, generative model, likelihood function
 
 
 #### Linear component
 
-- A linear model $y_i^{\ast} = \mathbf{x}_i^{\prime} \beta + \epsilon$
+- A linear model $y_i^{\ast} = \mathbf{x}_i^{\prime} \beta + \epsilon_i$
 - The goal of inference is the estimation of $\beta$
 - From, this, we can derive our *systematic component* or *linear predictor*, $\eta_i = \mathbf{x}_i^{\prime} \beta$
 
@@ -86,7 +86,7 @@ Every generalized linear model is a *special case* of this general framework.
 #### The three parts:
 
 - Family: $$y_i \sim \text{N}(\eta_i, \sigma^2)$$
-- Linear component: $$y_i = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon}_{\sim \text{N}(0, \sigma^2)}$$
+- Linear component: $$y_i = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon_i}_{\sim \text{N}(0, \sigma^2)}$$
 - Inverse link function: $$\eta_i = \text{id}(\eta_i)$$
 
 Thus, the linear model is given by
@@ -101,7 +101,7 @@ The probit model is a popular choice for modeling idiosyncratic binary choices.
 #### The three parts:
 
 - Family: $$y_i \sim \text{Bernoulli}(\pi_i)$$
-- Linear component: $$y_i^{\ast} = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon}_{\sim \text{N}(0, 1)}$$
+- Linear component: $$y_i^{\ast} = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon_i}_{\sim \text{N}(0, 1)}$$
 - Inverse link function: $$\pi_i = \Phi(\eta_i)$$
 
 Thus, the probit model is given by
@@ -117,7 +117,7 @@ With a slight change in the error distribution in the linear component and a cor
 #### The three parts:
 
 - Family: $$y_i \sim \text{Bernoulli}(\pi_i)$$
-- Linear component: $$y_i^{\ast} = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon}_{\sim \text{Logistic}(0, 1)}$$
+- Linear component: $$y_i^{\ast} = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon_i}_{\sim \text{Logistic}(0, 1)}$$
 - Inverse link function: $$\pi_i = \frac{\exp(\eta_i)}{1 + \exp(\eta_i)}$$
 
 Thus, the logit model is given by
@@ -161,6 +161,8 @@ Things get a bit more intricate when we model multivariate outcomes, e.g., discr
 
 Multi-categorical discrete choice outcomes typically require that we stipulate a *categorical distribution* which requires choice-specific probability parameters $\theta_{ij} = \Pr(Y_i = j)$.
 
+Thus, $\mathbf{\theta}_i$ is a length-$J$ vector for each $i=1,..,N$: $\mathbf{\theta}_i = \begin{bmatrix} \theta_{i1} & \dots & \theta_{iJ}\end{bmatrix}^{\prime}$, where $\sum_{j=1}^{J} \theta_{ij} = 1$ for each $i=1,..,N$. 
+
 A model that accommodates this while using a single univariate linear predictor $\eta_i$ is the *ordered logit model*, which can be used for modeling ordered outcomes with $J$ categories.
 
 #### Family
@@ -182,7 +184,7 @@ $$\begin{split}\Pr(y_i = j | \mathbf{x}_i) & =\Pr(\kappa_{j-1} < \eta_i \leq \ka
 
 ### Multivariate $\eta_i$, multivariate $\theta_i$
 
-When moving from ordered to unordered discrete choices, we must not only model choice-specific probability parameters $\theta_{ij}$ but also choice-specific linear predictors $\eta_{ij}$.
+When moving from ordered to unordered discrete choices, we not only need to model choice-specific probability parameters $\theta_{ij}$ but also choice-specific linear predictors $\eta_{ij}$.
 
 An example is the *multinomial logistic regression model*.
 
@@ -217,9 +219,9 @@ Similar logics apply to other models that involve censored data, e.g., in surviv
 
 #### Two-part models
 
-A generalization of this are *two-part models*. Instead of estimating one set of parameters $\beta$ and using different link functions for translating $\eta_i$ into $\theta_i^{f}$, these models estimate distinct sets of parameters $\beta^{f}$ for each of the stipulated data-generating process.
+A generalization of this are *two-part models*. Instead of estimating one set of parameters $\beta$ and using different link functions for translating $\eta_i$ into $\theta_i^{f}$, these models estimate distinct sets of parameters $\beta^{f}$ for each of the stipulated data-generating processes.
 
-An example is a *hurdle model*. Unlike a left-censored tobit model, this model allows for the possibility that different sets of parameters govern the data-generating process for $\Pr(y > y_L)$ and a normal data-generating process for the variation in $y$ given $y > y_L$.
+An example is a *hurdle model*. Unlike a left-censored tobit model, this model allows for the possibility that different sets of parameters govern the data-generating process for $\Pr(y > y_L)$ and the normal data-generating process for the variation in $y$ given $y > y_L$.
 
 ### Finite mixtures of identical families
 
@@ -320,7 +322,7 @@ The answers are simple:
 
 - *Fundamental uncertainty*  describes the randomness that comes from the fact that we stipulate stochastic data-generating processes.
     - Example: Over and beyond our uncertainty regarding the true mean of age in Germany, we have a stochastic model in mind that generates age, e.g.: $y \sim \text{N}(\hat \mu, \hat\sigma^2)$. So we could generate a predictive distribution of age from a normal distribution whose mean is the sample mean and whose variance is the sample variance.
-    - Fundamental uncertainty this describes our uncertainty about *predictions* via *predictive distributions*.
+    - Fundamental uncertainty thus describes our uncertainty about *predictions* via *predictive distributions*.
 
 ### The GLM context
 
@@ -356,10 +358,10 @@ So how can we get there?
 The algorithm presented by [King et al. (2000)](https://gking.harvard.edu/files/gking/files/making.pdf) contains five steps:
 
 1. Simulate the sampling distribution of the model parameters by taking $S$ draws from $\beta \sim \text{MVN}(\hat\beta, \hat \Sigma)$
-2. Choose a vector $\mathbf{x}$ or matrix $\mathbf{X}$.
-3. For each simulation $\beta^{s}$ for $s=1,...,S$, calculate $\theta^{s} = g^{-1}(\mathbf{x}^{\prime} \beta^{s})$.
+2. Choose a *covariate scenario*, i.e., specify a vector $\mathbf{x^{\ast}}$ or a matrix $\mathbf{X^{\ast}}$.
+3. For each simulation $\beta^{s}$ for $s=1,...,S$, calculate $\theta^{s} = g^{-1}(\mathbf{x^{\ast}}^{\prime} \beta^{s})$.
 
-Whenever $\theta$ gives a direct estimate of $\mathbb{E}[y|\mathbf{x}]$, these three steps will be sufficient!
+Whenever $\theta$ gives a direct estimate of $\mathbb{E}[y|\mathbf{x^{\ast}}]$, these three steps will be sufficient!
 
 In some instances involving non-symmetrical transformations, we need to go the extra mile: 
 

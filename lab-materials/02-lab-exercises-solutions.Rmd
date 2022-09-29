@@ -18,6 +18,7 @@ lapply(pkgs, library, character.only = TRUE)
 ## ---- Global Objects ----
 gles <- 
   read.dta("https://github.com/denis-cohen/statmodeling/raw/main/data/gles.dta")
+gles$vote_afd <- ifelse(gles$vote == "AfD", 1L, 0L)
 ```
 
 

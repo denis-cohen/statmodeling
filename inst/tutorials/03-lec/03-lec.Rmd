@@ -215,7 +215,7 @@ $$p(\mathbf{y}|\mu, \sigma) = \prod_{i=1}^{N} \frac{1}{\sigma \sqrt{2 \pi}} e^{-
 Suppose we flip a coin up to $N$ times:
 
 - The fairness of a coin can be expressed through a *probability parameter*, $\pi$, that governs the probability that a coin flip produces heads (H) has opposed to tails
-- We start out with the believe that the coin is fair -- that is, we consider it more probable that the coin is fair ($\pi \approx 0.5$) and less probable that it systematically over-produces either heads or tails
+- We start out with the belief that the coin is fair -- that is, we consider it more probable that the coin is fair ($\pi \approx 0.5$) and less probable that it systematically over-produces either heads or tails
 - Unbeknownst to us, the coin is far from fair -- it is 4 times as likely to produce heads as it is to produce tails (that is, $\pi=0.8$)
 - We slowly learn about this in the process of flipping the coin and keeping score of the number of flips $n$ and the number of heads $k$...
 
@@ -875,7 +875,7 @@ for (i in seq_len(nrow(draws_posterior))) {
       ylim = range(draws_posterior[, 2]),
       main = "Exploration of the joint posterior",
       xlab = expression(mu),
-      ylab = expression(sigma),
+      ylab = expression(sigma ^ 2),
       col = NA,
       bg = adjustcolor("red", alpha.f = 0.25)
     )
@@ -1057,16 +1057,16 @@ coda::autocorr.plot(draws_multiple_chains)
 - Bayesian inference does note presume large (quasi-infinite) streams of independent identically distributed (IID) data; data are considered fixed, parameters random.
 - This allows for straightforward interpretations of inferential uncertainty:
     - *Bayesian*: "Given the data, we can conclude that there is a 95% probability that the mean is between 8 and 12, with highest probability density at a value of 10".
-    - *Frequentist*: "If we took a large number of independent random samples from the same population and constructed a 95% confidence interval around the sample for each of them, these confidence intervals would contain the *true* population mean 95% of the time. Given this long-run frequency, we are 95% confident that the specific 95% confidence intervals from our singular sample contains the true population parameter" (yeah, right...).
+    - *Frequentist*: "If we took a large number of independent random samples from the same population and constructed a 95% confidence interval around the sample for each of them, these confidence intervals would contain the *true* population mean 95% of the time. Given this long-run frequency, we are 95% confident that the specific 95% confidence intervals from our singular sample contains the true population parameter...".
 
 #### Finite-sample and asymptotic properties
 
-- Bayesian inference allows for exact inference in finite-sample applications where the asymptotic properties of MLE estimators (normal approximation, etc.)...
-- ...but posterior distribution do often asymptotically converge to the sampling distribution of MLE estimators ([Bernstein-von-Mises Theorem](https://en.wikipedia.org/wiki/Bernstein%E2%80%93von_Mises_theorem))
+- Bayesian inference allows for exact inference in finite-sample applications where the asymptotic properties of MLE estimators are implausible (normal approximation, etc.)...
+- ...yet, posterior distribution often asymptotically converge to the sampling distribution of MLE estimators ([Bernstein-von-Mises Theorem](https://en.wikipedia.org/wiki/Bernstein%E2%80%93von_Mises_theorem))
 
 ### Flexibility and computational reliability
 
 - The use of MCMC algorithms for probabilistic approximate inference makes Bayesian approaches incredibly flexible and allows for computationally reliable estimation of complex, analytically intractable marginal likelihoods (avoids integration of super high-dimensional integrals)...
-- ...but also comes with the necessity of high computational resources, long computation times, and extensive convergence diagnosis and model checking
+- ...but sometimes comes with the necessity of high computational resources and/or long computation times, and always necessitates convergence diagnosis and model checking
 
 

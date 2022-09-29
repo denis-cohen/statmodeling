@@ -86,7 +86,7 @@ To simulate the model coefficients, take $S$ draws from $\text{MVN}(\hat\beta, \
 
 *Hints:* 
 
-- `MASS:mvrnorm()` allows you take random draws from a multivariate normal distribution.
+- `MASS::mvrnorm()` allows you take random draws from a multivariate normal distribution.
 - `coef()` allows you to extract the coefficient estimates.
 - `vcov()` allows you to extract the estimate for the variance-covariance matrix of the coefficients.
 
@@ -140,7 +140,7 @@ export(environment())
 1. Calculate vectors of linear predictors for all respondents under both scenarios. *Note:* 
       - Your matrix $\beta^\text{sim}$ is of dimensions $S \times K$. 
       - Your model matrices will e of dimensions $N \times K$. 
-      - Transpose and multiply the matrices such that your resulting object should be of dimensions $N \times S$.
+      - Transpose and multiply the matrices such that your resulting object is of dimensions $N \times S$.
 2. Apply the inverse logit link function (`plogis()`) to your linear predictors. This transforms the linear predictions to expected values (predicted probabilities).
 3. Take the difference between the two objects created in step (2) to get your simulated unit-specific marginal effects.
 
