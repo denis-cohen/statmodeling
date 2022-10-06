@@ -157,15 +157,15 @@ knitr::include_graphics("images/workflow.png")
 	
 ### Example: Linear model
 
-Our knowledge of generalized linear models gives us *almost everything we need!
+Our knowledge of generalized linear models gives us *almost* everything we need!
 
 ### Probability model for the data
 
 First, let's recap the three parts of every GLM in the context of the linear model:
 
-* Family: $\mathbf{y} \sim \text{Normal}(\mu, \sigma)$
-* (Inverse) link function: $\mathbf{y^{\ast}} = \text{id}(\mu) = \mu$
-* Linear component: $\mu = \mathbf{X} \beta$
+* Family: $\mathbf{y} \sim \text{Normal}(\eta, \sigma)$
+* (Inverse) link function: $\mathbf{y^{\ast}} = \text{id}(\eta) = \eta$
+* Linear component: $\eta = \mathbf{X} \beta$
 
 The *family* specifies the probability model (a.k.a. likelihood, data-generating process, or generative model) for the *data*: The fundamental assumption of the linear model is that every observation $y_i$ is a realization from a normal pdf with location parameter (mean) $\mu_i$ and constant scale parameter (variance) $\sigma^2$.
 
@@ -176,12 +176,12 @@ The *family* specifies the probability model (a.k.a. likelihood, data-generating
 * Parameters (unknown, random quantities):
     * $\beta$, the coefficient vector
     * $\sigma$, the scale parameter of the normal
-    * $\mu$, the location parameter of the normal
+    * $\eta$, the location parameter of the normal
 * Data (known, fixed quantities):
     * $\mathbf{y}$, the outcome vector
     * $\mathbf{X}$, the design matrix
     * the dimensions of $\mathbf{y}_{N \times 1}$ and $\mathbf{X}_{N \times K}$
-    * the dimensions of $\beta_{K \times 1}$, $\sigma$ (a scalar), and $\mu_{N \times 1}$
+    * the dimensions of $\beta_{K \times 1}$, $\sigma$ (a scalar), and $\eta_{N \times 1}$
     
 ### Priors
 
@@ -190,7 +190,7 @@ What is still missing are prior distributions for the unknown quantities.
 Here, we have quite some discretion. There are few rules we must adhere to:
 
 - Our $\beta$'s have unconstrained support (though by far not all value ranges may be reasonable!)
-- The scale parameter $sigma$ cannot be negative
+- The scale parameter $\sigma$ cannot be negative
 
 Here, we will opt for a convenience solution and specify weakly informative zero-mean normal priors for the $\beta$'s and a weakly informative half-Cauchy prior for $\sigma$:
 
@@ -330,7 +330,7 @@ parameters {
 
 Declare and specify unknown transformed quantities, including storage types, dimensions, and constraints: 
 
-- $\mu = \mathbf{X} \beta$, the linear prediction
+- $\eta = \mathbf{X} \beta$, the linear prediction
 
 
 ```{stan ex1-tpars1, output.var = "none", exercise = TRUE}
@@ -343,7 +343,7 @@ transformed parameters {
 ```{stan ex1-tpars1-solution, output.var = "none"}
 transformed parameters {
   vector[N] mu;  // declare
-  mu = x * beta; // assign
+  eta = x * beta; // assign
 }
 ```
 
@@ -353,7 +353,7 @@ Declare and specify local variables (optional) and specify sampling statements:
 
 - $\beta_k \sim \text{Normal}(0, 10) \text{ for k = 1,...,K}$ 
 - $\sigma \sim \text{Cauchy}^{+}(0, 5)$
-- $\mathbf{y} \sim \text{Normal}(\mu, \sigma)$
+- $\mathbf{y} \sim \text{Normal}(\eta, \sigma)$
 
 ```{stan ex1-mod1, output.var = "none", exercise = TRUE}
 model {
@@ -372,7 +372,7 @@ model {
   target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
   
   // log-likelihood
-  target += normal_lpdf(y | mu, sigma); // likelihood
+  target += normal_lpdf(y | eta, sigma);// likelihood
 }
 ```
 
@@ -401,7 +401,7 @@ parameters {
 
 transformed parameters {
   vector[N] mu;  // declare lin. pred.
-  mu = x * beta; // assign lin. pred.
+  eta = x * beta; // assign lin. pred.
 }
 
 model {
@@ -410,7 +410,7 @@ model {
   target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
   
   // log-likelihood
-  target += normal_lpdf(y | mu, sigma); // likelihood
+  target += normal_lpdf(y | eta, sigma); // likelihood
 }"
 
 # Write to script
@@ -438,10 +438,10 @@ beta <- rnorm(K, 0, 1)                    # coef. vector
 sigma <- 2.5                              # scale parameter
 
 # Get transformed parameters
-mu <- x %*% beta                          # linear prediction
+eta <- x %*% beta                         # linear prediction
 
 # Simulate outcome variable
-y_sim <- rnorm(N, mu, sigma)              # simulated outcome
+y_sim <- rnorm(N, eta, sigma)             # simulated outcome
 ```
 
 ### Setup and compilation
@@ -626,7 +626,7 @@ In the words of the developers:
 
 - Divergent transitions after warmup (validity concern)
     - increase `adapt_delta` (target acceptance rate)
-    - reparameterize/optimize your code (see )
+    - reparameterize/optimize your code
 - Maximum treedepth exceeded (efficiency concern)
     - increase `max_treedepth`
 - Diagnostics summary for `stanfit` object: `check_hmc_diagnostics(object)`
