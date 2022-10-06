@@ -79,7 +79,7 @@ $$
 
 For every element $\beta_k$ of the length-$K$ vector $\mathbf{\beta}$, we specify a normal prior in terms of mean $m = 0$ and precision $p = 0.1$: 
 
-$$\beta_k \sim N(m = 0, \frac{1}{p} = 10) \text{ for } k = 1,...,K$$ 
+$$\beta_k \sim N(m = 0, p^{-1} = 10) \text{ for } k = 1,...,K$$ 
 
 These are independent normal priors, which is equivalent to a variance-covariance matrix with zero-covariance on the off-diagonals. Thus, we can also write
 
@@ -240,9 +240,9 @@ lm_gibbs <- function(m_scalar,
       ## Iterations 2+: Update a and b
       a_star <- a + n_data / 2
       b_star <- as.vector(b +
-                            0.5 * (y %*% y +
-                                     m %*% P %*% m  -
-                                     m_star %*% P_star %*% m_star))
+                            0.5 * (t(y) %*% y +
+                                     t(m) %*% P %*% m  -
+                                     t(m_star) %*% P_star %*% m_star))
     }
     
     ## Sample tau

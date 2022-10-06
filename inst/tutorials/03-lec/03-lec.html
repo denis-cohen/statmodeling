@@ -172,8 +172,8 @@ class="math inline">\(p(\mathbf{y}|\theta)\)</span>.</li>
 by:</li>
 </ul>
 <p><span class="math display">\[p(\mathbf{y}|\mu, \sigma) =
-\prod_{i=1}^{N} \frac{1}{\sigma \sqrt{2 \pi}} e^{- 0.5 \left( (y_i -
-\mu_i)^2 / \sigma \right)}\]</span></p>
+\prod_{i=1}^{N} \frac{1}{\sigma \sqrt{2 \pi}} \exp\left(- 0.5 \left(
+(y_i - \mu_i)^2 / \sigma \right) \right)\]</span></p>
 <ul>
 <li>This is what we mean mathematically when we use the shorthand
 <ul>
@@ -246,12 +246,12 @@ times:</p>
 <ul>
 <li>The fairness of a coin can be expressed through a <em>probability
 parameter</em>, <span class="math inline">\(\pi\)</span>, that governs
-the probability that a coin flip produces heads (H) has apposed to
-tails</li>
-<li>We start out with the believe that the coin is fair – that is, we
+the probability that a coin flip produces heads (1) has opposed to tails
+(0)</li>
+<li>We start out with the belief that the coin is fair – that is, we
 consider it more probable that the coin is fair (<span
 class="math inline">\(\pi \approx 0.5\)</span>) and less probable that
-it over-produces heads or tails</li>
+it systematically over-produces either heads or tails</li>
 <li>Unbeknownst to us, the coin is far from fair – it is 4 times as
 likely to produce heads as it is to produce tails (that is, <span
 class="math inline">\(\pi=0.8\)</span>)</li>
@@ -271,12 +271,15 @@ characterizing our prior beliefs: <span class="math inline">\(\pi \sim
 <li>Characterized by two shape parameters, <span
 class="math inline">\(a\)</span> and <span
 class="math inline">\(b\)</span></li>
+<li><span class="math inline">\(a\)</span> and <span
+class="math inline">\(b\)</span> are <em>hyperparameters</em>: Known (or
+chosen) arameters that characterize a prior distribution.</li>
 <li>Constrained support: <span class="math inline">\(\pi \in [0,
 1]\)</span></li>
 <li>pdf: <span class="math inline">\(p(\pi) = \frac{\pi^{a-1} (1-
 \pi)^{b-1}}{\text{B}(a, b)}\)</span></li>
 </ul>
-<p><img src="03-lec_files/figure-html/beta-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="03-lec_files/figure-html/beta-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 <div id="section-analytical-form-likelihood" class="section level3">
 <h3>Analytical form: Likelihood</h3>
@@ -320,10 +323,16 @@ distribution with updated parameters</p>
 <li><span class="math inline">\(b^{\prime} = b+n-k-1\)</span></li>
 </ul>
 <p>This property is called <em>conjugacy</em>: Prior and posterior are
-in the same family.</p>
+of the same family.</p>
 <p>Now, take a moment to think about our analytical solution for the
-updated parameters. What does it take for the data to dominate the
-prior? What if the prior is weak? What if the prior is strong?</p>
+updated parameter:</p>
+<ul>
+<li>What does it take for the data to dominate the prior?</li>
+<li>What if the prior is weak (e.g., <span class="math inline">\(\pi
+\sim \text{beta}(1,1)\)</span>)?</li>
+<li>What if the prior is strong (e.g., <span class="math inline">\(\pi
+\sim \text{beta}(100,100)\)</span>)?</li>
+</ul>
 </div>
 <div id="section-simulation" class="section level3">
 <h3>Simulation</h3>
@@ -368,14 +377,14 @@ Code: Simulating the experiment
 len_pi &lt;- 1001L                      ### number of candidate values for pi
 pi &lt;- seq(0, 1, length.out = len_pi) ### candidate values for pi
 a &lt;- b &lt;- 5                          ### hyperparameters
-n &lt;- 200                             ### num. of coin flips
+n &lt;- 300                             ### num. of coin flips
 pi_true &lt;- .8                        ### true parameter
 data &lt;- rbinom(n, 1, pi_true)        ### n coin flips
 posterior &lt;- matrix(NA, 3L, n)       ### matrix container for posterior
 
 for (i in seq_len(n)) {    
-  current_sequenceuence &lt;- data[1:i]      ### sequence up until ith draw
-  k &lt;- sum(current_sequenceuence)         ### number of heads in current sequence
+  current_sequence &lt;- data[1:i]      ### sequence up until ith draw
+  k &lt;- sum(current_sequence)         ### number of heads in current sequence
   
   ##### Updating
   a_prime &lt;- a + k               
@@ -424,6 +433,9 @@ lines(
 )</code></pre>
 </details>
 <p><img src="03-lec_files/figure-html/coin-sim2-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p><em>Note:</em> After 300 coin flips, we have observed 241 heads,
+which is a proportion of 0.803. The posterior median is 0.794; the 95%
+credible interval is [0.747, 0.837].</p>
 </div>
 </div>
 </div>
@@ -449,9 +461,10 @@ uni-dimensional <em>parameter space</em>.</li>
 class="section level3">
 <h3>The limits of analytical Bayesian inference</h3>
 <ul>
-<li>Bayesian inference involves finding a <em>joint</em> posterior for
-<em>all</em> parameters in a model. We thus have a
-<em>multi-dimensional</em> parameter space.</li>
+<li>Even in only slightly more intricate applications, Bayesian
+inference involves finding a <em>joint</em> posterior for <em>all</em>
+parameters in a model, i.e., finding a <em>multi-dimensional</em>
+parameter space.</li>
 <li>Inference on single parameters from a joint multi-dimensional
 parameter space requires that we retrieve the marginal posterior
 distribution from the joint posterior distribution.</li>
@@ -459,12 +472,12 @@ distribution from the joint posterior distribution.</li>
 w.r.t. to a given a parameter gives the posterior distribution for that
 parameter. This requires <em>integrating</em> out all other
 parameters.</li>
-<li>For instance, when our joint posterior is <span
-class="math inline">\(p(\alpha,\beta, \gamma)\)</span>, we need to
-obtain each marginal posterior akin to <span
-class="math inline">\(p(\alpha) = \int_{\beta} \int_{\gamma}
+<li>For instance, when our joint posterior in a three-dimensional
+parameter space is <span class="math inline">\(p(\alpha,\beta,
+\gamma)\)</span>, we need to obtain each marginal posterior akin to
+<span class="math inline">\(p(\alpha) = \int_{\beta} \int_{\gamma}
 p(\alpha,\beta, \gamma) d\beta d\gamma\)</span></li>
-<li>For complex multi-dimensional posterior distributions, findings
+<li>For complex multi-dimensional posterior distributions, finding
 analytical solutions through integration becomes cumbersome, if not
 outright impossible.</li>
 </ul>
@@ -477,20 +490,22 @@ class="section level3">
 <ul>
 <li>MCMC are iterative computational processes that explore and describe
 a posterior distribution.</li>
+<li>Developed in the 1980s and popularized in the 1990s, MCMC algorithms
+quickly eliminated the need for analytical marginalizations of single
+parameters from joint multi-dimensional posteriors.</li>
+<li>The core idea:
+<ul>
 <li><em>Markov Chains</em> wander through, and take samples from, the
-parameter space.</li>
-<li>First developed in the 1980s and popularized in the 1990s, MCMC
-algorithms quickly eliminated the need for analytical marginalizations
-of single parameters from joint multi-dimensional posteriors.</li>
-<li>The core idea: Following an initial warmup period, the Markov Chains
+parameter space.Following an initial warmup period, the Markov Chains
 will converge to high-density regions of the underlying posterior
 distribution (ergodicity).</li>
-<li>The frequency of “steps” (iterations) in a given region of
-multidimensional parameter space gives a stochastic simulation of the
-posterior probability density.</li>
+<li>The proportion of “steps” in a given region of multidimensional
+parameter space gives a stochastic simulation of the posterior
+probability density.</li>
 <li>This yields a numerical approximation of the underlying posterior
 distribution, much like Monte Carlo simulations of MLE parameters yield
 numerical approximations of the underlying sampling distribution.</li>
+</ul></li>
 </ul>
 </div>
 <div id="section-some-mcmc-algorithms" class="section level3">
@@ -527,44 +542,34 @@ Reference Manual, Section 14.1</a> </sub></sup></p>
 </div>
 <div id="section-implementing-a-gibbs-sampler" class="section level2">
 <h2>Implementing a Gibbs sampler</h2>
-<div id="section-roadmap" class="section level3">
-<h3>Roadmap</h3>
+<div id="section-in-a-nutshell" class="section level3">
+<h3>In a nutshell</h3>
 <ul>
-<li>We will now apply an MCMC algorithm to a simple two-dimensional
-problem: Inference on the mean and variance parameters of the normal
-distribution.</li>
+<li>We want to perform inference on a variable <span
+class="math inline">\(y\)</span>, of which we have <span
+class="math inline">\(N\)</span> observations.</li>
+<li>We stipulate that the data-generating process that produces <span
+class="math inline">\(y\)</span> is normal: <span
+class="math inline">\(\mathbf{y} \sim \text{N}(\mu, \sigma^2)\)</span>.
+This yields a two-dimensional parameter space.</li>
+<li>For reasons of convenience, we parameterize the variance of this
+normal distribution in terms of its precision <span
+class="math inline">\(\tau = \frac{1}{\sigma^2}\)</span>, not in terms
+of its standard deviation or variance.</li>
+<li>Note, however, that <code>rnorm()</code> in R uses the standard
+deviation, which is <code>sqrt(1 / tau)</code>.</li>
 <li>We will use a <em>Gibbs sampler</em>. Remember that Gibbs draws
 iteratively and alternatively from the conditional conjugate
 distribution of each parameter.</li>
 <li>We thus need some analytical preliminaries: Namely, analytical forms
 for the posterior distributions of the two parameters from whose
 marginal posteriors we would like to sample.</li>
-<li>Note that this does <em>not</em> involve marginalizing out the
-“unwanted” parameters; instead, we express the posterior as conditional
-(i.e., joint) functions of <span class="math inline">\(\mu\)</span> and
-<span class="math inline">\(\sigma^2\)</span>:
-<ul>
-<li><span class="math inline">\(p(\mu | \theta, \omega, \sigma,
-\mathbf{y})\)</span></li>
-<li><span class="math inline">\(p(\sigma | \alpha, \beta, \mu,
-\mathbf{y})\)</span></li>
-</ul></li>
-</ul>
-</div>
-<div id="section-in-a-nutshell" class="section level3">
-<h3>In a nutshell</h3>
-<ul>
-<li>We want to perform inference on a variable <span
-class="math inline">\(\mathbf{y}\)</span>, of which we have <span
-class="math inline">\(N\)</span> observations.</li>
-<li>We stipulate that the data-generating process that produces <span
-class="math inline">\(\mathbf{y}\)</span> is normal: <span
-class="math inline">\(\mathbf{y} \sim \text{N}(\mu,
-\sigma^2)\)</span>.</li>
-<li>For reasons of convenience, we parameterize the variance of this
-normal distribution in terms of its precision <span
-class="math inline">\(\tau = \frac{1}{\sigma^2}\)</span>, not in terms
-of its standard deviation or variance.</li>
+<li>This will <em>not</em> involve marginalizing out the “unwanted”
+parameters; instead, we will derive the posteriors of <span
+class="math inline">\(\mu\)</span> and <span
+class="math inline">\(\tau\)</span> as conditional functions of <span
+class="math inline">\(\tau\)</span> and <span
+class="math inline">\(\mu\)</span>, respectively</li>
 </ul>
 </div>
 <div id="section-application" class="section level3">
@@ -579,14 +584,18 @@ electorate</li>
 <li>But we know that individual support is measured on a -5 to 5
 scale</li>
 <li>Our prior belief for <span class="math inline">\(\mu\)</span> should
-thus be agnostic as to whether people like or dislike the AfD, but
+thus be agnostic as to whether people like or dislike the AfD and
 sufficiently vague to allow for the possibility that we may be wrong:
-<span class="math inline">\(\mu \sim \text{N}(\theta = 0, \sigma^2 =
-10)\)</span></li>
-<li>Our prior belief for <span class="math inline">\(\sigma^2 =
-\frac{1}{\tau}\)</span> will also be vague: <span
-class="math inline">\(\tau \sim \Gamma(\alpha = 20, \beta =
-200)\)</span></li>
+<span class="math inline">\(\mu \sim \text{N}(\theta = 0, \omega^{-1} =
+10)\)</span> (mean <span class="math inline">\(\theta\)</span> and
+precision <span class="math inline">\(\omega\)</span> are
+hyperparameters for the prior of <span
+class="math inline">\(\mu\)</span>)</li>
+<li>Our prior belief for <span class="math inline">\(\tau\)</span> will
+also be vague: <span class="math inline">\(\tau \sim \Gamma(\alpha = 20,
+\beta = 200)\)</span> (shape <span class="math inline">\(\alpha\)</span>
+and rate <span class="math inline">\(\beta\)</span> are hyperparameters
+for the prior of <span class="math inline">\(\tau\)</span>)</li>
 <li>We have no prior belief about the dependence of both parameters and
 hence specify independent prior distributions</li>
 </ul></li>
@@ -595,11 +604,12 @@ hence specify independent prior distributions</li>
 <div id="section-analytical-preliminaries-mu" class="section level3">
 <h3>Analytical preliminaries: <span
 class="math inline">\(\mu\)</span></h3>
-<p>Our prior belief that <span class="math inline">\(\mu\)</span> is
+<p>Our prior belief is that <span class="math inline">\(\mu\)</span> is
 distributed normal with mean <span class="math inline">\(\theta =
 0\)</span> and precision <span class="math inline">\(\omega =
-.1\)</span>, i.e., <span class="math inline">\(\mu \sim \text{N}(0,
-10)\)</span>. Hence, the prior pdf is given by:</p>
+.1\)</span>:</p>
+<p><span class="math display">\[\mu \sim \text{N}(0, 10)\]</span></p>
+<p>The prior pdf is given by:</p>
 <p><span class="math display">\[
 p(\mu | \theta, \omega) = \sqrt{\frac{\omega}{2 \pi}} \exp \left
 (-\frac{\omega (\mu - \theta)^2}{2} \right)
@@ -618,14 +628,13 @@ p(\mu | \theta, \omega, \tau, \mathbf{y}) \propto \exp
 \left(-\frac{\omega + N \tau}{2}  \left(\mu - \frac{\omega \theta + N
 \tau \bar{y}}{\omega + N \tau}\right)^2 \right)
 \]</span></p>
-<p>We recognize this as the normal pdf with mean <span
+<p>We recognize this as the normal pdf with updated mean parameter <span
 class="math inline">\(\theta^{\ast} = \frac{\omega \theta + N \tau
-\bar{y}}{\omega + N \tau}\)</span> and precision <span
+\bar{y}}{\omega + N \tau}\)</span> and updated precision parameter <span
 class="math inline">\(\omega^{\ast} = \omega + N \tau\)</span>.</p>
 <p>This gives us the required analytical solutions for the normal
 parameters that characterize the posterior density of <span
-class="math inline">\(\mu\)</span> that we want our Gibbs sampler to
-explore.</p>
+class="math inline">\(\mu\)</span>.</p>
 </div>
 <div id="section-analytical-preliminaries-tau" class="section level3">
 <h3>Analytical preliminaries: <span
@@ -899,7 +908,7 @@ for (i in seq_len(nrow(draws_posterior))) {
       ylim = range(draws_posterior[, 2]),
       main = &quot;Exploration of the joint posterior&quot;,
       xlab = expression(mu),
-      ylab = expression(sigma),
+      ylab = expression(sigma ^ 2),
       col = NA,
       bg = adjustcolor(&quot;red&quot;, alpha.f = 0.25)
     )
@@ -944,9 +953,8 @@ can never know a priori if and when a chain has converged to its target
 distribution. We must thus rely on <em>convergence diagnostics</em>.</p>
 <p><em>Important:</em> Convergence diagnostics cannot show or prove
 convergence. They can only show signs of non-convergence!</p>
-<p>To be conclude that the post-warmup draws of our sampler in fact
-explore the target distribution, we want to show at least two
-things:</p>
+<p>To conclude that the post-warmup draws of our sampler in fact explore
+the target distribution, we want to show at least two things:</p>
 <ol style="list-style-type: decimal">
 <li>Every chain is in a stationary state (i.e., does not “wander off”
 the target distribution)</li>
@@ -1145,7 +1153,7 @@ interval around the sample for each of them, these confidence intervals
 would contain the <em>true</em> population mean 95% of the time. Given
 this long-run frequency, we are 95% confident that the specific 95%
 confidence intervals from our singular sample contains the true
-population parameter” (yeah, right…).</li>
+population parameter…”.</li>
 </ul></li>
 </ul>
 </div>
@@ -1154,9 +1162,9 @@ class="section level4">
 <h4>Finite-sample and asymptotic properties</h4>
 <ul>
 <li>Bayesian inference allows for exact inference in finite-sample
-applications where the asymptotic properties of MLE estimators (normal
-approximation, etc.)…</li>
-<li>…but posterior distribution do often asymptotically converge to the
+applications where the asymptotic properties of MLE estimators are
+implausible (normal approximation, etc.)…</li>
+<li>…yet, posterior distribution often asymptotically converge to the
 sampling distribution of MLE estimators (<a
 href="https://en.wikipedia.org/wiki/Bernstein%E2%80%93von_Mises_theorem">Bernstein-von-Mises
 Theorem</a>)</li>
@@ -1172,9 +1180,9 @@ makes Bayesian approaches incredibly flexible and allows for
 computationally reliable estimation of complex, analytically intractable
 marginal likelihoods (avoids integration of super high-dimensional
 integrals)…</li>
-<li>…but also comes with the necessity of high computational resources,
-long computation times, and extensive convergence diagnosis and model
-checking</li>
+<li>…but sometimes comes with the necessity of high computational
+resources and/or long computation times, and always necessitates
+convergence diagnosis and model checking</li>
 </ul>
 <p>
 <script type="application/shiny-prerendered" data-context="server-start">

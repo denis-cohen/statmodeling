@@ -177,7 +177,7 @@ The punchline is this: All likelihood-based models are Bayesian models in which 
 - We will use $p(\mathbf{y}|\theta)$.
 - Note that the likelihood function multiplies densities across *all* observations; e.g., a normal likelihood function is given by:
 
-$$p(\mathbf{y}|\mu, \sigma) = \prod_{i=1}^{N} \frac{1}{\sigma \sqrt{2 \pi}} e^{- 0.5 \left( (y_i - \mu_i)^2 / \sigma \right)}$$
+$$p(\mathbf{y}|\mu, \sigma) = \prod_{i=1}^{N} \frac{1}{\sigma \sqrt{2 \pi}} \exp\left(- 0.5 \left( (y_i - \mu_i)^2 / \sigma \right) \right)$$
 
 - This is what we mean mathematically when we use the shorthand
     - $\mathbf{y} \sim \text{N}(\mu, \sigma)$ or
@@ -214,7 +214,7 @@ $$p(\mathbf{y}|\mu, \sigma) = \prod_{i=1}^{N} \frac{1}{\sigma \sqrt{2 \pi}} e^{-
 
 Suppose we flip a coin up to $N$ times:
 
-- The fairness of a coin can be expressed through a *probability parameter*, $\pi$, that governs the probability that a coin flip produces heads (H) has opposed to tails
+- The fairness of a coin can be expressed through a *probability parameter*, $\pi$, that governs the probability that a coin flip produces heads (1) has opposed to tails (0)
 - We start out with the belief that the coin is fair -- that is, we consider it more probable that the coin is fair ($\pi \approx 0.5$) and less probable that it systematically over-produces either heads or tails
 - Unbeknownst to us, the coin is far from fair -- it is 4 times as likely to produce heads as it is to produce tails (that is, $\pi=0.8$)
 - We slowly learn about this in the process of flipping the coin and keeping score of the number of flips $n$ and the number of heads $k$...
@@ -224,17 +224,18 @@ Suppose we flip a coin up to $N$ times:
 
 - The *beta distribution* is a suitable candidate for characterizing our prior beliefs: $\pi \sim \text{beta}(a,b)$
 - Characterized by two shape parameters, $a$ and $b$
+- $a$ and $b$ are *hyperparameters*: Known (or chosen) arameters that characterize a prior distribution.
 - Constrained support: $\pi \in [0, 1]$
 - pdf: $p(\pi) = \frac{\pi^{a-1} (1- \pi)^{b-1}}{\text{B}(a, b)}$
 
-```{r beta, fig.align='center', fig.width= 9, fig.height = 4}
+```{r beta, fig.align='center', fig.width = 6, fig.height = 6}
 len_pi <- 1001L                      ### number of candidate values for pi
 
 ## Plot
-par(mfrow = c(1, 3))
+par(mfrow = c(2, 2))
 
 pi <- seq(0, 1, length.out = len_pi) ### candidate values for pi
-a <- b <- 0.95                        ### hyperparameters
+a <- b <- 0.95                       ### hyperparameters
 prior <- dbeta(pi, a, b)             ### prior distribution
 plot(                                ### set up empty plot, specify labels
   pi, prior,
@@ -242,7 +243,32 @@ plot(                                ### set up empty plot, specify labels
   main = "Beta(0.95, 0.95)  \n (weak, symmetrical, bimodal)",
   xlab = "Density",
   ylab = expression(paste("Prior Distribution for ", pi)),
-  ylim = c(0, max(prior[!is.infinite(prior)])),
+  ylim = c(0, 4),
+  axes = F
+)
+axis(1)
+axis(2)
+polygon(                             ### draw density distribution
+  c(0, pi[!is.infinite(prior)], 1),
+  c(0, prior[!is.infinite(prior)], 0),
+  col = adjustcolor('red', alpha.f = .4),
+  border = NA
+)
+abline(                              ### add vertical at pi = 0.5 
+  v = .5,
+  col = 'white'
+)
+
+pi <- seq(0, 1, length.out = len_pi) ### candidate values for pi
+a <- b <- 1.0                        ### hyperparameters
+prior <- dbeta(pi, a, b)             ### prior distribution
+plot(                                ### set up empty plot, specify labels
+  pi, prior,
+  type = 'n',
+  main = "Beta(1.0, 1.0)  \n (flat, uniform)",
+  xlab = "Density",
+  ylab = expression(paste("Prior Distribution for ", pi)),
+  ylim = c(0, 4),
   axes = F
 )
 axis(1)
@@ -267,6 +293,7 @@ plot(                                ### set up empty plot, specify labels
   main = "Beta(1.1, 1.1) \n (weak, symmetrical, unimodal)",
   xlab = "Density",
   ylab = expression(paste("Prior Distribution for ", pi)),
+  ylim = c(0, 4),
   axes = F
 )
 axis(1)
@@ -283,14 +310,15 @@ abline(                              ### add vertical at pi = 0.5
 )
 
 pi <- seq(0, 1, length.out = len_pi) ### candidate values for pi
-a <- b <- 100                        ### hyperparameters
+a <- b <- 10                        ### hyperparameters
 prior <- dbeta(pi, a, b)             ### prior distribution
 plot(                                ### set up empty plot, specify labels
   pi, prior,
   type = 'n',
-  main = "Beta(100, 100)  \n (strong, symmetrical, unimodal)",
+  main = "Beta(10, 10)  \n (stronger, symmetrical, unimodal)",
   xlab = "Density",
   ylab = expression(paste("Prior Distribution for ", pi)),
+  ylim = c(0, 4),
   axes = F
 )
 axis(1)
@@ -335,7 +363,11 @@ As you see, our posterior has the exact same form as our prior. It is a beta dis
 
 This property is called *conjugacy*: Prior and posterior are of the same family.
 
-Now, take a moment to think about our analytical solution for the updated parameters. What does it take for the data to dominate the prior? What if the prior is weak? What if the prior is strong?
+Now, take a moment to think about our analytical solution for the updated parameter:
+
+- What does it take for the data to dominate the prior?
+- What if the prior is weak (e.g., $\pi \sim \text{beta}(1,1)$)?
+- What if the prior is strong (e.g., $\pi \sim \text{beta}(100,100)$)?
 
 ### Simulation
 
@@ -402,14 +434,14 @@ set.seed(20210329)                   ### set seed for replicability
 len_pi <- 1001L                      ### number of candidate values for pi
 pi <- seq(0, 1, length.out = len_pi) ### candidate values for pi
 a <- b <- 5                          ### hyperparameters
-n <- 200                             ### num. of coin flips
+n <- 300                             ### num. of coin flips
 pi_true <- .8                        ### true parameter
 data <- rbinom(n, 1, pi_true)        ### n coin flips
 posterior <- matrix(NA, 3L, n)       ### matrix container for posterior
 
 for (i in seq_len(n)) {    
-  current_sequenceuence <- data[1:i]      ### sequence up until ith draw
-  k <- sum(current_sequenceuence)         ### number of heads in current sequence
+  current_sequence <- data[1:i]      ### sequence up until ith draw
+  k <- sum(current_sequence)         ### number of heads in current sequence
   
   ##### Updating
   a_prime <- a + k               
@@ -463,14 +495,14 @@ set.seed(20210329)                   ### set seed for replicability
 len_pi <- 1001L                      ### number of candidate values for pi
 pi <- seq(0, 1, length.out = len_pi) ### candidate values for pi
 a <- b <- 5                          ### hyperparameters
-n <- 200                             ### num. of coin flips
+n <- 300                             ### num. of coin flips
 pi_true <- .8                        ### true parameter
 data <- rbinom(n, 1, pi_true)        ### n coin flips
 posterior <- matrix(NA, 3L, n)       ### matrix container for posterior
 
 for (i in seq_len(n)) {    
-  current_sequenceuence <- data[1:i]      ### sequence up until ith draw
-  k <- sum(current_sequenceuence)         ### number of heads in current sequence
+  current_sequence <- data[1:i]      ### sequence up until ith draw
+  k <- sum(current_sequence)         ### number of heads in current sequence
   
   ##### Updating
   a_prime <- a + k               
@@ -521,6 +553,8 @@ lines(
 )
 ```
 
+*Note:* After `r n` coin flips, we have observed `r k` heads, which is a proportion of `r round(k / n, 3)`. The posterior median is `r round(posterior[1, ncol(posterior)], 3)`; the 95% credible interval is [`r round(posterior[2, ncol(posterior)], 3)`, `r round(posterior[3, ncol(posterior)], 3)`].
+
 ## MCMC algorithms
 
 ### Analytical (classical) Bayesian inference
@@ -536,18 +570,18 @@ lines(
 - Inference on single parameters from a joint multi-dimensional parameter space requires that we retrieve the marginal posterior distribution from the joint posterior distribution.
 - Marginalizing the joint multidimensional posterior distribution w.r.t. to a given a parameter gives the posterior distribution for that parameter. This requires *integrating* out all other parameters.
 - For instance, when our joint posterior in a three-dimensional parameter space is $p(\alpha,\beta, \gamma)$, we need to obtain each marginal posterior akin to $p(\alpha) = \int_{\beta} \int_{\gamma} p(\alpha,\beta, \gamma) d\beta d\gamma$
-- For complex multi-dimensional posterior distributions, findings analytical solutions through integration becomes cumbersome, if not outright impossible.
+- For complex multi-dimensional posterior distributions, finding analytical solutions through integration becomes cumbersome, if not outright impossible.
 
 ### Numerical approximation via MCMC
 
 That's where numerical approximation through Markov Chain Monte Carlo (MCMC) algorithms comes in:
 
 - MCMC are iterative computational processes that explore and describe a posterior distribution.
-- *Markov Chains* wander through, and take samples from, the parameter space.
-- First developed in the 1980s and popularized in the 1990s, MCMC algorithms quickly eliminated the need for analytical marginalizations of single parameters from joint multi-dimensional posteriors.
-- The core idea: Following an initial warmup period, the Markov Chains will converge to high-density regions of the underlying posterior distribution (ergodicity).
-- The frequency of "steps" (iterations) in a given region of multidimensional parameter space gives a stochastic simulation of the posterior probability density.
-- This yields a numerical approximation of the underlying posterior distribution, much like Monte Carlo simulations of MLE parameters yield numerical approximations of the underlying sampling distribution.
+- Developed in the 1980s and popularized in the 1990s, MCMC algorithms quickly eliminated the need for analytical marginalizations of single parameters from joint multi-dimensional posteriors.
+- The core idea: 
+    - *Markov Chains* wander through, and take samples from, the parameter space.Following an initial warmup period, the Markov Chains will converge to high-density regions of the underlying posterior distribution (ergodicity).
+    - The proportion of "steps" in a given region of multidimensional parameter space gives a stochastic simulation of the posterior probability density.
+    - This yields a numerical approximation of the underlying posterior distribution, much like Monte Carlo simulations of MLE parameters yield numerical approximations of the underlying sampling distribution.
 
 
 ### (Some) MCMC Algorithms
@@ -570,20 +604,15 @@ The Hamiltonian Monte Carlo algorithm starts at a specified initial set of param
  
 ## Implementing a Gibbs sampler
 
-### Roadmap
-
-- We will now apply an MCMC algorithm to a simple two-dimensional problem: Inference on the mean and variance parameters of the normal distribution.
-- We will use a *Gibbs sampler*. Remember that Gibbs draws iteratively and alternatively from the conditional conjugate distribution of each parameter.
-- We thus need some analytical preliminaries: Namely, analytical forms for the posterior distributions of the two parameters from whose marginal posteriors we would like to sample.
-- Note that this does *not* involve marginalizing out the "unwanted" parameters; instead, we express the posterior as conditional (i.e., joint) functions of $\mu$ and $\sigma^2$:
-    - $p(\mu | \theta, \omega, \sigma, \mathbf{y})$
-    - $p(\sigma | \alpha, \beta, \mu, \mathbf{y})$
-
 ### In a nutshell
 
 - We want to perform inference on a variable $y$, of which we have $N$ observations.
-- We stipulate that the data-generating process that produces $y$ is normal: $\mathbf{y} \sim \text{N}(\mu, \sigma^2)$.
+- We stipulate that the data-generating process that produces $y$ is normal: $\mathbf{y} \sim \text{N}(\mu, \sigma^2)$. This yields a two-dimensional parameter space.
 - For reasons of convenience, we parameterize the variance of this normal distribution in terms of its precision $\tau = \frac{1}{\sigma^2}$, not in terms of its standard deviation or variance.
+- Note, however, that `rnorm()` in R uses the standard deviation, which is `sqrt(1 / tau)`.
+- We will use a *Gibbs sampler*. Remember that Gibbs draws iteratively and alternatively from the conditional conjugate distribution of each parameter.
+- We thus need some analytical preliminaries: Namely, analytical forms for the posterior distributions of the two parameters from whose marginal posteriors we would like to sample.
+- This will *not* involve marginalizing out the "unwanted" parameters; instead, we will derive the posteriors of $\mu$ and $\tau$ as conditional functions of $\tau$ and $\mu$, respectively
 
 ### Application
 
@@ -591,8 +620,8 @@ The Hamiltonian Monte Carlo algorithm starts at a specified initial set of param
 - Let's pretend our prior belief is completely naive: 
     - We don't know how (un)popular the AfD is in the German electorate
     - But we know that individual support is measured on a -5 to 5 scale
-    - Our prior belief for $\mu$ should thus be agnostic as to whether people like or dislike the AfD and sufficiently vague to allow for the possibility that we may be wrong: $\mu \sim \text{N}(\theta = 0, \sigma^2 = 10)$
-    - Our prior belief for $\sigma^2 = \frac{1}{\tau}$ will also be vague: $\tau \sim \Gamma(\alpha = 20, \beta = 200)$
+    - Our prior belief for $\mu$ should thus be agnostic as to whether people like or dislike the AfD and sufficiently vague to allow for the possibility that we may be wrong: $\mu \sim \text{N}(\theta = 0, \omega^{-1} = 10)$ (mean $\theta$ and precision $\omega$ are hyperparameters for the prior of $\mu$)
+    - Our prior belief for $\tau$ will also be vague: $\tau \sim \Gamma(\alpha = 20, \beta = 200)$ (shape $\alpha$ and rate $\beta$ are hyperparameters for the prior of $\tau$)
     - We have no prior belief about the dependence of both parameters and hence specify independent prior distributions
     
 ### Analytical preliminaries: $\mu$
@@ -620,9 +649,9 @@ $$
 p(\mu | \theta, \omega, \tau, \mathbf{y}) \propto \exp \left(-\frac{\omega + N \tau}{2}  \left(\mu - \frac{\omega \theta + N \tau \bar{y}}{\omega + N \tau}\right)^2 \right)
 $$
 
-We recognize this as the normal pdf with mean $\theta^{\ast} = \frac{\omega \theta + N \tau \bar{y}}{\omega + N \tau}$ and precision $\omega^{\ast} = \omega + N \tau$.
+We recognize this as the normal pdf with updated mean parameter $\theta^{\ast} = \frac{\omega \theta + N \tau \bar{y}}{\omega + N \tau}$ and updated precision parameter $\omega^{\ast} = \omega + N \tau$.
 
-This gives us the required analytical solutions for the normal parameters that characterize the posterior density of $\mu$ that we want our Gibbs sampler to explore.
+This gives us the required analytical solutions for the normal parameters that characterize the posterior density of $\mu$.
 
 
 ### Analytical preliminaries: $\tau$
@@ -1068,5 +1097,3 @@ coda::autocorr.plot(draws_multiple_chains)
 
 - The use of MCMC algorithms for probabilistic approximate inference makes Bayesian approaches incredibly flexible and allows for computationally reliable estimation of complex, analytically intractable marginal likelihoods (avoids integration of super high-dimensional integrals)...
 - ...but sometimes comes with the necessity of high computational resources and/or long computation times, and always necessitates convergence diagnosis and model checking
-
-
