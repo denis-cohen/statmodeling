@@ -141,7 +141,7 @@ lm_gibbs <- function(m_scalar,
     ## Sample tau
     tau[i] <- rgamma(1, a_star, b_star)
     
-    ## Sample mu
+    ## Sample beta
     beta[i, ] <- MASS::mvrnorm(1, ...)
   }
   
