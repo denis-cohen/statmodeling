@@ -77,7 +77,7 @@ In this session, we want to pay closer attention to the four other model blocks:
 
 ### "Trivial" tasks
 
-As Stan if a full-blown statistical programming language, we can also accommodate numerous other tasks in the model.
+As Stan is a full-blown statistical programming language, we can also accommodate numerous other tasks in the model.
 
 As `rstan` users, however, the question with many of these tasks is whether we cannot accommodate them more efficiently in R before or after estimation.
 
@@ -88,20 +88,18 @@ As `rstan` users, however, the question with many of these tasks is whether we c
     - We could first define a function that standardizes our variables in the `functions` block and then apply it to the data in the `transformed data` block.
     - But we can equally standardize the data in R and pass the standardized variables to Stan.
 - Transformed parameters:
-    - In our example from the last session, we sampled the linear predictor `mu` as a global variable in `transformed parameters` block.
-    - As a result, samples for all $N$ observations were included in our `stanfit` object.
-    - To be clear, we did need $\mu = \mathbf{X\beta}$ for the likelihood. But...
-    - ..we could have equally defined `mu` as a temporary local variable in the `model block`, where it would have been discarded after each iteration...
+    - Last session, we sampled the linear predictor `eta` as a global variable in the `transformed parameters` block, which we (could have) sampled.
+    - We could have equally defined `eta` as a temporary local variable in the `model block`, where it would have been discarded after each iteration...
     - ...and recovered it in R per $\mathbf{X\beta}$ if necessary.
 - Quantities of interest:
-    - We can use the `generated quantities` block to calculate quantities of interest or to implement posterior predictive checks.
+    - We can use the `generated quantities` block to calculate quantities of interest (expected values, average marginal effects, etc.) or to implement posterior predictive checks.
     - But we can do this just as well in R using the posterior draws and the data.
     
 ### My recommendation
 
-My opinion: There is nothing wrong per se with accommodating "trivial tasks" in Stan, but several efficiency concerns may speak against it:
+There is nothing wrong per se with accommodating such "trivial tasks" in Stan. But several efficiency concerns may speak against it:
 
-- If you are more proficient in R than in Stan, implementing tasks in Stan that you can easily perform in R is time not wisely invested.
+- If you are more proficient in R than in Stan, implementing tasks in Stan that you could easily perform in R is time not wisely invested.
 - If you need to adjust transformations on a rolling basis (e.g., changing covariate scenarios for your quantities of interest), it is wise to separate estimation from "post-estimation" work.
 - *Most importantly:* Computational resources can be *expensive*!
     - Once your Stan models get too big to run on local machines, efficiency is money (literally!).
@@ -115,7 +113,7 @@ There are, however, some essential tasks that should or must be accommodated in 
 
 - Functions needed for estimation (e.g., custom log-density functions)
 - Transformed parameters that are of primary interest
-    - In many instances, it is computationally *more* efficient to but priors on "raw parameters" and transform these before they enter the likelihood.
+    - In many instances, it is computationally *more* efficient to specify priors for "raw parameters" and transform these before they enter the likelihood.
     - In these cases, your primary concern should be sampling and diagnosing the transformed parameters.
 
 
@@ -126,7 +124,7 @@ There are, however, some essential tasks that should or must be accommodated in 
 - Let's incorporate this feature into our Stan program for the linear model. 
 - The hack requires two things:
     - the definition of a new function
-    - a single-line modification in the model block 
+    - TWo minor, single-line modifications: One in the `data`, one in the `model` block 
     
 ### The unweighted normal log-likelihood
 
@@ -295,7 +293,9 @@ Note that this procedure is essentially cost-free and likely to speed up computa
 
 ### Starting point: Building a simple logit model
 
-Below, you find the code for the (slightly modified) linear model from the previous lecture.
+Below, you find the code for the linear model from the previous lecture.
+
+*Note:* `eta` is now a local variable in the `model` block, not a variable in the `transformed parameters` block.
 
 Let's use it a basis to build our logit model.
 
@@ -333,10 +333,10 @@ model {
 
 ```{stan logit1-solution, output.var = "none"}
 data {
-  int<lower=1> N;            // num. observations
-  int<lower=1> K;            // num. predictors
-  matrix[N, K] x;            // model matrix
-  int<lower=0,upper=1> y[N]; // outcome vector
+  int<lower=1> N;                  // num. observations
+  int<lower=1> K;                  // num. predictors
+  matrix[N, K] x;                  // model matrix
+  array[N] int<lower=0,upper=1> y; // outcome
 }
 
 parameters {
@@ -352,7 +352,7 @@ model {
   target += normal_lpdf(beta | 0, 10);  // priors for beta
 
   // log-likelihood
-  target += bernoulli_logit_lpmf(y | eta); // likelihood
+  target += bernoulli_logit_lpmf(y | eta); // likelihood, incl. inverse link
 }
 ```
 
@@ -361,52 +361,49 @@ model {
 - Extending our model to become a hierarchical varying-intercept model is easy.
 - All we need to do is extend the linear predictor with a group-specific zero-mean random effect:
 
-$$y_{ij} \sim \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta + \nu_j)) \\
+$$y_{ij} \sim \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta + \nu_{j_{[i]}}) \\
 \nu_j \sim \text{Normal}(0, \sigma_{\nu})$$
 
-- We accomplish this by adding a standard normal parameter in the `parameters` block, and scaling it later on block. 
+- We accomplish this by adding a standard normal parameter in the `parameters` block, and scaling it in the `transformed parameters` block. 
 - Note that the choice of the normal distribution is arbitrary: We could change the distribution of these "random deviation" from the intercept in any (plausible) way we like!
-- Of course, also need an integer vector of unit's group membership.
+- Of course, we also need an integer array that indicates each unit's group membership.
 
 ### Varying-intercepts logit model: Code
 
 ```{stan logit2, output.var = "none", echo = TRUE, eval = F}
 data {
-  int<lower=1> N;                // num. observations
-  int<lower=1> K;                // num. predictors
-  int<lower=1> J;                // num. groups
-  int<lower=1, upper=J> jj[N];   // group index
-  matrix[N, K] x;                // model matrix
-  int<lower=0, upper=1> y[N];    // outcome vector
+  int<lower=1> N;                    // num. observations
+  int<lower=1> K;                    // num. predictors
+  int<lower=1> J;                    // num. groups
+  array[N] int<lower=0, upper=J> jj; // outcome vector
+  matrix[N, K] x;                    // model matrix
+  array[N] int<lower=0, upper=1> y;  // outcome
 }
 
 parameters {
-  vector[K] beta;      // coef vector#
-  vector[J] nu_raw;    // unscaled random effect
-  real<lower=0> s_nu;  // scale of random effect
+  vector[K] beta;          // coef vector
+  vector[J] nu_raw;        // unscaled random effect
+  real<lower=0> sigma_nu;  // scale of random effect
 }
 
 transformed parameters {
-  vector[J] nu;        // scaled random effect
-  nu = nu_raw * s_nu;
+  vector[J] nu;            // scaled random effect
+  nu = nu_raw * sigm_nu;
 }
 
 model {
   // local variables
   vector[N] eta;
   
-  eta = x * beta;                 // lin. pred. without random effect
-  for (i in 1:N) {
-    eta[i] = eta[i] + nu[jj[i]];  // add group-specific random effect
-  }
+  eta = x * beta + nu[jj];              // lin. pred. without random effect
 
   // priors
-  target += normal_lpdf(beta | 0, 10);  // priors for beta
-  target += normal_lpdf(nu_raw | 0, 1); // priors for nu_raw
-  target += cauchy_lpdf(s_nu | 0, 5);   // prior for scale of nu
+  target += normal_lpdf(beta | 0, 10);      // priors for beta
+  target += normal_lpdf(nu_raw | 0, 1);     // priors for nu_raw
+  target += cauchy_lpdf(sigma_nu | 0, 5);   // prior for scale of nu
 
   // log-likelihood
-  target += bernoulli_logit_lpmf(y | eta); // likelihood
+  target += bernoulli_logit_lpmf(y | eta); // likelihood, incl. inverse link
 }
 ```
 
@@ -417,10 +414,10 @@ model {
 - Suppose we would like to have a varying slope for one variable, $x$, but none for all other covariates $\mathbf{z}$. 
 - Defining $\mathbf{x}^{\prime} = \begin{bmatrix} 1 & x_i \end{bmatrix}$, this yields the following model:
 
-$$y_{ij} \sim \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta_j + \mathbf{z} _i^{\prime} \gamma)) \\
+$$y_{ij} \sim \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta_{j_{[i]}} + \mathbf{z} _i^{\prime} \gamma)) \\
 \beta_{1j} = \beta_1 + \nu_{1j} \\
 \beta_{2j} = \beta_2 + \nu_{2j} \\
-\begin{bmatrix} \nu_{1j} \\ \nu_{1j} \end{bmatrix} \sim \text{MVN}\left( \begin{bmatrix} 0 \\ 0 \end{bmatrix}, \Sigma_{\nu} \right)$$
+\begin{bmatrix} \nu_{1j} \\ \nu_{2j} \end{bmatrix} \sim \text{MVN}\left( \begin{bmatrix} 0 \\ 0 \end{bmatrix}, \Sigma_{\nu} \right)$$
 
 - This is exactly the form in which we implement the model below.
 - We use a little efficiency trick for the variance covariance matrix of $\nu$:
@@ -433,18 +430,18 @@ $$y_{ij} \sim \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta_j +
 
 ```{stan logit3, output.var = "none", echo = TRUE, eval = F}
 data {
-  int<lower=1> N;                // num. observations
-  int<lower=1> K;                // num. predictors w. varying coefs
-  int<lower=1> L;                // num. predictors w. fixed coefs
-  int<lower=1> J;                // num. groups
-  int<lower=1, upper=J> jj[N];   // group index
-  matrix[N, K] x;                // matrix varying predictors, incl. intercept
-  matrix[N, L] z;                // matrix varying predictors, excl. intercept (!)
-  int<lower=0, upper=1> y[N];    // outcome vector
+  int<lower=1> N;                      // num. observations
+  int<lower=1> K;                      // num. predictors w. varying coefs
+  int<lower=1> L;                      // num. predictors w. fixed coefs
+  int<lower=1> J;                      // num. groups
+  array[N] int<lower=0, upper=J> jj;   // group index
+  matrix[N, K] x;                      // matrix varying predictors, incl. intercept
+  matrix[N, L] z;                      // matrix varying predictors, excl. intercept
+  array[N] int<lower=0, upper=1> y;    // outcome
 }
 
 transformed data {
-  row_vector[K] zeroes;
+  row_vector[K] zeroes;               // a length-K row vector of 0's
   zeroes = rep_row_vector(0.0, K);
 }
 
@@ -454,7 +451,7 @@ parameters {
   vector[L] gamma;     // fixed coef predictors w. fixed coefs
   
   // Random portions
-  vector[K] nu[J];                  // group-specific zero-mean deviations
+  array[J] vector[K] nu;            // group-specific deviations
   cholesky_factor_corr[K] L_Omega;  // prior correlation of deviations
   vector<lower=0>[K] tau;           // prior scale of deviations
 }
@@ -484,7 +481,7 @@ model {
 
 
   // log-likelihood
-  target += bernoulli_logit_lpmf(y | eta); // likelihood
+  target += bernoulli_logit_lpmf(y | eta); // likelihood, incl. inverse link
 }
 ```
 

@@ -180,16 +180,16 @@ export(environment())</code></pre>
 </div>
 <div id="section-compilation" class="section level3">
 <h3>Compilation</h3>
-<p>Now, compile your Stan program from the character string
+<p>Now, compile your Stan program from the (pre-loaded) character string
 <code>lm_code</code>.</p>
 <div class="tutorial-exercise" data-label="compilation"
 data-caption="Code" data-completion="1" data-diagnostics="1"
 data-startover="1" data-lines="0">
 <pre class="text"><code>lm_mod &lt;- ...
 
-# Export to global environment (make available in other exercise chunks)
-assign(&quot;lm_mod&quot;, lm_mod, envir = globalenv())</code></pre>
-<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+# Export newly created objects to global environment
+export(environment())</code></pre>
+<script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.timelimit":120,"exercise.checker":"NULL"}</script>
 </div>
 <div class="tutorial-exercise-support" data-label="compilation-solution"
 data-caption="Code" data-completion="1" data-diagnostics="1"
@@ -423,7 +423,7 @@ regplane3D::plane3D(
   xnlines = 6L,
   ynlines = 6L
 )</code></pre>
-<script type="application/json" data-opts-chunk="1">{"fig.width":9,"fig.height":6,"fig.retina":2,"fig.align":"center","fig.keep":"high","fig.show":"asis","out.width":864,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
+<script type="application/json" data-opts-chunk="1">{"fig.width":9,"fig.height":6,"fig.retina":2,"fig.align":"center","fig.keep":"high","fig.show":"asis","out.width":864,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.timelimit":120,"exercise.checker":"NULL"}</script>
 </div>
 <p>
 <script type="application/shiny-prerendered" data-context="server-start">
@@ -495,10 +495,11 @@ export <- function(env = environment()) {
     })
   })
   if (!is.null(new_obj)){
-    print("Exported objects:")
-    print(new_obj)
+    cat("Exported objects:\n")
+    cat(paste(new_obj, sep = ";; "))
   }
 }
+
 global_objects <- c(ls(), "global_objects")
 </script>
  
@@ -580,7 +581,7 @@ output$`tutorial-exercise-viz-output` <- renderUI({
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92]}},"value":[{"type":"character","attributes":{},"value":["base","bslib","cachem","callr","cli","coda","codetools","colorspace","compiler","crayon","curl","datasets","devtools","digest","dplyr","ellipsis","evaluate","fansi","fastmap","foreign","fs","generics","ggplot2","glue","graphics","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","inline","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","loo","magrittr","markdown","matrixStats","memoise","methods","mime","miniUI","munsell","parallel","pillar","pkgbuild","pkgconfig","pkgload","prettyunits","processx","profvis","promises","ps","purrr","R6","Rcpp","RcppParallel","regplane3D","remotes","rlang","rmarkdown","rprojroot","rstan","rstantools","rstudioapi","sass","scales","sessioninfo","shiny","StanHeaders","stats","stats4","stringi","stringr","tibble","tidyselect","tools","urlchecker","usethis","utf8","utils","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["4.2.1","0.4.0","1.0.6","3.7.2","3.4.0","0.19-4","0.2-18","2.0-3","4.2.1","1.5.1","4.3.2","4.2.1","2.4.4","0.6.29","1.0.10","0.3.2","0.16","1.0.3","1.1.0","0.8-82","1.5.2","0.1.3","3.3.6","1.6.2","4.2.1","4.2.1","4.2.1","2.3","0.3.1","0.5.3","1.5.4","1.6.6","0.3.19","0.1.4","1.8.0","1.40","1.3.0","0.20-45","0.10.1","1.0.2","2.5.1","2.0.3","1.1","0.62.0","2.0.1","4.2.1","0.12","0.1.1.1","0.5.0","4.2.1","1.8.1","1.3.1","2.0.3","1.3.0","1.1.1","3.7.0","0.3.7","1.2.0.1","1.7.1","0.3.4","2.5.1","1.0.9","5.1.5","0.1.0","2.4.2","1.0.5","2.16","2.0.3","2.21.7","2.2.0","0.14","0.4.2","1.2.1","1.2.2","1.7.2","2.21.0-7","4.2.1","4.2.1","1.7.8","1.4.1","3.1.8","1.1.2","4.2.1","1.0.1","2.1.6","1.2.2","4.2.1","0.4.1","2.5.0","0.33","1.8-4","2.3.5"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93]}},"value":[{"type":"character","attributes":{},"value":["base","bslib","cachem","callr","cli","coda","codetools","colorspace","compiler","crayon","curl","datasets","devtools","digest","dplyr","ellipsis","evaluate","fansi","fastmap","foreign","fs","generics","ggplot2","glue","graphics","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","inline","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","loo","magrittr","markdown","matrixStats","memoise","methods","mime","miniUI","munsell","parallel","pillar","pkgbuild","pkgconfig","pkgload","prettyunits","processx","profvis","promises","ps","purrr","R6","Rcpp","RcppParallel","regplane3D","remotes","rlang","rmarkdown","rprojroot","rstan","rstantools","rstudioapi","sass","scales","sessioninfo","shiny","StanHeaders","stats","stats4","stringi","stringr","tibble","tidyselect","tools","urlchecker","usethis","utf8","utils","V8","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["4.2.1","0.4.0","1.0.6","3.7.2","3.3.0","0.19-4","0.2-18","2.0-3","4.2.1","1.5.1","4.3.2","4.2.1","2.4.4","0.6.29","1.0.10","0.3.2","0.16","1.0.3","1.1.0","0.8-82","1.5.2","0.1.3","3.3.6","1.6.2","4.2.1","4.2.1","4.2.1","2.3","0.3.1","0.5.3","1.5.4","1.6.5","0.3.19","0.1.4","1.8.0","1.40","1.3.0","0.20-45","0.10.1","1.0.2","2.5.1","2.0.3","1.1","0.62.0","2.0.1","4.2.1","0.12","0.1.1.1","0.5.0","4.2.1","1.8.1","1.3.1","2.0.3","1.3.0","1.1.1","3.7.0","0.3.7","1.2.0.1","1.7.1","0.3.4","2.5.1","1.0.9","5.1.5","0.1.0","2.4.2","1.0.5","2.16","2.0.3","2.26.13","2.2.0","0.14","0.4.2","1.2.1","1.2.2","1.7.2","2.26.13","4.2.1","4.2.1","1.7.8","1.4.1","3.1.8","1.1.2","4.2.1","1.0.1","2.1.6","1.2.2","4.2.1","4.2.1","0.4.1","2.5.0","0.32","1.8-4","2.3.5"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>

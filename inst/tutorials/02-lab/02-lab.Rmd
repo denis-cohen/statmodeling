@@ -31,7 +31,6 @@ lapply(pkgs, library, character.only = TRUE)
 
 
 ## ---- Global learnr Objects ----
-## ---- Global learnr Objects ----
 gles <- 
   read.dta("https://github.com/denis-cohen/statmodeling/raw/main/data/gles.dta")
 gles$vote_afd = ifelse(gles$vote == "AfD", 1L, 0L)
@@ -51,8 +50,8 @@ export <- function(env = environment()) {
     })
   })
   if (!is.null(new_obj)){
-    print("Exported objects:")
-    print(new_obj)
+    cat("Exported objects:\n")
+    cat(paste(new_obj, sep = ";; "))
   }
 }
 

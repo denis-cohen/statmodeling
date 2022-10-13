@@ -77,10 +77,11 @@ export <- function(env = environment()) {
     })
   })
   if (!is.null(new_obj)){
-    print("Exported objects:")
-    print(new_obj)
+    cat("Exported objects:\n")
+    cat(paste(new_obj, sep = ";; "))
   }
 }
+
 global_objects <- c(ls(), "global_objects")
 ```
 
@@ -140,13 +141,13 @@ export(environment())
 
 ### Compilation
 
-Now, compile your Stan program from the character string `lm_code`.
+Now, compile your Stan program from the (pre-loaded) character string `lm_code`.
 
-```{r compilation, exercise=TRUE}
+```{r compilation, exercise=TRUE, exercise.timelimit = 120}
 lm_mod <- ...
 
-# Export to global environment (make available in other exercise chunks)
-assign("lm_mod", lm_mod, envir = globalenv())
+# Export newly created objects to global environment
+export(environment())
 ```
 
 ```{r compilation-solution}
@@ -334,7 +335,7 @@ export(environment())
 You guessed it: We can now use `regplane3D::plane3D()` on `pred_summary` to
 visualize our expected values, much like we did yesterday in Lab 1.
 
-```{r viz, exercise=TRUE, fig.align='center', fig.width = 9, fig.height=6}
+```{r viz, exercise=TRUE, fig.align='center', fig.width = 9, fig.height=6, exercise.timelimit = 120}
 # Change array dimensions to make them compatible with plane3D()
 pred_summary <- aperm(pred_summary, perm = c(2, 3, 1))
 

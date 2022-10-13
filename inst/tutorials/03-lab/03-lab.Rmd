@@ -45,8 +45,8 @@ export <- function(env = environment()) {
     })
   })
   if (!is.null(new_obj)){
-    print("Exported objects:")
-    print(new_obj)
+    cat("Exported objects:\n")
+    cat(paste(new_obj, sep = ";; "))
   }
 }
 

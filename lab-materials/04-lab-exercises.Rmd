@@ -83,7 +83,7 @@ standat <- list(...)
 
 ### Compilation
 
-Now, compile your Stan program from the character string `lm_code`.
+Now, compile your Stan program from the (pre-loaded) character string `lm_code`.
 
 ```{r compilation, exercise=TRUE}
 lm_mod <- ...

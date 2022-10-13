@@ -152,17 +152,17 @@ tapply(gles$vote_afd, gles$bl, sum)
 
 ### Compilation
 
-```{r compilation, eval = FALSE, echo=TRUE}
+```{r compilation, eval = FALSE, echo = TRUE}
 # Model code
 rslogit_code <- "data {
-  int<lower=1> N;                // num. observations
-  int<lower=1> K;                // num. predictors w. varying coefs
-  int<lower=1> L;                // num. predictors w. fixed coefs
-  int<lower=1> J;                // num. groups
-  int<lower=1, upper=J> jj[N];   // group index
-  matrix[N, K] x;                // matrix varying predictors, incl. intercept
-  matrix[N, L] z;                // matrix varying predictors, excl. intercept (!)
-  int<lower=0, upper=1> y[N];    // outcome vector
+  int<lower=1> N;                      // num. observations
+  int<lower=1> K;                      // num. predictors w. varying coefs
+  int<lower=1> L;                      // num. predictors w. fixed coefs
+  int<lower=1> J;                      // num. groups
+  array[N] int<lower=0, upper=J> jj;   // group index
+  matrix[N, K] x;                      // matrix varying predictors, incl. intercept
+  matrix[N, L] z;                      // matrix varying predictors, excl. intercept
+  array[N] int<lower=0, upper=1> y;    // outcome
 }
 
 transformed data {
@@ -330,9 +330,9 @@ This quantity of interest is vastly similar to the average marginal effect from 
 
 The conditional average marginal effect for a one unit increase in $\mathtt{la\_self}$ at any given value of $\mathtt{bl\_immig}^{\ast}$ is defined as:
 
-$$\frac{1}{N} \sum_{i=1}^{N} \left\{ \text{logit}^{-1}(\beta_1 + \beta_2 (\mathtt{la\_self}_i + 1) + \gamma_1 \mathtt{bl\_immig}_{j[i]} + \gamma_2 (\mathtt{la\_self}_i + 1) \times \mathtt{bl\_immig}^{\ast}) \\ - \text{logit}^{-1}(\beta_1 + \beta_2 \mathtt{la\_self}_i  + \gamma_1 \mathtt{bl\_immig}_{j[i]} + \gamma_2 \mathtt{la\_self}_i \times \mathtt{bl\_immig}^{\ast}) \right\}$$
+$$\frac{1}{N} \sum_{i=1}^{N} \left\{ \text{logit}^{-1}(\beta_1 + \beta_2 (\mathtt{la\_self}_i + 1) + \gamma_1 \mathtt{bl\_immig}^{\ast} + \gamma_2 (\mathtt{la\_self}_i + 1) \times \mathtt{bl\_immig}^{\ast}) \\ - \text{logit}^{-1}(\beta_1 + \beta_2 \mathtt{la\_self}_i  + \gamma_1 \mathtt{bl\_immig}^{\ast} + \gamma_2 \mathtt{la\_self}_i \times \mathtt{bl\_immig}^{\ast}) \right\}$$
 
-Note that we use a hypothetical value $\mathtt{bl\_immig}^{\ast}$ in the product term but the observed values $\mathtt{bl\_immig}_{j[i]}$ elsewhere. This may seem counterintuitive at first but it is essential to separate *effect modification* induced by the moderator $\mathtt{bl\_immig}$ from its distinct effect of on the linear predictor.
+<!-- Note that we use a hypothetical value $\mathtt{bl\_immig}^{\ast}$ in the product term but the observed values $\mathtt{bl\_immig}_{j[i]}$ elsewhere. This may seem counterintuitive at first but it is essential to separate *effect modification* induced by the moderator $\mathtt{bl\_immig}$ from its distinct effect of on the linear predictor. -->
 
 Of course, we do not simply want the average marginal value conditional on a single value of  $\mathtt{bl\_immig}^{\ast}$ but on a *sequence of values* of $\mathtt{bl\_immig}^{\ast}$. This will allow us to see how the marginal effect changes along the values of the moderator.
 
@@ -356,9 +356,9 @@ came <- array(NA, dim = c(length(bl_immig_vals), 3L))
 
 # Start loop
 for (i in seq_along(bl_immig_vals)) {
-    # Adjust the second column of Z
-  Z0[, "bl_immig:la_self"] <- ...
-  Z1[, "bl_immig:la_self"] <- ...
+  # Manipulate z matrices
+  Z0[, c("bl_immig", "bl_immig:la_self")] <- ...
+  Z1[, c("bl_immig", "bl_immig:la_self")] <- ...
   
   # Get unit-specific linear predictors
   eta0 <- ...
@@ -393,9 +393,11 @@ came <- array(NA, dim = c(length(bl_immig_vals), 3L))
 
 # Start loop
 for (i in seq_along(bl_immig_vals)) {
-    # Adjust the second column of Z
-  Z0[, "bl_immig:la_self"] <- bl_immig_vals[i] * X0[, "la_self"]
-  Z1[, "bl_immig:la_self"] <- bl_immig_vals[i] * X1[, "la_self"]
+  # Manipulate z matrices
+  Z0[, c("bl_immig", "bl_immig:la_self")] <-
+    cbind(bl_immig_vals[i], bl_immig_vals[i] * X0[, "la_self"])
+  Z1[, c("bl_immig", "bl_immig:la_self")] <-
+    cbind(bl_immig_vals[i], bl_immig_vals[i] * X1[, "la_self"])
   
   # Get unit-specific linear predictors
   eta0 <- X0 %*% t(pars$beta) + Z0 %*% t(pars$gamma)
