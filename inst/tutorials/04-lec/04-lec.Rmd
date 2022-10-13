@@ -167,7 +167,7 @@ First, let's recap the three parts of every GLM in the context of the linear mod
 * (Inverse) link function: $\mathbf{y^{\ast}} = \text{id}(\eta) = \eta$
 * Linear component: $\eta = \mathbf{X} \beta$
 
-The *family* specifies the probability model (a.k.a. likelihood, data-generating process, or generative model) for the *data*: The fundamental assumption of the linear model is that every observation $y_i$ is a realization from a normal pdf with location parameter (mean) $\mu_i$ and constant scale parameter (variance) $\sigma^2$.
+The *family* specifies the probability model (a.k.a. likelihood, data-generating process, or generative model) for the *data*: The fundamental assumption of the linear model is that every observation $y_i$ is a realization from a normal pdf with location parameter (mean) $\eta_i$ and constant scale parameter (variance) $\sigma^2$.
 
 *Note:* Mimicking the convention in both R and Stan, we parameterize the normal distribution in terms of its mean and *standard deviation* (not variance)!
 
@@ -342,7 +342,7 @@ transformed parameters {
 
 ```{stan ex1-tpars1-solution, output.var = "none"}
 transformed parameters {
-  vector[N] mu;  // declare
+  vector[N] eta;  // declare
   eta = x * beta; // assign
 }
 ```
@@ -381,7 +381,7 @@ model {
 - You can supply Stan programs as a character string in R
 - Downsides:
     - No syntax highlighting, formatting, and checking
-    - Must use double quotation marks `"` around the strong to avoid that the [transposition operator](https://mc-stan.org/docs/2_26/functions-reference/transposition-operator.html) `'` breaks the string
+    - Must use double quotation marks `"` around the string to avoid that the [transposition operator](https://mc-stan.org/docs/2_26/functions-reference/transposition-operator.html) `'` breaks the string
 - Upsides: Works with the interactive `learnr` tutorials in our workshop!
 
 ```{r ex1-full, exercise = TRUE, exercise.lines = 30}
@@ -400,7 +400,7 @@ parameters {
 }
 
 transformed parameters {
-  vector[N] mu;  // declare lin. pred.
+  vector[N] eta;  // declare lin. pred.
   eta = x * beta; // assign lin. pred.
 }
 
@@ -433,7 +433,7 @@ x <- cbind(                               # design matrix
   matrix(rnorm(N * (K - 1)), N, (K - 1))
   )
 
-# Simulate parameters
+# Set "true" parameters
 beta <- rnorm(K, 0, 1)                    # coef. vector
 sigma <- 2.5                              # scale parameter
 
@@ -502,7 +502,7 @@ lm_val
 ```
 
 - When comparing these estimates, the question is, of course, how much deviation should have us worried.
-- Deviations from a single validation run may be due to a circumstantial selection of extreme ‘true’ parameter values when simulating the data generating process. 
+- Deviations from a single validation run may be due to a circumstantial simulation of 'extreme' outcome values when mimicking the data generating process. 
 - [Cook, Gelman, and Rubin (2006)](https://www.tandfonline.com/doi/abs/10.1198/106186006X136976) thus recommend running many replications of such validation simulations.
 - They also provide a useful test statistic.
 
