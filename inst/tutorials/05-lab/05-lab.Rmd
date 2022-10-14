@@ -382,7 +382,6 @@ X0 <- X1 <- standat_rslogit$x
 Z0 <- Z1 <- standat_rslogit$z
 X1[, "la_self"] <- X1[, "la_self"] + 1
 
-
 # Define value sequence for bl_immig (approx range: 1-4)
 bl_immig_vals <- seq(1, 4, 0.1)
 
@@ -481,4 +480,52 @@ lines(bl_immig_vals,
       came[ ,3],
       lty = 1,
       col = "gray30")
+```
+
+### Follow-up
+
+Suppose you have included this plot in a submission. Reviewer 2 remarks that it is interesting to see that the average effect of a one-point increase in anti-immigration preferences on AfD voting more than doubles along the scale of state-level immigration rates. However, they point out that the credible intervals at the two ends of the $x$-axis widely overlap and, therefore, wonder if the reported effect modification is truly systematic.
+
+Modify the code you used to compute the conditional average effect  to report the probability that the average effect of a one-point increase in anti-immigration preferences is greater when the state-level immigration rate is at its maximum as opposed to its minimum value.
+
+```{r qoi2, exercise = TRUE, exercise.lines = 36}
+
+```
+
+```{r qoi2-solution}
+# Extract the model parameters
+pars <- rstan::extract(rslogit_est)
+
+# Extract the model matrices from standat_rslogit
+X0 <- X1 <- standat_rslogit$x
+Z0 <- Z1 <- standat_rslogit$z
+X1[, "la_self"] <- X1[, "la_self"] + 1
+
+# Get min/max values of bl_immig
+bl_immig_vals <- range(standat_rslogit$z[, 1])
+
+# Initialize container (for full posterior)
+came <- array(NA, dim = c(length(bl_immig_vals), nrow(pars$beta)))
+
+# Start loop
+for (i in seq_along(bl_immig_vals)) {
+  # Manipulate z matrices
+  Z0[, c("bl_immig", "bl_immig:la_self")] <-
+    cbind(bl_immig_vals[i], bl_immig_vals[i] * X0[, "la_self"])
+  Z1[, c("bl_immig", "bl_immig:la_self")] <-
+    cbind(bl_immig_vals[i], bl_immig_vals[i] * X1[, "la_self"])
+  
+  # Get unit-specific linear predictors
+  eta0 <- X0 %*% t(pars$beta) + Z0 %*% t(pars$gamma)
+  eta1 <- X1 %*% t(pars$beta) + Z1 %*% t(pars$gamma)
+  
+  # Get unit-specific conditional marginal effects
+  cme <- plogis(eta1) - plogis(eta0)
+  
+  # Average across observations
+  came[i, ] <- apply(cme, 2, mean)
+}
+
+# Report probability of interest
+mean(came[2, ] > came[1, ])
 ```
