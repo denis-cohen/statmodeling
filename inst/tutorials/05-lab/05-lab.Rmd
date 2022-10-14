@@ -332,8 +332,6 @@ The conditional average marginal effect for a one unit increase in $\mathtt{la\_
 
 $$\frac{1}{N} \sum_{i=1}^{N} \left\{ \text{logit}^{-1}(\beta_1 + \beta_2 (\mathtt{la\_self}_i + 1) + \gamma_1 \mathtt{bl\_immig}^{\ast} + \gamma_2 (\mathtt{la\_self}_i + 1) \times \mathtt{bl\_immig}^{\ast}) \\ - \text{logit}^{-1}(\beta_1 + \beta_2 \mathtt{la\_self}_i  + \gamma_1 \mathtt{bl\_immig}^{\ast} + \gamma_2 \mathtt{la\_self}_i \times \mathtt{bl\_immig}^{\ast}) \right\}$$
 
-<!-- Note that we use a hypothetical value $\mathtt{bl\_immig}^{\ast}$ in the product term but the observed values $\mathtt{bl\_immig}_{j[i]}$ elsewhere. This may seem counterintuitive at first but it is essential to separate *effect modification* induced by the moderator $\mathtt{bl\_immig}$ from its distinct effect of on the linear predictor. -->
-
 Of course, we do not simply want the average marginal value conditional on a single value of  $\mathtt{bl\_immig}^{\ast}$ but on a *sequence of values* of $\mathtt{bl\_immig}^{\ast}$. This will allow us to see how the marginal effect changes along the values of the moderator.
 
 ### Calculate the QOI

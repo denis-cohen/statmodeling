@@ -82,7 +82,7 @@ options(mc.cores = parallel::detectCores())  # parallelize across all CPUs
 ### An example from my own research: Modeling comparative vote switching
 
 ```{r france, exercise = FALSE, echo = FALSE, out.width = '90%', fig.align="center"}
-knitr::include_graphics("files/fr17-plots-1.png")
+knitr::include_graphics("images/fr17-plots-1.png")
 ```
 
 ### Voter transition matrices
@@ -106,14 +106,14 @@ knitr::include_graphics("files/fr17-plots-1.png")
 
 #### Basic quantities of interest
 
-1. .cyan[Party-specific retention rates], $p_{i,i}$
-2. .cyan[Dyadic gross gains/losses], $p_{i,j}$
-3. .cyan[Dyadic trade volumes], $V_{i,j} = p_{j,i} + p_{i,j}$
-4. .cyan[Dyadic trade balances], $V_{i,j} = p_{j,i} - p_{i,j}$
+1. *Party-specific retention rates*, $p_{i,i}$
+2. *Dyadic gross gains/losses*, $p_{i,j}$
+3. *Dyadic trade volumes*, $V_{i,j} = p_{j,i} + p_{i,j}$
+4. *Dyadic trade balances*, $V_{i,j} = p_{j,i} - p_{i,j}$
   
 #### Derived quantities of interest: Aggregate and normalize as needed
 
-Let our quantity of interest be .cyan[government parties'] trade balances with .cyan[opposition parties], .cyan[relative to their own support base at t - 1]:
+Let our quantity of interest be *government parties'* trade balances with *opposition parties*, *relative to their own support base at t - 1*:
 
 $$\text{QOI} = \frac{100 \times \sum_{j = 2}^{4} p_{j, 1} -  p_{1, j}}{\sum_{k = 1}^{5} p_{1, k}} = \frac{100 \times (2.6 - 5.2)}{21.6} \approx 12.0$$
 
@@ -121,7 +121,7 @@ $$\text{QOI} = \frac{100 \times \sum_{j = 2}^{4} p_{j, 1} -  p_{1, j}}{\sum_{k =
 
 #### Description
 
-MAVCL models latent election-level .cyan[cell proportions], $\Pr(y_{j} = c)$, derived as average micro-level .cyan[choice probabilities], based on cell counts, $w_{jc}$:
+MAVCL models latent election-level *cell proportions*, $\Pr(y_{j} = c)$, derived as average micro-level *choice probabilities*, based on cell counts, $w_{jc}$:
 
 - A categorical likelihood at the voter level models individual *choice probabilities* (as in MNL).
 - As the model only involves election-level covariates, we can re-express this model at the election-level with $w_{jc}$'s serve as election-and-cell-specific frequency weights. This yields a multinomial quasi-likelihood at the election-level.
@@ -140,6 +140,18 @@ MAVCL models latent election-level .cyan[cell proportions], $\Pr(y_{j} = c)$, de
 ### Software implementation
 
 <p align="center">
-  <iframe width="800" height="520" src="files/voteswitchR-package.html" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  <iframe width="800" height="520" src="images/voteswitchR-package.html" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </p>
 
+
+## Take-aways for aspiring model developers
+
+- Determine if a "canned solution" already exists.
+    - It exists and accomplishes exactly what you want to do? $\rightarrow$ Use it!
+    - It exists but falls short of accomplishing what you want to do? $\rightarrow$ Build up on it!
+    - It doesn't exist? $\rightarrow$ It may seem like you are starting from scratch, but most likely, many parts of your model will resemble existing (Stan) models.
+- Choose the correct likelihood for your model. Stan will almost certainly feature the required log probability function.
+- Think about the "right-hand side" of your model formula (i.e., systematic component and inverse link). Start simple, increase flexibility step-wise.
+- Use the documentation and the vast online resources. Seek help when necessary.
+- Once your model runs: Validate it.
+- After validation and inference, get the most out of your posterior samples. Process your posterior draws into substantively meaningful quantities of interest, and visualize whenever possible.
