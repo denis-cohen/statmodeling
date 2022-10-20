@@ -260,9 +260,9 @@ log-likelihood, <code>normal_lpdf</code>.</p>
 href="https://en.wikipedia.org/wiki/Normal_distribution">normal
 probability density function</a> (pdf) and sums across the resulting
 values of all observations, which returns a scalar:</p>
-<p><span class="math display">\[ \mathtt{normal\_lpdf(y | mu, sigma)} =
+<p><span class="math display">\[ \mathtt{normal\_lpdf(y | eta, sigma)} =
 \sum_{i=1}^{N}\frac{1}{2} \log (2 \pi \sigma^2) \Big(
-\frac{y_i-\mu_i}{\sigma}\Big)\]</span></p>
+\frac{y_i-\eta_i}{\sigma}\Big)\]</span></p>
 </div>
 <div id="section-the-weighted-normal-log-likelihood"
 class="section level3">
@@ -280,9 +280,9 @@ all observations.</li>
 normal pdf:</li>
 </ul>
 <pre class="stan"><code>functions {
-  vector pw_norm(vector y, vector mu, real sigma) {
+  vector pw_norm(vector y, vector eta, real sigma) {
     return -0.5 * (log(2 * pi() * square(sigma)) + 
-                     square((y - mu) / sigma));
+                     square((y - eta) / sigma));
   }
 }</code></pre>
 </div>
@@ -307,15 +307,15 @@ model {
   ...
   
   // weighted log-likelihood
-  target += dot_product(weights, pw_norm(y, mu, sigma));
+  target += dot_product(weights, pw_norm(y, eta, sigma));
 }
 </code></pre>
 <p>The dot product returns the sum of the pairwise products of entries
 of both vectors, which gives us our weighted log-likelihood:</p>
 <p><span class="math display">\[\mathtt{dot\_product(weights,
-pw\_norm(y, mu, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times
+pw\_norm(y, eta, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times
 \frac{1}{2} \log (2 \pi \sigma^2) \Big(
-\frac{y_i-\mu_i}{\sigma}\Big)\]</span></p>
+\frac{y_i-\eta_i}{\sigma}\Big)\]</span></p>
 </div>
 <div id="section-standardized-data" class="section level3">
 <h3>Standardized Data</h3>
@@ -374,15 +374,15 @@ variables.</li>
 
 model {
   // local variables
-  vector[N] mu_std;          // declare lin. pred.
-  mu_std = x_std * beta_std; // assign lin. pred.
+  vector[N] eta_std;          // declare lin. pred.
+  eta_std = x_std * beta_std; // assign lin. pred.
 
   // priors
   target += normal_lpdf(beta | 0, 10);  // priors for beta
   target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
   
   // log-likelihood
-  target += normal_lpdf(y_std | mu_std, sigma_std); // likelihood
+  target += normal_lpdf(y_std | eta_std, sigma_std); // likelihood
 }</code></pre>
 </div>
 <div id="section-retrieving-the-original-parameters"
@@ -426,7 +426,7 @@ below:</p>
   save_warmup = FALSE,        # discard warmup sims
   sample_file = NULL,         # no sample file
   diagnostic_file = NULL,     # no diagnostic file
-  pars = c(&quot;beta&quot;, &quot;sigma&quot;),  # select parameters #&lt;&lt;
+  pars = c(&quot;beta&quot;, &quot;sigma&quot;),  # select parameters
   iter = 2000L,               # iter per chain
   warmup = 1000L,             # warmup period
   thin = 2L,                  # thinning factor
@@ -491,7 +491,7 @@ model {
   target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
   
   // log-likelihood
-  target += normal_lpdf(y | mu, sigma); // likelihood
+  target += normal_lpdf(y | eta, sigma); // likelihood
 }</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"paged","exercise.checker":"NULL"}</script>
 </div>
@@ -532,7 +532,7 @@ group-specific zero-mean random effect:</li>
 </ul>
 <p><span class="math display">\[y_{ij} \sim
 \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta +
-\nu_{j}_{[i]})) \\
+\nu_{j_{[i]}}) \\
 \nu_j \sim \text{Normal}(0, \sigma_{\nu})\]</span></p>
 <ul>
 <li>We accomplish this by adding a standard normal parameter in the
@@ -549,12 +549,12 @@ group membership.</li>
 class="section level3">
 <h3>Varying-intercepts logit model: Code</h3>
 <pre class="stan"><code>data {
-  int&lt;lower=1&gt; N;                   // num. observations
-  int&lt;lower=1&gt; K;                   // num. predictors
-  int&lt;lower=1&gt; J;                   // num. groups
-  array[N] int&lt;lower=0,upper=J&gt; jj; // outcome vector
-  matrix[N, K] x;                   // model matrix
-  array[N] int&lt;lower=0,upper=1&gt; y;  // outcome
+  int&lt;lower=1&gt; N;                    // num. observations
+  int&lt;lower=1&gt; K;                    // num. predictors
+  int&lt;lower=1&gt; J;                    // num. groups
+  array[N] int&lt;lower=0, upper=J&gt; jj; // outcome vector
+  matrix[N, K] x;                    // model matrix
+  array[N] int&lt;lower=0, upper=1&gt; y;  // outcome
 }
 
 parameters {
@@ -565,7 +565,7 @@ parameters {
 
 transformed parameters {
   vector[J] nu;            // scaled random effect
-  nu = nu_raw * sigm_nu;
+  nu = nu_raw * sigma_nu;
 }
 
 model {
@@ -598,11 +598,11 @@ covariates <span class="math inline">\(\mathbf{z}\)</span>.</li>
 following model:</li>
 </ul>
 <p><span class="math display">\[y_{ij} \sim
-\text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta_j +
-\mathbf{z} _i^{\prime} \gamma)) \\
-\beta_{1j} = \beta_1 + \nu_{1j}_{[i]} \\
-\beta_{2j} = \beta_2 + \nu_{2j}_{[i]} \\
-\begin{bmatrix} \nu_{1j} \\ \nu_{1j} \end{bmatrix} \sim \text{MVN}\left(
+\text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta_{j_{[i]}}
++ \mathbf{z} _i^{\prime} \gamma)) \\
+\beta_{1j} = \beta_1 + \nu_{1j} \\
+\beta_{2j} = \beta_2 + \nu_{2j} \\
+\begin{bmatrix} \nu_{1j} \\ \nu_{2j} \end{bmatrix} \sim \text{MVN}\left(
 \begin{bmatrix} 0 \\ 0 \end{bmatrix}, \Sigma_{\nu} \right)\]</span></p>
 <ul>
 <li>This is exactly the form in which we implement the model below.</li>
@@ -627,14 +627,14 @@ class="math inline">\(\Sigma_{nu}\)</span>.</li>
 class="section level3">
 <h3>Varying-intercepts, varying slopes logit model: Code</h3>
 <pre class="stan"><code>data {
-  int&lt;lower=1&gt; N;                     // num. observations
-  int&lt;lower=1&gt; K;                     // num. predictors w. varying coefs
-  int&lt;lower=1&gt; L;                     // num. predictors w. fixed coefs
-  int&lt;lower=1&gt; J;                     // num. groups
-  array[N] int&lt;lower=0,upper=1&gt; jj;   // group index
-  matrix[N, K] x;                     // matrix varying predictors, incl. intercept
-  matrix[N, L] z;                     // matrix varying predictors, excl. intercept
-  array[N] int&lt;lower=0,upper=1&gt; y;    // outcome
+  int&lt;lower=1&gt; N;                      // num. observations
+  int&lt;lower=1&gt; K;                      // num. predictors w. varying coefs
+  int&lt;lower=1&gt; L;                      // num. predictors w. fixed coefs
+  int&lt;lower=1&gt; J;                      // num. groups
+  array[N] int&lt;lower=0, upper=J&gt; jj;   // group index
+  matrix[N, K] x;                      // matrix varying predictors, incl. intercept
+  matrix[N, L] z;                      // matrix varying predictors, excl. intercept
+  array[N] int&lt;lower=0, upper=1&gt; y;    // outcome
 }
 
 transformed data {
@@ -665,7 +665,9 @@ model {
   
   // linear predictor
   eta = x * beta + z * gamma;               // lin. pred. without random effect
-  eta = eta + x * nu[jj];                   // add group-specific random effects
+  for (i in 1:N) {
+    eta[i] = eta[i] + x[i, ] * nu[jj[i]];   // add group-specific random effects
+  }
   
   // priors
   target += normal_lpdf(beta | 0, 10);               // priors for beta
@@ -756,7 +758,7 @@ output$`tutorial-exercise-logit1-output` <- renderUI({
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81]}},"value":[{"type":"character","attributes":{},"value":["base","bslib","cachem","callr","cli","coda","codetools","colorspace","compiler","crayon","curl","datasets","digest","dplyr","ellipsis","evaluate","fansi","fastmap","generics","ggplot2","glue","graphics","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","inline","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","loo","magrittr","markdown","matrixStats","methods","mime","munsell","parallel","pillar","pkgbuild","pkgconfig","prettyunits","processx","promises","ps","purrr","R6","Rcpp","RcppParallel","rlang","rmarkdown","rprojroot","rstan","rstantools","rstudioapi","sass","scales","shiny","StanHeaders","stats","stats4","stringi","stringr","tibble","tidyselect","tools","utf8","utils","V8","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["4.2.1","0.4.0","1.0.6","3.7.2","3.3.0","0.19-4","0.2-18","2.0-3","4.2.1","1.5.1","4.3.2","4.2.1","0.6.29","1.0.10","0.3.2","0.16","1.0.3","1.1.0","0.1.3","3.3.6","1.6.2","4.2.1","4.2.1","4.2.1","2.3","0.3.1","0.5.3","1.5.4","1.6.5","0.3.19","0.1.4","1.8.0","1.40","1.3.0","0.20-45","0.10.1","1.0.2","2.5.1","2.0.3","1.1","0.62.0","4.2.1","0.12","0.5.0","4.2.1","1.8.1","1.3.1","2.0.3","1.1.1","3.7.0","1.2.0.1","1.7.1","0.3.4","2.5.1","1.0.9","5.1.5","1.0.5","2.16","2.0.3","2.26.13","2.2.0","0.14","0.4.2","1.2.1","1.7.2","2.26.13","4.2.1","4.2.1","1.7.8","1.4.1","3.1.8","1.1.2","4.2.1","1.2.2","4.2.1","4.2.1","0.4.1","2.5.0","0.32","1.8-4","2.3.5"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81]}},"value":[{"type":"character","attributes":{},"value":["base","bslib","cachem","callr","cli","coda","codetools","colorspace","compiler","crayon","curl","datasets","digest","dplyr","ellipsis","evaluate","fansi","fastmap","generics","ggplot2","glue","graphics","grDevices","grid","gridExtra","gtable","htmltools","htmlwidgets","httpuv","inline","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","loo","magrittr","markdown","matrixStats","methods","mime","munsell","parallel","pillar","pkgbuild","pkgconfig","prettyunits","processx","promises","ps","purrr","R6","Rcpp","RcppParallel","rlang","rmarkdown","rprojroot","rstan","rstantools","rstudioapi","sass","scales","shiny","StanHeaders","stats","stats4","stringi","stringr","tibble","tidyselect","tools","utf8","utils","V8","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["4.2.1","0.4.0","1.0.6","3.7.2","3.4.0","0.19-4","0.2-18","2.0-3","4.2.1","1.5.1","4.3.2","4.2.1","0.6.29","1.0.10","0.3.2","0.16","1.0.3","1.1.0","0.1.3","3.3.6","1.6.2","4.2.1","4.2.1","4.2.1","2.3","0.3.1","0.5.3","1.5.4","1.6.6","0.3.19","0.1.4","1.8.0","1.40","1.3.0","0.20-45","0.10.1","1.0.2","2.5.1","2.0.3","1.1","0.62.0","4.2.1","0.12","0.5.0","4.2.1","1.8.1","1.3.1","2.0.3","1.1.1","3.7.0","1.2.0.1","1.7.1","0.3.4","2.5.1","1.0.9","5.1.5","1.0.5","2.16","2.0.3","2.26.13","2.2.0","0.14","0.4.2","1.2.1","1.7.2","2.26.13","4.2.1","4.2.1","1.7.8","1.4.1","3.1.8","1.1.2","4.2.1","1.2.2","4.2.1","4.2.1","0.4.1","2.5.0","0.33","1.8-4","2.3.5"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>

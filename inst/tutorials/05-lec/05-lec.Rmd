@@ -132,7 +132,7 @@ We first need to understand the built-in function for the unweighted log-likelih
 
 `normal_lpdf` defines the log of the [normal probability density function](https://en.wikipedia.org/wiki/Normal_distribution) (pdf) and sums across the resulting values of all observations, which returns a scalar:
 
-$$ \mathtt{normal\_lpdf(y | mu, sigma)} = \sum_{i=1}^{N}\frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\mu_i}{\sigma}\Big)$$
+$$ \mathtt{normal\_lpdf(y | eta, sigma)} = \sum_{i=1}^{N}\frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)$$
 
 ### The weighted normal log-likelihood
 
@@ -144,9 +144,9 @@ Why is this problematic?
 
 ```{stan ext1a, output.var="ext1a", eval = FALSE, echo = TRUE}
 functions {
-  vector pw_norm(vector y, vector mu, real sigma) {
+  vector pw_norm(vector y, vector eta, real sigma) {
     return -0.5 * (log(2 * pi() * square(sigma)) + 
-                     square((y - mu) / sigma));
+                     square((y - eta) / sigma));
   }
 }
 ```
@@ -171,14 +171,14 @@ model {
   ...
   
   // weighted log-likelihood
-  target += dot_product(weights, pw_norm(y, mu, sigma));
+  target += dot_product(weights, pw_norm(y, eta, sigma));
 }
 
 ```
 
 The dot product returns the sum of the pairwise products of entries of both vectors, which gives us our weighted log-likelihood:
 
-$$\mathtt{dot\_product(weights, pw\_norm(y, mu, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times \frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\mu_i}{\sigma}\Big)$$
+$$\mathtt{dot\_product(weights, pw\_norm(y, eta, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times \frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)$$
 
 ### Standardized Data
 
@@ -221,15 +221,15 @@ parameters {
 
 model {
   // local variables
-  vector[N] mu_std;          // declare lin. pred.
-  mu_std = x_std * beta_std; // assign lin. pred.
+  vector[N] eta_std;          // declare lin. pred.
+  eta_std = x_std * beta_std; // assign lin. pred.
 
   // priors
   target += normal_lpdf(beta | 0, 10);  // priors for beta
   target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
   
   // log-likelihood
-  target += normal_lpdf(y_std | mu_std, sigma_std); // likelihood
+  target += normal_lpdf(y_std | eta_std, sigma_std); // likelihood
 }
 ```
 
@@ -327,7 +327,7 @@ model {
   target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
   
   // log-likelihood
-  target += normal_lpdf(y | mu, sigma); // likelihood
+  target += normal_lpdf(y | eta, sigma); // likelihood
 }
 ```
 
@@ -388,7 +388,7 @@ parameters {
 
 transformed parameters {
   vector[J] nu;            // scaled random effect
-  nu = nu_raw * sigm_nu;
+  nu = nu_raw * sigma_nu;
 }
 
 model {
