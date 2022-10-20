@@ -124,7 +124,7 @@ There are, however, some essential tasks that should or must be accommodated in 
 - Let's incorporate this feature into our Stan program for the linear model. 
 - The hack requires two things:
     - the definition of a new function
-    - TWo minor, single-line modifications: One in the `data`, one in the `model` block 
+    - Two minor, single-line modifications: One in the `data`, one in the `model` block 
     
 ### The unweighted normal log-likelihood
 
