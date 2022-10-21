@@ -674,7 +674,7 @@ $$
 p(\tau | \alpha, \beta, \mu, \mathbf{y}) \propto \tau^{\alpha + \frac{N}{2} - 1} \exp\left(-\left(\beta + \sum_{i=1}^{N} \frac{(y_i - \mu)^2}{2} \tau\right)\right)
 $$
 
-This is a gamma distribution with updated parameters $\alpha^{\ast} = \alpha + \frac{N}{2}$ and $\beta^{\ast} = \beta + \sum_{i=1}^{N} \frac{(x_i - \mu)^2}{2}$. Thus, we also have analytical solutions for the Gamma parameters that characterize the posterior density of $\tau$.
+This is a gamma distribution with updated parameters $\alpha^{\ast} = \alpha + \frac{N}{2}$ and $\beta^{\ast} = \beta + \sum_{i=1}^{N} \frac{(y_i - \mu)^2}{2}$. Thus, we also have analytical solutions for the Gamma parameters that characterize the posterior density of $\tau$.
 
 ### Simulating the independent prior distributions
 
