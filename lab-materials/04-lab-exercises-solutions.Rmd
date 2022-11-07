@@ -53,6 +53,10 @@ model {
 ## ---- rstan Options ----
 rstan_options(auto_write = TRUE)             # avoid recompilation of models
 options(mc.cores = parallel::detectCores())  # parallelize across all CPUs
+
+## ---- Global chunk options ----
+knitr::opts_chunk$set(echo = TRUE,
+                      eval = FALSE)
 ```
 
 

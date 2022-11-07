@@ -26,6 +26,10 @@ gles <-
 
 y <- gles$sup_afd
 X <- model.matrix(~ se_self + la_self + se_self:la_self, data = gles)
+
+## ---- Global chunk options ----
+knitr::opts_chunk$set(echo = TRUE,
+                      eval = FALSE)
 ```
 
 

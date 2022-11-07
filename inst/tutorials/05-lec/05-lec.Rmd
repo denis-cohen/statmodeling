@@ -124,7 +124,7 @@ There are, however, some essential tasks that should or must be accommodated in 
 - Let's incorporate this feature into our Stan program for the linear model. 
 - The hack requires two things:
     - the definition of a new function
-    - TWo minor, single-line modifications: One in the `data`, one in the `model` block 
+    - Two minor, single-line modifications: One in the `data`, one in the `model` block 
     
 ### The unweighted normal log-likelihood
 
@@ -132,7 +132,7 @@ We first need to understand the built-in function for the unweighted log-likelih
 
 `normal_lpdf` defines the log of the [normal probability density function](https://en.wikipedia.org/wiki/Normal_distribution) (pdf) and sums across the resulting values of all observations, which returns a scalar:
 
-$$ \mathtt{normal\_lpdf(y | mu, sigma)} = \sum_{i=1}^{N}\frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\mu_i}{\sigma}\Big)$$
+$$ \mathtt{normal\_lpdf(y | eta, sigma)} = \sum_{i=1}^{N}\frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)$$
 
 ### The weighted normal log-likelihood
 
@@ -144,9 +144,9 @@ Why is this problematic?
 
 ```{stan ext1a, output.var="ext1a", eval = FALSE, echo = TRUE}
 functions {
-  vector pw_norm(vector y, vector mu, real sigma) {
+  vector pw_norm(vector y, vector eta, real sigma) {
     return -0.5 * (log(2 * pi() * square(sigma)) + 
-                     square((y - mu) / sigma));
+                     square((y - eta) / sigma));
   }
 }
 ```
@@ -171,14 +171,14 @@ model {
   ...
   
   // weighted log-likelihood
-  target += dot_product(weights, pw_norm(y, mu, sigma));
+  target += dot_product(weights, pw_norm(y, eta, sigma));
 }
 
 ```
 
 The dot product returns the sum of the pairwise products of entries of both vectors, which gives us our weighted log-likelihood:
 
-$$\mathtt{dot\_product(weights, pw\_norm(y, mu, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times \frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\mu_i}{\sigma}\Big)$$
+$$\mathtt{dot\_product(weights, pw\_norm(y, eta, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times \frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)$$
 
 ### Standardized Data
 
@@ -221,15 +221,15 @@ parameters {
 
 model {
   // local variables
-  vector[N] mu_std;          // declare lin. pred.
-  mu_std = x_std * beta_std; // assign lin. pred.
+  vector[N] eta_std;          // declare lin. pred.
+  eta_std = x_std * beta_std; // assign lin. pred.
 
   // priors
   target += normal_lpdf(beta | 0, 10);  // priors for beta
   target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
   
   // log-likelihood
-  target += normal_lpdf(y_std | mu_std, sigma_std); // likelihood
+  target += normal_lpdf(y_std | eta_std, sigma_std); // likelihood
 }
 ```
 
@@ -327,7 +327,7 @@ model {
   target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
   
   // log-likelihood
-  target += normal_lpdf(y | mu, sigma); // likelihood
+  target += normal_lpdf(y | eta, sigma); // likelihood
 }
 ```
 
@@ -361,7 +361,7 @@ model {
 - Extending our model to become a hierarchical varying-intercept model is easy.
 - All we need to do is extend the linear predictor with a group-specific zero-mean random effect:
 
-$$y_{ij} \sim \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta + \nu_{j_{[i]}}) \\
+$$y_{ij} \sim \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta + \nu_{j_{[i]}})) \\
 \nu_j \sim \text{Normal}(0, \sigma_{\nu})$$
 
 - We accomplish this by adding a standard normal parameter in the `parameters` block, and scaling it in the `transformed parameters` block. 
@@ -375,7 +375,7 @@ data {
   int<lower=1> N;                    // num. observations
   int<lower=1> K;                    // num. predictors
   int<lower=1> J;                    // num. groups
-  array[N] int<lower=0, upper=J> jj; // outcome vector
+  array[N] int<lower=0, upper=J> jj; // group index
   matrix[N, K] x;                    // model matrix
   array[N] int<lower=0, upper=1> y;  // outcome
 }
@@ -388,14 +388,14 @@ parameters {
 
 transformed parameters {
   vector[J] nu;            // scaled random effect
-  nu = nu_raw * sigm_nu;
+  nu = nu_raw * sigma_nu;
 }
 
 model {
   // local variables
   vector[N] eta;
   
-  eta = x * beta + nu[jj];              // lin. pred. without random effect
+  eta = x * beta + nu[jj];                  // linear predictor
 
   // priors
   target += normal_lpdf(beta | 0, 10);      // priors for beta
@@ -436,7 +436,7 @@ data {
   int<lower=1> J;                      // num. groups
   array[N] int<lower=0, upper=J> jj;   // group index
   matrix[N, K] x;                      // matrix varying predictors, incl. intercept
-  matrix[N, L] z;                      // matrix varying predictors, excl. intercept
+  matrix[N, L] z;                      // matrix fixed predictors, excl. intercept
   array[N] int<lower=0, upper=1> y;    // outcome
 }
 
@@ -487,4 +487,212 @@ model {
 
 ### Transferability to other GLM
 
-The specification of univariate or multivariate random effects is fairly general. It does not depend on a specific type of GLM. You could equally use the respective code chunks in a linear model or a tobit model, for instance.
+The specification of univariate or multivariate random effects is fairly general. It does not depend on a specific type of GLM. 
+
+You could equally use the respective code chunks in a linear model or a tobit model, for instance. This is an example of modular model building.
+
+
+## Developing your own Stan models
+
+### Motivation
+
+- The above example shows how one can continuously expand the complexity of a Stan model.
+- Yet, this is still a standard hierarchical model that you could equally estimate using a 'canned solution'.
+- At some point, however, you will likely want to push past the boundaries of such canned solutions.
+- Below are some motivating examples.
+
+### Relaxing model assumptions
+
+- You estimate a hierarchical GLM with random intercepts and few groups.
+- Reviewer 2 has read up on some recent publications (e.g., [Stegmueller 2013](https://onlinelibrary.wiley.com/doi/full/10.1111/ajps.12001); [Elff et al. 2020](https://www.elff.eu/article/multilevel-improving/)) and criticizes your use of normally distributed random effects.
+- Why not use Stan to relax this distributional assumption?
+- You may, e.g., reestimate your model with different distributions for your random effects, and conduct simulation studies to test their relative performance towards one another.
+
+### Heterogeneous treatment effects
+
+- You conduct an RCT with a binary treatment on political attitudes.
+- You use a standard difference-in-means estimator, which yields a null effect.
+- This is in line with your expectations, as you expect that the treatment will "shift" some individuals to the left, others to the right.
+- You cannot accurately characterize left-shifters an right-shifters in terms of covariates and, therefore, not present meaningful subgroup-specific difference-in-means estimates.
+- Why not focus on the variance, then?
+- Use Stan to implement a "difference-in-variances" estimator. Use the posterior distribution for inference on the question if your treatment polarizes political attitudes among treated individuals relative to control units.
+
+### Re-running (and extending) models written in defunct or proprietary programming languages
+
+- In *When Moderate Voters Prefer Extreme Parties*, [Kedar (2005)](https://www.cambridge.org/core/journals/american-political-science-review/article/when-moderate-voters-prefer-extreme-parties-policy-balancingin-parliamentary-elections/A6729F56D47DDD3993DD3CA02840B6B0) proposes a formal model for representational (sincere) and compensational (strategic) voting.
+- The model involves a mixing parameter, $\beta$: $$u_{ij} = \theta [-\beta \times \text{representational}_{ij} - (1 - \beta) \times \text{compensational}_{ij}] + \mathbf{z}_{i}^{\prime}\delta_j $$
+- The empirical analyses implement this idea in a conditional logit model with a constrained mixing parameter, $\beta \in [0,1]$, and coded up in [GAUSS](https://en.wikipedia.org/wiki/GAUSS_(software)).
+- Why not implement this model in Stan?
+- Why not transfer the idea of a mixing parameter to a different type of model?
+- Why not extend the idea of a mixing parameter from two to three (or more) components, and allow it to vary? One example: A trivariate heterogeneous mixing parameter that tests how consistently policy distances on (1) socio-economic issues, (2) immigration, and (3) climate change affect vote choices for voters of different generations?
+
+### An example from my own research: Modeling comparative vote switching
+
+```{r france, exercise = FALSE, echo = FALSE, out.width = '90%', fig.align="center"}
+knitr::include_graphics("images/fr17-plots-1.png")
+```
+
+### Voter transition matrices
+
+<table class="huxtable" style="border-collapse: collapse; border: 0px; margin-bottom: 2em; margin-top: 2em; ; margin-left: auto; margin-right: auto;  " id="tab:transition-matrix-6">
+<caption style="caption-side: bottom; text-align: center;">Voter transition matrix, UK General Elections 2005-2010.</caption><col><col><col><col><col><col><col><tr>
+<th style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 0pt 4pt 4pt 0pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;"></th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 0pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">LAB '10</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 0pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">LIB '10</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 0pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">CON '10</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 0pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">OTH '10</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 0pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">NON '10</th><th style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 0pt 0pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">2005</th></tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 4pt 0pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">LAB '05</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: normal; font-size: 9pt;"> 12.7</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  2.3</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  2.1</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  0.7</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  3.8</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 0pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;"> 21.6</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 0pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">LIB '05</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  1.4</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: normal; font-size: 9pt;">  8.7</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  1.7</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  0.4</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  1.2</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 0pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;"> 13.5</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 0pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">CON '05</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  0.8</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  1.0</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: normal; font-size: 9pt;"> 15.0</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  1.0</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  2.0</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 0pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;"> 19.9</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: normal; padding: 4pt 4pt 4pt 0pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">OTH '05</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  0.2</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  0.7</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  0.6</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: normal; font-size: 9pt;">  3.5</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  1.3</td><td style="vertical-align: top; text-align: center; white-space: normal; padding: 4pt 0pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">  6.4</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 4pt 4pt 4pt 0pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">NON '05</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  3.7</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  2.2</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  4.0</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 4pt 4pt 4pt 4pt; font-weight: normal; font-size: 9pt;">  2.2</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 4pt 4pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: normal; font-size: 9pt;"> 26.5</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0pt 0pt 0.4pt 0pt;    padding: 4pt 0pt 4pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;"> 38.6</td></tr>
+<tr>
+<td style="vertical-align: top; text-align: left; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 0pt 0pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">2010</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 0pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;"> 18.9</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 0pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;"> 15.0</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 0pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;"> 23.5</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 0pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">  7.7</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 4pt 0pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;"> 34.9</td><td style="vertical-align: top; text-align: center; white-space: normal; border-style: solid solid solid solid; border-width: 0.4pt 0pt 0pt 0pt;    padding: 4pt 0pt 0pt 4pt; background-color: rgb(242, 242, 242); font-weight: bold; font-size: 9pt;">100.0</td></tr>
+</table>
+
+#### Basic quantities of interest
+
+1. *Party-specific retention rates*, $p_{i,i}$
+2. *Dyadic gross gains/losses*, $p_{i,j}$
+3. *Dyadic trade volumes*, $V_{i,j} = p_{j,i} + p_{i,j}$
+4. *Dyadic trade balances*, $V_{i,j} = p_{j,i} - p_{i,j}$
+  
+#### Derived quantities of interest: Aggregate and normalize as needed
+
+Let our quantity of interest be *government parties'* trade balances with *opposition parties*, *relative to their own support base at t - 1*:
+
+$$\text{QOI} = \frac{100 \times \sum_{j = 2}^{4} p_{j, 1} -  p_{1, j}}{\sum_{k = 1}^{5} p_{1, k}} = \frac{100 \times (2.6 - 5.2)}{21.6} \approx 12.0$$
+
+### Mixed Aggregate MNL Model with Varying Choice Sets (MAVCL)
+
+#### Description
+
+MAVCL models latent election-level *cell proportions*, $\Pr(y_{j} = c)$, derived as average micro-level *choice probabilities*, based on cell counts, $w_{jc}$:
+
+- A categorical likelihood at the voter level models individual *choice probabilities* (as in MNL).
+- As the model only involves election-level covariates, we can re-express this model at the election-level with $w_{jc}$'s serve as election-and-cell-specific frequency weights. This yields a multinomial quasi-likelihood at the election-level.
+- Here, election-cell-specific random effects capture variation of interest: Latent election-specific *cell proportions*.
+- Party system heterogeneity yields election-specific choice sets $S_j = \{1,...,C\}$
+  + some outcomes categories $c$ will be deterministically empty
+  + accommodated in a modified softmax link function (see Yamamoto 2014)
+
+
+#### Formal notation
+
+- Linear component: $\eta_{jc} = \alpha_c + \mathbf{x}_j^{\prime} \beta_c + \nu_{jc} \text{  for each  } c \in S_{j}$
+- Link function: $\Pr(y_{j} = c | \mathbf{x}_j) = \frac{\exp(\eta_{jc})}{\sum_{c \in S_{j}} \exp(\eta_{jc})}$
+- Likelihood: $\log L = \sum_{j=1}^{J} \sum_{c \in S_{j}} w_{jc} \log \Pr(y_{j} = c | \mathbf{x}_j)$
+
+### Software implementation
+
+<p align="center">
+  <iframe width="800" height="520" src="images/voteswitchR-package.html" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</p>
+
+
+## Take-aways for aspiring model developers
+
+### Determine if a 'canned solution' already exists.
+
+1. It exists and accomplishes exactly what you want to do? $\rightarrow$ Use it!
+2. It exists but falls short of accomplishing *exactly* what you want to do? $\rightarrow$ Build up on it!
+3. It doesn't exist? $\rightarrow$ Build your own model! Note that while it may seem like you are starting from scratch, but most likely, many parts of your model will resemble existing (Stan) models.
+
+### Moving beyond 'canned solutions'
+
+1. Choose the correct likelihood for your model. Stan will almost certainly feature the required log probability function. If it doesn't, translate the mathematical log-likelihood function to a custom `lpmf`/`lpdf` function.
+2. Think about the "right-hand side" of your model formula (i.e., systematic component and inverse link). Start simple, increase flexibility step-wise.
+3. Use the documentation and the vast online resources. Seek help when necessary.
+4. Once your model runs: Validate it.
+5. Once validated, move on to inference. Carefully diagnose your model!
+
+### Computational problems
+
+Suppose one or several of the following apply:
+
+- Your algorithm-specific diagnostics throw warnings (that don't go away easily)
+- Your convergence diagnostics indicate signs of non-convergence (and increasing the warm-up period doesn't help)
+- Everything converges, but you get non-sensical estimates and predictions
+- You are confident that your model will eventually converge to a well-behaved target distribution but it takes *forever* and even lengthy runs won't get you there (yet).
+
+Then what? 
+
+### Addressing computational problems
+
+Gelman et al. (2020) have some answers:
+
+### Check for model misspecification
+
+- Is the probability model correctly specified?
+- Are constraints set adequately?
+- Do your priors allow for posterior density in regions where you'd expect it?
+- Are your parameters statistically identified?
+
+### When a complex model fails: Reduce complexity
+
+- Suppose you fit a mixture model with two equations, a constrained probabilistic mixing parameter, and various random effects in each equation
+- Fit each equation separately without the random effects
+- Fit the mixture model without the random effects
+- Fit each equation with random effects
+
+### Be time-efficient
+
+- Test the model on small sets of well-behaved simulated data
+- Test the model using short runs
+
+### [Efficiency tuning](https://mc-stan.org/docs/2_26/stan-users-guide/optimization-chapter.html)
+
+- Vectorize: Use matrix multiplication instead of loops through matrix rows.
+- Reparameterize.
+- Standardize data inputs. Increases the chances that your parameters will be on similar scales (which may speed up computation).
+- *Alternatively:* Use weakly informative data-dependent priors.
+- Make priors more informative (if defensible): Can prevent chains from wandering far off the target distribution.
+- Parallelize: Markov chains are independent. Let them run at the same time (if your CPUs allow for it)!
+
+### Lastly: Get the most out of your estimates!
+
+- After validation and inference, get the most out of your posterior samples. 
+- Process your posterior draws into substantively meaningful quantities of interest.
+- Visualize whenever possible.
+
+## Info on Session 6
+
+### Optional task for the next two weeks
+
+If you already have an applied project in mind: Work on out!
+
+1. Determine if there is a pre-implemented solution for *estimating* the model you have in mind.
+    - If yes, use it.
+    - If no, attempt to build it. If possible, validate and use it.
+2. Diagnose your estimates.
+3. Determine if there is a pre-implemented solution for *processing* your model estimates such that you can interpret them optimally.
+    - If yes, use it.
+    - If no, attempt to build it.
+    
+If you do not have an applied project in mind: Practice nonetheless!
+
+1. Select an empirical analysis you have conducted in the past.
+1. Implement, validate, and estimate the model in Stan.
+1. Diagnose your estimates.
+1. Process your estimates into substantively meaningful quantities of interest.
+
+### Structure
+
+- 09:00 - 10:30: "Elevator pitch" presentations: $\approx$ 3min
+    - Slide 1: Motivation (1-2 bullet points), formal notation, targeted estimand (quantity of interest)
+    - Slide 2: Code (the important parts)
+    - Slide 3: Remaining issues
+- 10:45 - 12:15: Individual consultations
+    - project-specific questions $\rightarrow$ Denis
+    - "generic" course-related questions $\rightarrow$ Tim
+
+### Logistics
+
+- You can present your own projects (but don't have to!).
+- If you wish to present, sign up *today* (via ILIAS)
+- If you wish to talk about your project or Bayesian stats in general, sign up for individual consultations via ILIAS
+- For consultations, feel free to send a short report detailing their model and potential problems encountered during implementation in advance of this session
+- If you do not wish to present, you are invited to join as audience members
+
+### Questions?

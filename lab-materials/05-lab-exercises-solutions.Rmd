@@ -1,0 +1,498 @@
+---
+title: "Lab: Applied Bayesian Statistics Using Stan: Extensions"
+
+---
+
+```{r setup, include=FALSE}
+## ---- CRAN Packages ----
+## Save package names as a vector of strings
+pkgs <-  c("rstan",
+           "rstantools", 
+           "coda",
+           "dplyr",
+           "lme4", 
+           "ggplot2",
+           "foreign",
+           "bayesplot")
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
+
+## ---- Global learnr Objects ----
+lab5_url <-
+  "https://github.com/denis-cohen/statmodeling/raw/main/data/lab5.RData"
+load(url(lab5_url))
+
+gles <- 
+  read.dta("https://github.com/denis-cohen/statmodeling/raw/main/data/gles.dta")
+gles$vote_afd = ifelse(gles$vote == "AfD", 1L, 0L)
+gles$bl <- droplevels(gles$bl)
+
+## ---- rstan Options ----
+rstan_options(auto_write = TRUE)             # avoid recompilation of models
+options(mc.cores = parallel::detectCores())  # parallelize across all CPUs
+
+## ---- Global chunk options ----
+knitr::opts_chunk$set(echo = TRUE,
+                      eval = FALSE)
+```
+
+
+## The hierarchical logit model
+
+### Prompt
+
+We will pick things up right where we left off.
+
+We now want to apply the varying intercept, varying slope logit model to our running example of vote choice for the AfD.
+
+Specifically, we want to know whether anti-immigration preferences predict voting for the AfD more strongly among respondents in Bundesländer where the immigrant population is large.
+
+### An explicit multi-level notation
+
+To make the multi-level structure of our model explicit, we can use a two-level notation for the linear predictor:
+
+$$
+\begin{split}
+\eta_{ij} & = \beta_{1j} + \beta_{2j} \mathtt{la\_self}_i  \\
+\beta_{1j} & = \beta_1 + \gamma_{1} \mathtt{bl\_immig}_j + \nu_{j1} \\
+\beta_{2j} & = \beta_2 + \gamma_{2} \mathtt{bl\_immig}_j + \nu_{j2}
+\end{split}
+$$
+The level-two equations show how we want to use the context-level variable $\mathtt{bl\_immig}_j$ to explain the variability in our varying intercepts and slopes.
+
+Rearranging into a single equation yields
+
+$$\begin{split}
+\eta_{ij} & = \beta_1 + \gamma_{1} \mathtt{bl\_immig}_j + \nu_{j1} + (\beta_2 + \gamma_{2} \mathtt{bl\_immig}_j + \nu_{j2}) \mathtt{la\_self}_i + \epsilon_i \\
+\eta_{ij} & = \beta_1 + \gamma_{1} \mathtt{bl\_immig}_j + \nu_{j1} + \beta_2 \mathtt{la\_self}_i + \gamma_{2} \mathtt{bl\_immig}_j \mathtt{la\_self}_i + \nu_{j2} \mathtt{la\_self}_i  + \epsilon_i \\
+\eta_{ij} & = \beta_1 + \underbrace{\beta_2 \mathtt{la\_self}_i + \gamma_{1} \mathtt{bl\_immig}_j + \gamma_{2} \mathtt{bl\_immig}_j \mathtt{la\_self}_i}_{\text{interaction}} + \underbrace{\epsilon_i + \nu_{j1} + \nu_{j2} \mathtt{la\_self}_i}_{\text{composite errors}}
+\end{split}$$
+
+This is why we also call this a model with a *cross-level interaction*.
+
+### An MLE reference model
+
+Before we start, fit the same model using MLE estimation with `lme4::glmer()`.
+
+Get a `summary()` of your model. Are there any irregularities you can spot?
+
+```{r glmer}
+
+```
+
+```{r glmer-solution}
+# Estimate
+glmer_est <- lme4::glmer(
+  vote_afd ~ la_self +
+    bl_immig +
+    bl_immig:la_self +
+    (1 + la_self | bl),
+  data = gles,
+  family = binomial(link = "logit")
+)
+
+# Print summary
+summary(glmer_est)
+```
+
+### Estimation problems
+
+We can see (at least) two problems:
+
+1. Convergence failure of MLE
+1. Singularity: A correlation of $-1.00$ between intercept and slopes indicates that the model cannot adequately estimate the variance-covariance matrix of the random effects
+
+This is not surprising!
+
+  - We are running a complex model on a relatively small data set
+  - The number of groups *and* the number of observations in some groups (Saarland!) are very low:
+
+```{r table1, echo = TRUE}
+table(gles$bl)
+```
+
+This even more apparent when we consider the number of AfD voters per Bundesland (Bremen!):
+
+```{r table2, echo = TRUE}
+tapply(gles$vote_afd, gles$bl, sum)
+```
+
+### Compilation
+
+```{r compilation, eval = FALSE, echo = TRUE}
+# Model code
+rslogit_code <- "data {
+  int<lower=1> N;                      // num. observations
+  int<lower=1> K;                      // num. predictors w. varying coefs
+  int<lower=1> L;                      // num. predictors w. fixed coefs
+  int<lower=1> J;                      // num. groups
+  array[N] int<lower=0, upper=J> jj;   // group index
+  matrix[N, K] x;                      // matrix varying predictors, incl. intercept
+  matrix[N, L] z;                      // matrix varying predictors, excl. intercept
+  array[N] int<lower=0, upper=1> y;    // outcome
+}
+
+transformed data {
+  row_vector[K] zeroes;
+  zeroes = rep_row_vector(0.0, K);
+}
+
+parameters {
+  // Fixed portions
+  vector[K] beta;      // fixed coef predictors w. varying coefs
+  vector[L] gamma;     // fixed coef predictors w. fixed coefs
+  
+  // Random portions
+  vector[K] nu[J];                  // group-specific zero-mean deviations
+  cholesky_factor_corr[K] L_Omega;  // prior correlation of deviations
+  vector<lower=0>[K] tau;           // prior scale of deviations
+}
+
+transformed parameters {
+  // Variance-covariance matrix of random deviatons
+  matrix[K,K] Sigma;
+  Sigma = diag_pre_multiply(tau, L_Omega) * diag_pre_multiply(tau, L_Omega)';
+}
+
+model {
+  // local variables
+  vector[N] eta;
+  
+  // linear predictor
+  eta = x * beta + z * gamma;               // lin. pred. without random effect
+  for (i in 1:N) {
+    eta[i] = eta[i] + x[i, ] * nu[jj[i]];   // add group-specific random effects
+  }
+  
+  // priors
+  target += normal_lpdf(beta | 0, 2.5);             // priors for beta
+  target += normal_lpdf(gamma | 0, 2.5);            // priors for gamma
+  target += cauchy_lpdf(tau | 0, 2.5);               // prior for scales of nu
+  target += lkj_corr_cholesky_lpdf(L_Omega | K);   // Cholesky LJK corr. prior
+  target += multi_normal_lpdf(nu | zeroes, Sigma); // nu
+
+
+  // log-likelihood
+  target += bernoulli_logit_lpmf(y | eta); // likelihood
+}"
+
+# C++ Compilation
+rslogit_mod <- rstan::stan_model(model_code = rslogit_code)
+```
+
+
+### Data
+
+In order to specify the model in the form given above, we need two model matrices:
+
+- $\mathbf{X}_{N\times2}$ accommodates a leading column of 1's and `la_self`
+- $\mathbf{Z}_{N\times2}$ accommodates a `bl_immig` and the product term `bl_immig:la_self`
+
+Generate these, and all other required inputs below:
+
+```{r data}
+# Define data objects
+y <- ...
+x <- ...
+z <- ...
+z <- ...
+jj <- ...
+J <- ...
+N <- ...
+K <- ...
+L <- ...
+
+# Bind in a named list
+standat_rslogit <- list(
+  y = y,
+  x = x,
+  z = z,
+  jj = jj,
+  J = J,
+  N = N,
+  K = K,
+  L = L
+)
+```
+
+```{r data-solution}
+# Define data objects
+y <- gles$vote_afd
+x <- model.matrix(~la_self, data = gles)
+z <- model.matrix(~bl_immig + bl_immig:la_self, data = gles)
+z <- z[, 2:ncol(z)]
+jj <- as.integer(gles$bl)
+J <- length(unique(jj))
+N <- nrow(x)
+K <- ncol(x)
+L <- ncol(z)
+
+# Bind in a named list
+standat_rslogit <- list(
+  y = y,
+  x = x,
+  z = z,
+  jj = jj,
+  J = J,
+  N = N,
+  K = K,
+  L = L
+)
+```
+
+### Inference
+
+We can fit the model using the following code:
+
+```{r fit, eval = FALSE, echo=TRUE}
+rslogit_est <- rstan::sampling(
+  rslogit_mod,               
+  data = standat_rslogit,         
+  algorithm = "NUTS",
+  control = list(
+    max_treedepth = 15,
+    adapt_delta = 0.9
+  ),
+  pars = c("beta", "gamma", "Sigma", "nu"),  
+  iter = 8000L,               
+  warmup = 4000L,             
+  thin = 4L,                  
+  chains = 2L,                
+  cores = 2L,                 
+  seed = 20210330)   
+```
+
+As we know, the model is quite demanding. We are already doing quite a bit to ensure the validity of our estimates. In effort to avoid divergent transitions, non-convergence or poor mixing of chains, or low effective sample sizes due to high autocorrelation, we:
+
+- run our chains for `iter = 8000L` iterations, of which we discard the first half as warmup.
+- increase the algorithm control arguments `max_treedepth` and `adapt_delta`
+
+The result is that the model shows no obvious signs of algorithm failure but takes quite some time to run (on my machine, approx. 20 minutes).
+
+Therefore, we will not run it as part of this exercise; instead, you can directly assess the `stanfit` object in the next task!
+
+### Model results and convergence diagnosis
+
+Run the code to print the model summary. Do the generic diagnostics show any signs of non-convergence?
+
+```{r print}
+print(rslogit_est, 
+      pars = c("beta", "gamma", "Sigma"),
+      digits = 4L)
+```
+
+
+Use the [bayesplot](https://mc-stan.org/bayesplot/articles/visual-mcmc-diagnostics.html) package to try out some cool visual diagnostics.
+
+```{r visualize}
+```
+
+## Quantities of interest
+
+### Conditional average marginal effects
+
+We are now going to calculate our most challenging quantity of interest yet: The *conditional average marginal effect* of $\mathtt{la\_self}$ on  $\Pr(\mathtt{vote\_afd})$.
+
+This quantity of interest is vastly similar to the average marginal effect from Lab 2. But since our predictor $\mathtt{la\_self}$ is interacted with the variable $\mathtt{bl\_immig}$, the marginal effect will change along the scale of $\mathtt{bl\_immig}$. The general intuition (in the context of OLS models) is explained by [Brambor, Clark, and Golder (2006)](https://www.jstor.org/stable/25791835#metadata_info_tab_contents).
+
+The conditional average marginal effect for a one unit increase in $\mathtt{la\_self}$ at any given value of $\mathtt{bl\_immig}^{\ast}$ is defined as:
+
+$$\frac{1}{N} \sum_{i=1}^{N} \left\{ \text{logit}^{-1}(\beta_1 + \beta_2 (\mathtt{la\_self}_i + 1) + \gamma_1 \mathtt{bl\_immig}^{\ast} + \gamma_2 (\mathtt{la\_self}_i + 1) \times \mathtt{bl\_immig}^{\ast}) \\ - \text{logit}^{-1}(\beta_1 + \beta_2 \mathtt{la\_self}_i  + \gamma_1 \mathtt{bl\_immig}^{\ast} + \gamma_2 \mathtt{la\_self}_i \times \mathtt{bl\_immig}^{\ast}) \right\}$$
+
+Of course, we do not simply want the average marginal value conditional on a single value of  $\mathtt{bl\_immig}^{\ast}$ but on a *sequence of values* of $\mathtt{bl\_immig}^{\ast}$. This will allow us to see how the marginal effect changes along the values of the moderator.
+
+### Calculate the QOI
+
+```{r qoi}
+# Extract the model parameters
+pars <- rstan::extract(rslogit_est)
+
+# Extract the model matrices from standat_rslogit
+X0 <- X1 <- standat_rslogit$x
+Z0 <- Z1 <- standat_rslogit$z
+X1[, "la_self"] <- X1[, "la_self"] + 1
+
+
+# Define value sequence for bl_immig (approx range: 1-4)
+bl_immig_vals <- seq(1, 4, 0.1)
+
+# Initialize container (for posterior median, 2.5 and 97.5 percentiles)
+came <- array(NA, dim = c(length(bl_immig_vals), 3L))
+
+# Start loop
+for (i in seq_along(bl_immig_vals)) {
+  # Manipulate z matrices
+  Z0[, c("bl_immig", "bl_immig:la_self")] <- ...
+  Z1[, c("bl_immig", "bl_immig:la_self")] <- ...
+  
+  # Get unit-specific linear predictors
+  eta0 <- ...
+  eta1 <- .
+  
+  # Get unit-specific conditional marginal effects
+  cme <- plogis(eta1) - plogis(eta0)
+  
+  # Average across observations, take quantiles
+  ...
+}
+```
+
+```{r qoi-solution}
+# Extract the model parameters
+pars <- rstan::extract(rslogit_est)
+
+# Extract the model matrices from standat_rslogit
+X0 <- X1 <- standat_rslogit$x
+Z0 <- Z1 <- standat_rslogit$z
+X1[, "la_self"] <- X1[, "la_self"] + 1
+
+# Define value sequence for bl_immig (approx range: 1-4)
+bl_immig_vals <- seq(1, 4, 0.1)
+
+# Initialize container (for posterior median, 2.5 and 97.5 percentiles)
+came <- array(NA, dim = c(length(bl_immig_vals), 3L))
+
+# Start loop
+for (i in seq_along(bl_immig_vals)) {
+  # Manipulate z matrices
+  Z0[, c("bl_immig", "bl_immig:la_self")] <-
+    cbind(bl_immig_vals[i], bl_immig_vals[i] * X0[, "la_self"])
+  Z1[, c("bl_immig", "bl_immig:la_self")] <-
+    cbind(bl_immig_vals[i], bl_immig_vals[i] * X1[, "la_self"])
+  
+  # Get unit-specific linear predictors
+  eta0 <- X0 %*% t(pars$beta) + Z0 %*% t(pars$gamma)
+  eta1 <- X1 %*% t(pars$beta) + Z1 %*% t(pars$gamma)
+  
+  # Get unit-specific conditional marginal effects
+  cme <- plogis(eta1) - plogis(eta0)
+  
+  # Average across observations, take quantiles
+  came[i, ] <- quantile(apply(cme, 2, mean), c(.5, .025, .975))
+}
+```
+
+### Visualization
+
+```{r visualize2}
+# Plot
+## Auxiliary objects
+x_lines <-  seq(1, 4, .5)
+y_lines <- seq(0, .125, .025)
+
+## Canvas
+plot(
+  1,
+  1,
+  type = 'n',
+  main = paste("Conditonal Average Marginal Efffect",
+               sep = "\n"),
+  axes = F,
+  xlab = "Bundesland-level immigration rate",
+  ylab = "AME on Pr(Vote AfD)",
+  ylim = range(y_lines),
+  xlim = range(x_lines)
+)
+axis(2, outer = FALSE)
+axis(1)
+rect(
+  min(x_lines),
+  min(y_lines),
+  max(x_lines),
+  max(y_lines),
+  col = "gray95",
+  border = NA
+)
+for (y in y_lines)
+  segments(min(x_lines),
+           y,
+           max(x_lines),
+           y,
+           col = "white",
+           lwd = 2)
+for (x in x_lines)
+  segments(x,
+           min(y_lines),
+           x,
+           max(y_lines),
+           col = "white",
+           lwd = 2)
+
+## Prediction
+polygon(
+  c(bl_immig_vals, rev(bl_immig_vals)),
+  c(
+    came[, 2],
+    rev(came[, 3])
+  ),
+  col = adjustcolor("gray30", alpha.f = .2),
+  border = NA
+)
+lines(bl_immig_vals,
+      came[, 1],
+      lty = 1,
+      col = "gray10",
+      lwd = 2)
+lines(bl_immig_vals,
+      came[, 2],
+      lty = 1,
+      col = "gray30")
+lines(bl_immig_vals,
+      came[ ,3],
+      lty = 1,
+      col = "gray30")
+```
+
+### Follow-up
+
+Suppose you have included this plot in a submission. Reviewer 2 remarks that it is interesting to see that the average effect of a one-point increase in anti-immigration preferences on AfD voting more than doubles along the scale of state-level immigration rates. However, they point out that the credible intervals at the two ends of the $x$-axis widely overlap and, therefore, wonder if the reported effect modification is truly systematic.
+
+Modify the code you used to compute the conditional average effect  to report the probability that the average effect of a one-point increase in anti-immigration preferences is greater when the state-level immigration rate is at its maximum as opposed to its minimum value.
+
+```{r qoi2}
+
+```
+
+```{r qoi2-solution}
+# Extract the model parameters
+pars <- rstan::extract(rslogit_est)
+
+# Extract the model matrices from standat_rslogit
+X0 <- X1 <- standat_rslogit$x
+Z0 <- Z1 <- standat_rslogit$z
+X1[, "la_self"] <- X1[, "la_self"] + 1
+
+# Get min/max values of bl_immig
+bl_immig_vals <- range(standat_rslogit$z[, 1])
+
+# Initialize container (for full posterior)
+came <- array(NA, dim = c(length(bl_immig_vals), nrow(pars$beta)))
+
+# Start loop
+for (i in seq_along(bl_immig_vals)) {
+  # Manipulate z matrices
+  Z0[, c("bl_immig", "bl_immig:la_self")] <-
+    cbind(bl_immig_vals[i], bl_immig_vals[i] * X0[, "la_self"])
+  Z1[, c("bl_immig", "bl_immig:la_self")] <-
+    cbind(bl_immig_vals[i], bl_immig_vals[i] * X1[, "la_self"])
+  
+  # Get unit-specific linear predictors
+  eta0 <- X0 %*% t(pars$beta) + Z0 %*% t(pars$gamma)
+  eta1 <- X1 %*% t(pars$beta) + Z1 %*% t(pars$gamma)
+  
+  # Get unit-specific conditional marginal effects
+  cme <- plogis(eta1) - plogis(eta0)
+  
+  # Average across observations
+  came[i, ] <- apply(cme, 2, mean)
+}
+
+# Report probability of interest
+mean(came[2, ] > came[1, ])
+```

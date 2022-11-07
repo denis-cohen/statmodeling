@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## ---- CRAN Packages ----
 ## Save package names as a vector of strings
-pkgs <-  c("rstan", "rstantools", "coda", "dplyr", "shinystan")
+pkgs <-  c("rstan", "rstantools", "coda", "dplyr", "shinystan", "devtools")
 
 ## Install uninstalled packages
 lapply(pkgs[!(pkgs %in% installed.packages())], 
@@ -368,11 +368,11 @@ model {
 ```{stan ex1-mod1-solution, output.var = "none"}
 model {
   // priors
-  target += normal_lpdf(beta | 0, 10);  // priors for beta
-  target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
+  target += normal_lpdf(beta | 0, 10);   // priors for beta
+  target += cauchy_lpdf(sigma | 0, 5);   // prior for sigma
   
   // log-likelihood
-  target += normal_lpdf(y | eta, sigma);// likelihood
+  target += normal_lpdf(y | eta, sigma); // likelihood
 }
 ```
 
@@ -446,7 +446,7 @@ y_sim <- rnorm(N, eta, sigma)             # simulated outcome
 
 ### Setup and compilation
 
-```{r inf-setup, exercise = TRUE}
+```{r inf-setup, exercise = TRUE, exercise.timelimit = 120}
 ## Setup
 library(rstan)
 rstan_options(auto_write = TRUE)             # avoid recompilation of models
@@ -591,7 +591,7 @@ print(lm_inf,
 
 #### Hypothesis testing
 
-```{r inf-prob, echo = TRUE}
+```{r inf-prob, exercise = TRUE}
 # Extract posterior samples for beta[2]
 beta2_posterior <- rstan::extract(lm_inf)$beta[, 2]
 
@@ -632,9 +632,32 @@ In the words of the developers:
 - Diagnostics summary for `stanfit` object: `check_hmc_diagnostics(object)`
 - For further information, see the [Guide to Stan's warnings](https://mc-stan.org/misc/warnings.html)
 
+### Print summaries of generic and algorithm-specific diagnostics
+
+[Michael Betancourt](https://betanalpha.github.io/), one of the
+[core developers](https://mc-stan.org/about/team/) of Stan, has provided a
+utility function that performs all diagnostic checks at once:
+
+```{r all-checks, echo=TRUE}
+# Source function directly from GitHub
+devtools::source_url(
+  paste0(
+    "https://github.com/betanalpha/",
+    "knitr_case_studies/blob/master/principled_bayesian_workflow/",
+    "stan_utility.R?raw=TRUE"
+  )
+)
+
+# Apply function to stanfit object
+check_all_diagnostics(lm_inf)
+```
+
 ### Visual diagnostics using shinystan
 
-```{r shiny, exercise = TRUE}
+*Note:* `shinystan` launches a ShinyApp, which cannot be launched during an
+active `learnr` session.
+
+```{r shiny, echo = TRUE, eval = FALSE}
 library(shinystan)
 launch_shinystan(lm_inf)
 ```
@@ -663,11 +686,11 @@ For full functionality, examples, and vignettes:
 
 - [GitHub Examples](https://github.com/stan-dev/bayesplot)
 - [CRAN Vignettes](https://cran.r-project.org/web/packages/bayesplot/vignettes/visual-mcmc-diagnostics.html)
-- `available_mcmc()`function
+- `available_mcmc()` function
 
 ### Example: Trace plot for sigma
 
-```{r bayesplot, exercise = FALSE, eval = TRUE, message = FALSE, warning = FALSE, fig.align = "center", out.width='50%'}
+```{r bayesplot, exercise = FALSE, eval = TRUE, echo = TRUE, message = FALSE, warning = FALSE, fig.align = "center", out.width='50%'}
 library(bayesplot)
 
 # Extract posterior draws from stanfit object
@@ -676,46 +699,3 @@ lm_post_draws <- extract(lm_inf, permuted = FALSE)
 # Traceplot
 mcmc_trace(lm_post_draws, pars = c("sigma"))
 ```
-
-## Computational problems
-
-Suppose one or several of the following apply:
-
-- Your algorithm-specific diagnostics throw warnings (that don't go away easily)
-- Your convergence diagnostics indicate signs of non-convergence (and increasing the warm-up period doesn't help)
-- Everything converges, but you get non-sensical estimates and predictions
-- You are confident that your model will eventually converge to a well-behaved target distribution but it takes *forever* and even lengthy runs won't get you there (yet).
-
-Then what? 
-
-### Addressing computational problems
-
-Gelman et al. (2020) have some answers:
-
-### Check for model misspecification
-
-- Is the probability model correctly specified?
-- Are constraints set adequately?
-- Do your priors allow for posterior density in regions where you'd expect it?
-- Are your parameters statistically identified?
-
-### When a complex model fails: Reduce complexity
-
-- Suppose you fit a mixture model with two equations, a constrained probabilistic mixing parameter, and various random effects in each equation
-- Fit each equation separately without the random effects
-- Fit the mixture model without the random effects
-- Fit each equation with random effects
-
-### Be time-efficient
-
-- Test the model on small sets of well-behaved simulated data
-- Test the model using short runs
-
-### [Efficiency tuning](https://mc-stan.org/docs/2_26/stan-users-guide/optimization-chapter.html)
-
-- Vectorize: Use matrix multiplication instead of loops through matrix rows.
-- Reparameterize. There are some common suggestions (more in the next session).
-- Standardize data inputs. Increases the chances that your parameters will be on similar scales (which may speed up computation).
-- *Alternatively:* Use weakly informative data-dependent priors.
-- Make priors more informative (if defensible): Can prevent chains from wandering far off the target distribution.
-- Parallelize: Markov chains are independent. Let them run at the same time (if your CPUs allow for it)!

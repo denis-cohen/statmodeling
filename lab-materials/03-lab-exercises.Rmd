@@ -18,6 +18,10 @@ lapply(pkgs, library, character.only = TRUE)
 ## ---- Global Objects ----
 gles <- 
   read.dta("https://github.com/denis-cohen/statmodeling/raw/main/data/gles.dta")
+
+## ---- Global chunk options ----
+knitr::opts_chunk$set(echo = TRUE,
+                      eval = FALSE)
 ```
 
 ## A Gibbs sampler for the linear model

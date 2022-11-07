@@ -332,7 +332,7 @@ $$\underbrace{\underbrace{y_i \sim \text{f}}_{\text{fund.}}(\theta_i = g^{-1}(\m
 
 1. Inferential uncertainty about the model parameters can be simulated by taking draws from their joint sampling distribution.
 1. Fundamental uncertainty can be simulated by taking draws of $\mathbf{y}$ from $\mathbf{y} \sim f(\theta, \psi)$.
-1. Total uncertainty can be simulated by simulating (1) within (2).
+1. Total uncertainty can be simulated by simulating (1) within (2)
 
 ### Inferential uncertainty in GLM
 

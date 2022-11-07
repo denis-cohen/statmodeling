@@ -347,7 +347,21 @@ for (i in seq_along(se_vals)) {
 
 Time for some shameless self-promotion: We are going to use my `regplane3D` package to visualize the expected values of AfD support as a joint function of socio-economic and immigration preferences.
 
-```{r viz-setup}
+```{r viz-1, echo = T, eval = F}
+regplane3D::plane3D(
+  z = pred,
+  x = se_vals,
+  y = la_vals,
+  main = "Expected AfD Support \n by Redistribution and Immigration Preferences",
+  zlab = "Support AfD",
+  xlab = "Pro-Redistribution",
+  ylab = "Anti-Immigration",
+  xnlines = 6L,
+  ynlines = 6L
+)
+```
+
+```{r viz, fig.align='center', fig.width = 9, fig.height=6}
 b <- solve(t(X) %*% X) %*% t(X) %*% y
 e <- y - X %*% b
 N <- nrow(X)
@@ -366,9 +380,6 @@ for (i in seq_along(se_vals)) {
     pred[i, j, 3] <- pred[i, j, 1] + qnorm(.975) * std_err
   }
 }
-```
-
-```{r viz, exercise=TRUE, exercise.setup="viz-setup", fig.align='center', fig.width = 9, fig.height=6}
 regplane3D::plane3D(
   z = pred,
   x = se_vals,

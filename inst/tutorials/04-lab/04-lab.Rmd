@@ -92,7 +92,7 @@ global_objects <- c(ls(), "global_objects")
 
 We now return to our example from Labs 1 and 3: A regression of AfD support on pro-redistribution and anti-immigration preferences.
 
-Unlike Lab 3, we now want to use our posterior draws to generate substantively meaningful quantities of interest: A Bayesian version of the 3D visualization from Lab 1.
+We now want to use our posterior draws to generate more complex substantively meaningful quantities of interest: A Bayesian version of the 3D visualization from Lab 1.
 
 
 ### Data

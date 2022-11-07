@@ -1,0 +1,122 @@
+---
+title: "Statistical Modeling with R and Stan"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    css: css/learnr-theme.css
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+if ("learnr" %in% (.packages()))
+  detach(package:learnr, unload = TRUE)
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+
+## Save package names as a vector of strings
+pkgs <-  c()
+
+## Install uninstalled packages
+lapply(pkgs[!(pkgs %in% installed.packages())], 
+       install.packages,
+       repos='http://cran.us.r-project.org')
+
+## Load all packages to library and adjust options
+lapply(pkgs, library, character.only = TRUE)
+```
+
+## Hi, I'm Denis!
+
+- Postdoctoral Fellow, Data and Methods Unit, MZES
+- Ph.D. Humboldt University (2018)
+
+Here are some of the things I work on:
+
+- Party competition:
+    - *The Centre-Right versus the Radical Right: the Role of Migration Issues and Economic Grievances* (with Tarik Abou-Chadi and Markus Wagner)
+    - *Does Accommodation Work? Mainstream Party Strategies and the Success of Radical Right Parties* (with Werner Krause and Tarik Abou-Chadi)
+    - *Getting the most out of comparative vote-switching data: A new framework for studying dynamic multiparty competition* (with Werner Krause and Tarik Abou-Chadi) [`rstan`]
+- Far-right voting:
+    - *Between strategy and protest: How policy demand, political dissatisfaction and strategic incentives matter for far-right voting* [`rstan`]
+    - *Ökonomisches Risiko und die elektorale Anziehungskraft der AfD*
+    - *Economic Risk, Anti-Immigration Preferences and Voting for the Radical Right* [`rstan`]
+- The political economy of spatial inequalities:
+    - *The Political Economy of Rental Housing* (with Tarik Abou-Chadi and Thomas Kurer)
+    - *Preferences for rent control: Between political geography and political economy* [`brms`]
+    - *The housing crisis on social media: Housing markets and the subnational diversification of policy supply* (with Tim Allinger and Andreas Küpfer) [`rstan`]
+    - *Regional Labor Markets and the Politics of Resentment* (with Sergi Pardos-Prado)
+- Methods:
+    - [*Methods Bites: Blog of the MZES Social Science Data Lab*](https://www.mzes.uni-mannheim.de/socialsciencedatalab/) (with Cosima Meyer and Julian Bernauer)
+    - *Estimating legislator-level issue salience and issue positions from political text* (with Andreas Küpfer) [`rstan`]
+    - *Simulating party shares* (with Chris Hanretty) [`cmdstanr`]
+    - *When (not) to trust the overlap in confidence intervals: A practical guide.*
+    - *Applied Causal Inference (with R)* (with Paul C. Bauer)
+
+
+## Advanced Bayesian Statistical Modeling with R and Stan
+
+### Primary Learning Objectives
+
+1. Understand generalized linear models as a common theoretical framework for statistical models
+1. Understand how to process estimates from generalized linear models into substantively meaningful quantities of interest *without* relying on pre-implemented software
+1. Understand how to use distributional summaries as a flexible framework for reporting inferential uncertainty
+1. *Applied* Bayesian statistics: Learn how to translate formal statistical models into code using Stan
+
+### Secondary Learning Objectives
+
+1. Bump up your programming skills
+1. Bump up your understanding of probability theory
+1. *Theoretical* Bayesian statistics: Learn about fundamentals concepts of Bayesian statistics
+
+### The end goal
+
+1. Empower you to implement custom modeling solutions
+    - Building (complex) generative models from scratch
+    - Derive substantively meaningful quantities of interest from any model
+1. On the way there: Get a better understanding of what happens 'under the hood' when using 'canned solutions'
+
+## Schedule
+
+### Sessions
+
+| Session | Time                           | Topics                                                                                                     |
+|:-------:|:-------------------------------|:-----------------------------------------------------------------------------------------------------------|
+| 1       | 2022-11-08 (morning)           | **R Math & Programming Refresher**                                                                         |
+| 2       | 2022-11-08 (afternoon)         | **Generalized Linear Models & Simulation-based Approaches to Inferential Uncertainty**                     |
+| 3       | 2022-11-09 (morning)           | **Bayesian Fundamentals**                                                                                  |
+| 4       | 2022-11-09 (afternoon)         | **Applied Bayesian Statistics Using Stan: Basics & Workflow**                                              |
+| 5       | 2022-11-10 (morning)           | **Applied Bayesian Statistics Using Stan: Extensions and Advanced Modeling**                               |
+| 6       | 2022-11-24 (morning)           | **Applied Bayesian Statistics Using Stan: Custom Modeling Solutions**                                      |
+
+### Session 6: Motivation and structure
+
+- Becoming an active Bayesian practitioner and/or model developer requires practice
+- Therefore, Session 6 is for project presentations & individual consultations
+    - 09:00 - 10:30: Presentations (depending on the number of presentations, 3-5 min)
+    - 10:45 - 12:15: Individual consultations (project-specific questions $\rightarrow$ Denis; "generic" course-related questions $\rightarrow$ Tim)
+- More info at the end of Lecture 5
+
+
+## Structure of our sessions
+
+We have 180 minutes per session. We will flexibly divide each session into the following sequence:
+
+1. Lecture
+2. Lab: Hands-on exercises (in small teams), solutions to exercises
+    - You will be assigned to small teams in breakout rooms
+    - I will be in the main meeting, available for questions
+    - Tim will switch between breakout rooms to assist you
+3. Breaks (after +/- 90min, after lecture/before lab)
+
+## RStan installation: Any problems?
+
+- Did you successfully got RStan to run on your machine, incl. `example(stan_model, package = "rstan", run.dontrun = TRUE) `?
+- If yes: Great! You're all set!
+- If no: No worries, we will start using Stan *tomorrow*. I will stick around after 17:00 today in case you need assistance.
+
+## Questions?
+
+
+
+

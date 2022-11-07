@@ -77,9 +77,9 @@ $$
 
 ### Priors
 
-For every element $\beta_k$ of the length-$K$ vector $\mathbf{\beta}$, we specify a normal prior in terms of mean $m = 0$ and precision $p = 0.1$: 
+For every element $\beta_k$ of the length-$K$ vector $\mathbf{\beta}$, we specify a normal prior in terms of mean $m = 0$ and precision $p = 0.01$ (i.e., a variance of $100$ or a standard deviation of $10$): 
 
-$$\beta_k \sim N(m = 0, p^{-1} = 10) \text{ for } k = 1,...,K$$ 
+$$\beta_k \sim N(m = 0, p^{-1} = 100) \text{ for } k = 1,...,K$$ 
 
 These are independent normal priors, which is equivalent to a variance-covariance matrix with zero-covariance on the off-diagonals. Thus, we can also write
 
