@@ -4,6 +4,8 @@
 Denis Cohen  
 <denis.cohen@uni-mannheim.de>
 
+*Version: GESIS Training Program, 2022-11-08*
+
 ## Abstract
 
 Statistical models are widely used in the social sciences for
@@ -39,8 +41,8 @@ is recommended.
 
 This workshop requires installations of recent versions of
 [`R`](https://cran.r-project.org/mirrors.html) and
-[`RStudio`](https://rstudio.com/products/rstudio/download/#download). On
-In the second half of the workshop, we will use
+[`RStudio`](https://rstudio.com/products/rstudio/download/#download). In
+the second half of the workshop, we will use
 [`Stan`](https://mc-stan.org/) via its R interface `RStan`. Setting up
 `RStan` can be somewhat time-consuming as it requires the installation
 of a C++ compiler. Workshop participants should follow [these
@@ -60,10 +62,9 @@ exercises.
 |:-------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |    1    | **R Math & Programming Refresher**                                                                                                                                                                                                       |
 |         | ***Session contents:***                                                                                                                                                                                                                  |
-|         | \- Data types                                                                                                                                                                                                                            |
-|         | \- Object types and conversions; slicing and indexing                                                                                                                                                                                    |
-|         | \- Probability distributions                                                                                                                                                                                                             |
+|         | \- Quick review: Data types; object types and conversions; slicing and indexing                                                                                                                                                          |
 |         | \- Linear algebra                                                                                                                                                                                                                        |
+|         | \- Probability distributions                                                                                                                                                                                                             |
 |         | \- Control structures                                                                                                                                                                                                                    |
 |         | \- Programming                                                                                                                                                                                                                           |
 |         | ***Suggested readings:***                                                                                                                                                                                                                |
@@ -120,7 +121,7 @@ package. To download, install, and use the interactive materials, run
 the following code:
 
 ``` r
-## Detach if loaded
+# Detach if loaded
 if ("statmodeling" %in% (.packages())) {
   detach(package:statmodeling, unload = TRUE)
 }
@@ -143,13 +144,13 @@ devtools::install_github("denis-cohen/statmodeling")
 library(statmodeling)
 
 # Run tutorials
-learnr::run_tutorial("00-int", package = "statmodeling")
+learnr::run_tutorial("00-int-gesis", package = "statmodeling")
 learnr::run_tutorial("01-lec", package = "statmodeling")
 learnr::run_tutorial("01-lab", package = "statmodeling")
 learnr::run_tutorial("02-lec", package = "statmodeling")
 learnr::run_tutorial("02-lab", package = "statmodeling")
 learnr::run_tutorial("03-lec", package = "statmodeling")
-learnr::run_tutorial("03-lab", package = "statmodeling")
+learnr::run_tutorial("03-lab-canned", package = "statmodeling")
 learnr::run_tutorial("04-lec", package = "statmodeling")
 learnr::run_tutorial("04-lab", package = "statmodeling")
 learnr::run_tutorial("05-lec", package = "statmodeling")

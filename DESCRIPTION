@@ -23,7 +23,9 @@ Imports:
     MASS,
     shinystan,
     rstantools,
-    bayesplot
+    bayesplot,
+    brms,
+    future
 Remotes: 
     denis-cohen/regplane3D
 RoxygenNote: 7.1.1
