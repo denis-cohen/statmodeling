@@ -128,7 +128,7 @@ library(statmodeling)
 
 # Run tutorials
 learnr::run_tutorial("00-int-gesis", package = "statmodeling")
-learnr::run_tutorial("01-lec", package = "statmodeling")
+learnr::run_tutorial("01-lec-short", package = "statmodeling")
 learnr::run_tutorial("01-lab", package = "statmodeling")
 learnr::run_tutorial("02-lec", package = "statmodeling")
 learnr::run_tutorial("02-lab", package = "statmodeling")
