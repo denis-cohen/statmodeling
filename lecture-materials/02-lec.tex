@@ -1,0 +1,626 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  11pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{float}
+\floatplacement{figure}{ht}
+\usepackage[section]{placeins}
+\usepackage{longtable}
+\usepackage{hyperref}
+\hypersetup{colorlinks = true, linkcolor = blue, urlcolor = blue}
+\widowpenalty10000
+\clubpenalty10000
+\usepackage[page,header]{appendix}
+\usepackage{titletoc}
+\usepackage{tocloft}
+\usepackage{makecell}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Lecture: Generalized Linear Models},
+  pdfauthor={Denis Cohen},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Lecture: Generalized Linear Models}
+\author{Denis Cohen\footnote{Mannheim Centre for European Social Research, University of Mannheim, 68131 Mannheim, Germany. \href{mailto:denis.cohen@uni-mannheim.de}{\nolinkurl{denis.cohen@uni-mannheim.de}}.}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.5}
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{generalized-linear-models}{%
+\subsection{Generalized linear models}\label{generalized-linear-models}}
+
+\hypertarget{goals-for-this-session}{%
+\subsubsection{Goals for this session}\label{goals-for-this-session}}
+
+\begin{itemize}
+\tightlist
+\item
+  To understand generalized linear models (GLM) as a unified methodology for producing parameter estimates (\href{https://www.researchgate.net/publication/235726158_Generalized_Linear_Models_A_Unified_Approach}{Gill 2001}, \href{https://us.sagepub.com/en-us/nam/generalized-linear-models/book257965}{Gill and Torres 2019}).
+\item
+  To understand that all GLM produce two important, intuitive, and substantively meaningful quantities of interest that can be derived from the parameter estimates and the data (\href{https://gking.harvard.edu/files/gking/files/making.pdf}{King et al.~2000}):
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    Expected values (conditional expectations)
+  \item
+    Average marginal effects or first differences
+  \end{enumerate}
+\item
+  To learn how to estimate these quantities and how to specify the uncertainty about our inferences using simulation techniques (\href{https://gking.harvard.edu/files/gking/files/making.pdf}{King et al.~2000}).
+\end{itemize}
+
+\hypertarget{the-three-parts-of-every-glm}{%
+\subsubsection{The three parts of every GLM}\label{the-three-parts-of-every-glm}}
+
+All generalized linear models have three characteristic parts:
+
+\hypertarget{family}{%
+\paragraph{Family}\label{family}}
+
+\begin{itemize}
+\tightlist
+\item
+  The family stipulates a stochastic process that can plausibly generate an outcome \(y\)
+\item
+  This means we choose a pdf or pmf for \(y\) given some parameters: \(y_i \sim \text{f}(\theta_i, \psi)\)
+\item
+  The choice usually depends on the distributional properties of \(y\)
+\item
+  Aliases: data-generating process, generative model, likelihood function
+\end{itemize}
+
+\hypertarget{linear-component}{%
+\paragraph{Linear component}\label{linear-component}}
+
+\begin{itemize}
+\tightlist
+\item
+  A linear model \(y_i^{\ast} = \mathbf{x}_i^{\prime} \beta + \epsilon_i\)
+\item
+  The goal of inference is the estimation of \(\beta\)
+\item
+  From, this, we can derive our \emph{systematic component} or \emph{linear predictor}, \(\eta_i = \mathbf{x}_i^{\prime} \beta\)
+\end{itemize}
+
+\hypertarget{inverse-link-function}{%
+\paragraph{Inverse link function}\label{inverse-link-function}}
+
+\begin{itemize}
+\tightlist
+\item
+  A function that transforms the systematic component \(\eta_i\) such that it represents a characteristic \emph{parameter} \(\theta_i\) of the family
+\item
+  \(\theta_i = g^{-1}(\eta_i)\)
+\end{itemize}
+
+\hypertarget{in-a-nutshell}{%
+\subsubsection{In a nutshell}\label{in-a-nutshell}}
+
+Putting it all together, a GLM is given by
+
+\[y_i \sim \text{f}(\theta_i = g^{-1}(\mathbf{x}_i^{\prime} \beta), \psi)\]
+
+where \(\psi\) is an auxiliary parameter that will sometimes be estimated (e.g., \(\sigma^2\) in the linear model) and sometimes be fixed.
+
+Every generalized linear model is a \emph{special case} of this general framework.
+
+\hypertarget{example-1-the-linear-model}{%
+\subsubsection{Example 1: The linear model}\label{example-1-the-linear-model}}
+
+\begin{itemize}
+\tightlist
+\item
+  While every GLM is a special case, the linear model is arguably a \emph{very} special case.
+\item
+  Why? Because its link function is the \emph{identity function}.
+\item
+  This not only makes the notation easier, but also means that the \(\beta\)'s are \emph{directly interpretable} on the scale of the outcome.
+\end{itemize}
+
+\hypertarget{the-three-parts}{%
+\paragraph{The three parts:}\label{the-three-parts}}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \[y_i \sim \text{N}(\eta_i, \sigma^2)\]
+\item
+  Linear component: \[y_i = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon_i}_{\sim \text{N}(0, \sigma^2)}\]
+\item
+  Inverse link function: \[\eta_i = \text{id}(\eta_i)\]
+\end{itemize}
+
+Thus, the linear model is given by
+
+\[y_i \sim \text{N}(\mathbf{x}_i^{\prime} \beta, \sigma^2)\]
+where both \(\beta\) and \(\sigma^2\) are being estimated.
+
+\hypertarget{example-2-the-probit-model}{%
+\subsubsection{Example 2: The probit model}\label{example-2-the-probit-model}}
+
+The probit model is a popular choice for modeling idiosyncratic binary choices.
+
+\hypertarget{the-three-parts-1}{%
+\paragraph{The three parts:}\label{the-three-parts-1}}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \[y_i \sim \text{Bernoulli}(\pi_i)\]
+\item
+  Linear component: \[y_i^{\ast} = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon_i}_{\sim \text{N}(0, 1)}\]
+\item
+  Inverse link function: \[\pi_i = \Phi(\eta_i)\]
+\end{itemize}
+
+Thus, the probit model is given by
+
+\[y_i \sim \text{Bernoulli}(\Phi(\mathbf{x}_i^{\prime} \beta))\]
+
+where the \(\beta\) vector is being estimated. \(\Phi\) is the standard normal CDF. Note that the standard normal CDF follows from fixing the variance of the error term, \(\epsilon \sim \text{N}(0, 1)\).
+
+\hypertarget{example-3-the-logit-model}{%
+\subsubsection{Example 3: The logit model}\label{example-3-the-logit-model}}
+
+With a slight change in the error distribution in the linear component and a corresponding change in the inverse link function, we can derive the logit model for binary choices.
+
+\hypertarget{the-three-parts-2}{%
+\paragraph{The three parts:}\label{the-three-parts-2}}
+
+\begin{itemize}
+\tightlist
+\item
+  Family: \[y_i \sim \text{Bernoulli}(\pi_i)\]
+\item
+  Linear component: \[y_i^{\ast} = \underbrace{\mathbf{x}_i^{\prime} \beta}_{\eta_i} + \underbrace{\epsilon_i}_{\sim \text{Logistic}(0, 1)}\]
+\item
+  Inverse link function: \[\pi_i = \frac{\exp(\eta_i)}{1 + \exp(\eta_i)}\]
+\end{itemize}
+
+Thus, the logit model is given by
+
+\[y_i \sim \text{Bernoulli}\left(\frac{\exp(\eta_i)}{1 + \exp(\eta_i)}\right)\]
+
+where the \(\beta\) vector is being estimated. \(\frac{\exp(\cdot)}{1 + \exp(\cdot)}\) is the standard logistic CDF. Shorthand: \(\text{logit}^{-1}(\cdot)\).
+
+As you can see, the \emph{assumed} distribution of the error term on the latent variable \(y_i^{\ast}\) dictates our choice of the inverse link function.
+
+As the error distribution is fixed and its parameters are not being estimated, it is not in itself of substantive interest.
+
+\hypertarget{glm-typology}{%
+\subsection{GLM Typology}\label{glm-typology}}
+
+\hypertarget{single-family-models}{%
+\subsubsection{Single-family models}\label{single-family-models}}
+
+We will first focus on models whose likelihood function follows a single pdf or pmf.
+
+\hypertarget{univariate-eta_i-univariate-theta_i}{%
+\subsubsection{\texorpdfstring{Univariate \(\eta_i\), univariate \(\theta_i\)}{Univariate \textbackslash eta\_i, univariate \textbackslash theta\_i}}\label{univariate-eta_i-univariate-theta_i}}
+
+Among the simplest GLM are those models that require
+
+\begin{itemize}
+\tightlist
+\item
+  a single family
+\item
+  a univariate systematic component \(\eta_i\)
+\item
+  a univariate parameter \(\theta_i\)
+\end{itemize}
+
+Examples include the three models discussed above:
+
+\begin{itemize}
+\tightlist
+\item
+  The linear model (\(\eta_i = \theta_i = \mu_i\))
+\item
+  The probit model (\(\eta_i = \mathbf{x}_i^{\prime}\beta\), \(\theta_i = \Phi(\eta_i)\))
+\item
+  The logit model (\(\eta_i = \mathbf{x}_i^{\prime}\beta\), \(\theta_i = \text{logit}^{-1}(\eta_i)\))
+\end{itemize}
+
+An additional example would be the \emph{Poisson model} for counts:
+
+\begin{itemize}
+\tightlist
+\item
+  \(y_i \sim \text{Poisson}(\exp(\theta_i = \mathbf{x}_i^{\prime}\beta))\)
+\end{itemize}
+
+\hypertarget{univariate-eta_i-multivariate-theta_i}{%
+\subsubsection{\texorpdfstring{Univariate \(\eta_i\), multivariate \(\theta_i\)}{Univariate \textbackslash eta\_i, multivariate \textbackslash theta\_i}}\label{univariate-eta_i-multivariate-theta_i}}
+
+Things get a bit more intricate when we model multivariate outcomes, e.g., discrete choice across multiple categories.
+
+Multi-categorical discrete choice outcomes typically require that we stipulate a \emph{categorical distribution} which requires choice-specific probability parameters \(\theta_{ij} = \Pr(Y_i = j)\).
+
+Thus, \(\mathbf{\theta}_i\) is a length-\(J\) vector for each \(i=1,..,N\): \(\mathbf{\theta}_i = \begin{bmatrix} \theta_{i1} & \dots & \theta_{iJ}\end{bmatrix}^{\prime}\), where \(\sum_{j=1}^{J} \theta_{ij} = 1\) for each \(i=1,..,N\).
+
+A model that accommodates this while using a single univariate linear predictor \(\eta_i\) is the \emph{ordered logit model}, which can be used for modeling ordered outcomes with \(J\) categories.
+
+\hypertarget{family-1}{%
+\paragraph{Family}\label{family-1}}
+
+\[y_{ij} \sim \text{Categorical}(\theta_{ij})\]
+
+\hypertarget{systematic-component}{%
+\paragraph{Systematic component}\label{systematic-component}}
+
+The linear predictor is \(\eta_i = \mathbf{x}_i^{\prime}\beta\), where \(\beta\) does \emph{not} include an intercept and \(\mathbf{x}_i^{\prime}\) does not include a leading one.
+
+In place of an intercept, the model produces \(J-1\) ordered threshold parameters \(\kappa\).
+
+\hypertarget{link-function}{%
+\paragraph{Link function}\label{link-function}}
+
+We then use the inverse logit link function to retrieve \(J\) probabilities \(\theta_{ij}\) that \(\eta_i\) exceeds a given threshold \(\kappa\):
+
+\[\begin{split}\Pr(y_i = j | \mathbf{x}_i) & =\Pr(\kappa_{j-1} < \eta_i \leq \kappa_j) \\ & =\text{logit}^{-1} (\kappa_j - \eta_i) - \text{logit}^{-1} (\kappa_{j-1} - \eta_i)\end{split}\]
+
+\hypertarget{multivariate-eta_i-multivariate-theta_i}{%
+\subsubsection{\texorpdfstring{Multivariate \(\eta_i\), multivariate \(\theta_i\)}{Multivariate \textbackslash eta\_i, multivariate \textbackslash theta\_i}}\label{multivariate-eta_i-multivariate-theta_i}}
+
+When moving from ordered to unordered discrete choices, we not only need to model choice-specific probability parameters \(\theta_{ij}\) but also choice-specific linear predictors \(\eta_{ij}\).
+
+An example is the \emph{multinomial logistic regression model}.
+
+\hypertarget{family-2}{%
+\paragraph{Family}\label{family-2}}
+
+\[y_{ij} \sim \text{Categorical}(\theta_{ij})\]
+
+\hypertarget{systematic-component-1}{%
+\paragraph{Systematic component}\label{systematic-component-1}}
+
+The linear predictor is \(\eta_{ij} = \mathbf{x}_i^{\prime}\beta_j + \mathbf{z}_{ij}^{\prime} \gamma\). For statistical identification, we must set the \(\beta\) vector for one category to zero, e.g., \(\beta_J = \mathbf{0}\).
+
+\hypertarget{link-function-1}{%
+\paragraph{Link function}\label{link-function-1}}
+
+The link function is the \emph{softmax} function, a multivariate generalization of the inverse logit function:
+
+\[\Pr(y_i = j) = \text{softmax}(\eta_{ij}) = \frac{\exp (\eta_{ij})}{\sum_{j=1}^{J} \exp(\eta_{ij})}\]
+
+\hypertarget{multiple-families}{%
+\subsubsection{Multiple families}\label{multiple-families}}
+
+Some models stipulate complex data generating processes. They combine multiple families \(f\) in the likelihood (which means that the likelihood will be a mixture of the constitutive likelihoods).
+
+\hypertarget{univariate-eta_i-multivariate-theta_i-1}{%
+\subsubsection{\texorpdfstring{Univariate \(\eta_i\), multivariate \(\theta_i\)}{Univariate \textbackslash eta\_i, multivariate \textbackslash theta\_i}}\label{univariate-eta_i-multivariate-theta_i-1}}
+
+These models estimate only one set of parameters \(\beta\), but use different link functions for translating the resulting linear predictor \(\eta_i\) into different parameters \(\theta_i^{f}\) that match the stipulated data-generating processes \(f\).
+
+A well-known case is the \emph{tobit model} for censored data. For instance, a left-censored tobit model with a lower bound at \(y_L = 0\) jointly accommodates a Bernoulli data-generating process for \(\Pr(y > y_L)\) and a normal data-generating process for the variation in \(y\) given \(y > y_L\). By assumption, both data-generating processes are governed by the same parameters \(\beta\).
+
+Similar logics apply to other models that involve censored data, e.g., in survival analysis.
+
+\hypertarget{multivariate-eta_i-multivariate-theta_i-1}{%
+\subsubsection{\texorpdfstring{Multivariate \(\eta_i\), multivariate \(\theta_i\)}{Multivariate \textbackslash eta\_i, multivariate \textbackslash theta\_i}}\label{multivariate-eta_i-multivariate-theta_i-1}}
+
+\hypertarget{two-part-models}{%
+\paragraph{Two-part models}\label{two-part-models}}
+
+A generalization of this are \emph{two-part models}. Instead of estimating one set of parameters \(\beta\) and using different link functions for translating \(\eta_i\) into \(\theta_i^{f}\), these models estimate distinct sets of parameters \(\beta^{f}\) for each of the stipulated data-generating processes.
+
+An example is a \emph{hurdle model}. Unlike a left-censored tobit model, this model allows for the possibility that different sets of parameters govern the data-generating process for \(\Pr(y > y_L)\) and the normal data-generating process for the variation in \(y\) given \(y > y_L\).
+
+\hypertarget{finite-mixtures-of-identical-families}{%
+\subsubsection{Finite mixtures of identical families}\label{finite-mixtures-of-identical-families}}
+
+A different intuition underlies finite mixture models. Rather than stipulating different \emph{families} depending on the observed values of each unit, finite mixture models stipulate that substantively different data generating processes of the \emph{same family} may generate the observed outcomes of all observations.
+
+\hypertarget{quantities-of-interest}{%
+\subsection{Quantities of interest}\label{quantities-of-interest}}
+
+\hypertarget{expected-values}{%
+\subsubsection{Expected values}\label{expected-values}}
+
+\begin{itemize}
+\tightlist
+\item
+  The \emph{expected value} tells you where to expect the \emph{conditional mean} of \(y\) given some covariate values \(\mathbf{x}\) on the scale of \(y\).
+\item
+  For most (but not all) GLM, the expected value is directly given by our estimate of the parameter \(\theta_i = g^{-1}(\mathbf{x}_i^{\prime} \beta)\):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Linear model: \(\mathbb{E}[y|\mathbf{x}] = \mathbf{x}_i^{\prime} \beta\) (``predicted value'')
+  \item
+    Probit model: \(\mathbb{E}[y|\mathbf{x}] = \Phi(\mathbf{x}_i^{\prime} \beta)\) (``predicted probability'')
+  \item
+    Logit model: \(\mathbb{E}[y|\mathbf{x}] = \text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta)\) (``predicted probability'')
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{first-differences}{%
+\subsubsection{First differences}\label{first-differences}}
+
+\begin{itemize}
+\tightlist
+\item
+  A first difference is the difference between two expected values.
+\item
+  It usually gives an estimate of how changing one covariate \(d\) affects our conditional expectation of \(y\) while holding all else (\(\mathbf{x}\)) constant.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Linear model: \(\mathbb{E}[y|d_1, \mathbf{x}] - \mathbb{E}[y| d_0,\mathbf{x}] = (\alpha + \tau d_1 + \mathbf{x}_i^{\prime} \beta) - (\alpha + \tau d_0 + \mathbf{x}_i^{\prime} \beta) = \tau (d_1 - d_0)\)
+  \item
+    Probit model: \(\mathbb{E}[y|d_1, \mathbf{x}] - \mathbb{E}[y| d_0,\mathbf{x}] = \Phi(\alpha + \tau d_1 + \mathbf{x}_i^{\prime} \beta)- \Phi(\alpha + \tau d_0 + \mathbf{x}_i^{\prime} \beta)\)
+  \item
+    Logit model: \(\mathbb{E}[y|d_1, \mathbf{x}] - \mathbb{E}[y| d_0,\mathbf{x}] = \text{logit}^{-1}(\alpha + \tau d_1 + \mathbf{x}_i^{\prime} \beta)- \text{logit}^{-1}(\alpha + \tau d_0 + \mathbf{x}_i^{\prime} \beta)\)
+  \end{itemize}
+\end{itemize}
+
+An important insight is that the first difference in the linear model does \emph{not} depend on the values of other covariates \(\mathbf{x}\).
+
+In all other GLM, the presence of an inverse link function makes first differences sensitive to the choice of covariates \(\mathbf{x}\)!
+
+\hypertarget{marginal-effects}{%
+\subsubsection{Marginal effects}\label{marginal-effects}}
+
+The marginal effect of a variable \(d\) on the expected value \(\mathbb{E}[y|d, \mathbf{x}]\) is given by the marginal rate of change in \(\mathbb{E}[y|d, \mathbf{x}]\) for an infinitesimal change in \(d\):
+
+\[\frac{\mathbb{E}[y|d + \Delta_d, \mathbf{x}] - \mathbb{E}[y|d, \mathbf{x}]}{\Delta_d}\]
+
+As \(\Delta_d \rightarrow 0\), this becomes \(\frac{\partial \mathbb{E}[y|d, \mathbf{x}]}{\partial d}\).
+
+For the linear model, this is mathematically straightforward:
+
+\[\frac{\partial (\alpha + \tau d + \mathbf{x}_i^{\prime} \beta)}{\partial d} = \tau\]
+
+For all other GLM, we rely on \emph{normalized first differences} for a freely chosen shift \(\Delta_d\).
+
+For instance, the marginal effect in a probit model for a \emph{standard deviation increase} in \(d\) is given by
+
+\[\frac{\mathbb{E}[y|d + \text{sd}(d), \mathbf{x}] - \mathbb{E}[y|d, \mathbf{x}]}{\text{sd}(d)} = \frac{\Phi(\alpha + \tau (d + \text{sd}(d)) + \mathbf{x}_i^{\prime} \beta) - \Phi(\alpha + \tau d + \mathbf{x}_i^{\prime} \beta)}{\text{sd}(d)}\]
+As with first differences, the marginal effect is thus sensitive to the choice of covariates \(\mathbf{x}\)!
+
+\hypertarget{average-quantities-of-interest}{%
+\subsubsection{Average quantities of interest}\label{average-quantities-of-interest}}
+
+The sensitivity of first differences and marginal effects to the choice of \(\mathbf{x}\) is problematic because makes these quantities of interest dependent on subjective judgment.
+
+For instance, the estimates of these quantities may differ dramatically depending on whether we set all variables in \(\mathbf{x}\) to their sample means, sample minimums, or sample maximums.
+
+A remedy is the \emph{observed values approach} (\href{https://onlinelibrary.wiley.com/doi/full/10.1111/j.1540-5907.2012.00602.x}{Hanmer and Kalkan 2013}), which involves two steps:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Calculate unit-specific quantities of interest at the observed values \(\mathbf{x}_i\) for each observation \(i = 1,...,N\)
+\item
+  Average across the \(N\) unit-specific quantities to obtain the \emph{average} quantities of interest
+\end{enumerate}
+
+So for instance, the average first difference for a binary variable \(d\) in a probit model is given by
+
+\[\frac{1}{N} \sum_{i=1}^{N}\Phi(\alpha + \tau \times 1 + \mathbf{x}_i^{\prime} \beta) - \Phi(\alpha + \tau \times 0 + \mathbf{x}_i^{\prime} \beta)\]
+
+Analogously, the average marginal effect for a one unit increase in a continuous variable \(d\) is given by
+
+\[\frac{1}{N} \sum_{i=1}^{N}\Phi(\alpha + \tau (d_i + 1) + \mathbf{x}_i^{\prime} \beta) - \Phi(\alpha + \tau d_i + \mathbf{x}_i^{\prime} \beta)\]
+
+\hypertarget{quantities-of-interest-why}{%
+\subsubsection{Quantities of interest: why?}\label{quantities-of-interest-why}}
+
+The answers are simple:
+
+\begin{itemize}
+\tightlist
+\item
+  Your readers have a right to know!
+\item
+  It makes your research accessible to non-technical audiences.
+\item
+  Chances are: You will not truly understand your own findings without it.
+\end{itemize}
+
+\hypertarget{do-not}{%
+\paragraph{Do not:}\label{do-not}}
+
+``The logit-coefficient of our information treatment on turnout is \(b = 1.5\) (\(p < .05\)). We thus conclude that there is a considerable treatment effect.''
+
+\hypertarget{do}{%
+\paragraph{Do:}\label{do}}
+
+``Our logit model yields a predicted turnout probability of \(0.88\) \([0.85, 0.91]\) in the treatment group, compared to \(0.63\) \([0.59, 0.67]\) in the control group. The corresponding difference of \(0.25\) \([0.22, 0.28]\) is of considerable substantive magnitude and statistically significant at the 95\% level.''
+
+\hypertarget{the-simulation-approach}{%
+\subsection{The simulation approach}\label{the-simulation-approach}}
+
+\hypertarget{inferential-uncertainty-vs-fundamental-uncertainty}{%
+\subsubsection{Inferential uncertainty vs fundamental uncertainty}\label{inferential-uncertainty-vs-fundamental-uncertainty}}
+
+\href{https://gking.harvard.edu/files/gking/files/making.pdf}{King et al.~(2000)} distinguish \emph{inferential uncertainty} and \emph{fundamental uncertainty}.
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Inferential uncertainty} describes the problem that we never know our parameters exactly.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Instead, we estimate them with some uncertainty that is represented in their respective \emph{sampling distribution}.
+  \item
+    Example: In large samples, we assume that the mean of age in Germany has a normal sampling distribution such that \(\hat \mu \sim \text{N}(\bar x, \sigma_{\bar x}^2)\), where \(\sigma_{\bar x}\) is the standard error of the mean.
+  \item
+    Inferential uncertainty thus describes our uncertainty about \emph{estimates} via \emph{sampling distributions}.
+  \end{itemize}
+\item
+  \emph{Fundamental uncertainty} describes the randomness that comes from the fact that we stipulate stochastic data-generating processes.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Example: Over and beyond our uncertainty regarding the true mean of age in Germany, we have a stochastic model in mind that generates age, e.g.: \(y \sim \text{N}(\hat \mu, \hat\sigma^2)\). So we could generate a predictive distribution of age from a normal distribution whose mean is the sample mean and whose variance is the sample variance.
+  \item
+    Fundamental uncertainty thus describes our uncertainty about \emph{predictions} via \emph{predictive distributions}.
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{the-glm-context}{%
+\subsubsection{The GLM context}\label{the-glm-context}}
+
+For a generic GLM, this means:
+
+\[\underbrace{\underbrace{y_i \sim \text{f}}_{\text{fund.}}(\theta_i = g^{-1}(\mathbf{x}_i^{\prime} \underbrace{\beta), \psi}_{\text{inf.}})}_{\text{Total uncertainty}}\]
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Inferential uncertainty about the model parameters can be simulated by taking draws from their joint sampling distribution.
+\item
+  Fundamental uncertainty can be simulated by taking draws of \(\mathbf{y}\) from \(\mathbf{y} \sim f(\theta, \psi)\).
+\item
+  Total uncertainty can be simulated by simulating (1) within (2)
+\end{enumerate}
+
+\hypertarget{inferential-uncertainty-in-glm}{%
+\subsubsection{Inferential uncertainty in GLM}\label{inferential-uncertainty-in-glm}}
+
+Quantities of interest such as expected values, (average) marginal effects, or (average) first differences are estimates of population parameters.
+
+Unless we engage in predictive modeling, we thus care primarily about inferential uncertainty.
+
+However:
+
+\begin{itemize}
+\tightlist
+\item
+  In GLM, we rarely estimate our quantities of interest directly.
+\item
+  We usually estimate our \emph{model coefficients} \(\beta\), from which we derive our quantities of interest.
+\item
+  We thus only have information on the sampling distribution of \(\beta\), \(\beta \sim \text{MVN}(\hat\beta, \hat \Sigma)\), not the sampling distribution of our quantity of interest.
+\end{itemize}
+
+So how can we get there?
+
+\begin{itemize}
+\tightlist
+\item
+  Beyond OLS, deriving the sampling distribution of quantities of interest analytically is rather painful.
+\item
+  Analytical normal-approximation confidence intervals are also imprecise when the asymptotic properties of estimators do not hold in finite samples (e.g., 95\% confidence intervals that include predicted probabilities outside of \([0, 1]\)).
+\item
+  So we will use a flexible approach that allows us to get sampling distributions for \emph{any} quantity of interest: \textbf{Parameter simulation}.
+\end{itemize}
+
+\hypertarget{the-algorithm}{%
+\subsubsection{The algorithm}\label{the-algorithm}}
+
+The algorithm presented by \href{https://gking.harvard.edu/files/gking/files/making.pdf}{King et al.~(2000)} contains five steps:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Simulate the sampling distribution of the model parameters by taking \(S\) draws from \(\beta \sim \text{MVN}(\hat\beta, \hat \Sigma)\)
+\item
+  Choose a \emph{covariate scenario}, i.e., specify a vector \(\mathbf{x^{\ast}}\) or a matrix \(\mathbf{X^{\ast}}\).
+\item
+  For each simulation \(\beta^{s}\) for \(s=1,...,S\), calculate \(\theta^{s} = g^{-1}(\mathbf{x^{\ast}}^{\prime} \beta^{s})\).
+\end{enumerate}
+
+Whenever \(\theta\) gives a direct estimate of \(\mathbb{E}[y|\mathbf{x^{\ast}}]\), these three steps will be sufficient!
+
+In some instances involving non-symmetrical transformations, we need to go the extra mile:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Simulate the predictive distribution \(M\) times for each simulation \(\theta^{s}\).
+\item
+  Average over the \(M\) predictive draws within each simulation \(s\).
+\end{enumerate}
+
+We will \emph{not} cover any such examples. So in our upcoming applied logistic regression example, we can produce inferential uncertainty with the simpler three-step algorithm.
+
+You can easily see why this the case: The expected value of a Bernoulli distribution with parameter \(\pi\) is \(\pi\) itself: \(\mathbb{E}[\text{Bernoulli}(\pi)] = \pi\). So drawing many 0's and 1's in step 4 just to average them back to a proportion that will be (approximately) equal to \(\pi\) is redundant.
+
+\end{document}

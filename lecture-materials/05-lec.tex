@@ -1,0 +1,1113 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  11pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{float}
+\floatplacement{figure}{ht}
+\usepackage[section]{placeins}
+\usepackage{longtable}
+\usepackage{hyperref}
+\hypersetup{colorlinks = true, linkcolor = blue, urlcolor = blue}
+\widowpenalty10000
+\clubpenalty10000
+\usepackage[page,header]{appendix}
+\usepackage{titletoc}
+\usepackage{tocloft}
+\usepackage{makecell}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Lecture: Applied Bayesian Statistics Using Stan: Extensions},
+  pdfauthor={Denis Cohen},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Lecture: Applied Bayesian Statistics Using Stan: Extensions}
+\author{Denis Cohen\footnote{Mannheim Centre for European Social Research, University of Mannheim, 68131 Mannheim, Germany. \href{mailto:denis.cohen@uni-mannheim.de}{\nolinkurl{denis.cohen@uni-mannheim.de}}.}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.5}
+\hypertarget{model-blocks}{%
+\subsection{\texorpdfstring{\href{https://mc-stan.org/docs/2_26/reference-manual/blocks-chapter.html}{Model blocks}}{Model blocks}}\label{model-blocks}}
+
+\hypertarget{main-model-blocks-for-bayesian-inference}{%
+\subsubsection{Main model blocks for Bayesian inference}\label{main-model-blocks-for-bayesian-inference}}
+
+As we established in the last session, a Stan program for \emph{Bayesian inference} must include the following model blocks:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Data}: Declare all known quantities, including data types, dimensions, and constraints
+\item
+  \textbf{Parameters}: Declare unknown `base' quantities, including storage types, dimensions, and constraints
+\item
+  \textbf{Model}: Declare and specify local variables (optional) and specify sampling statements for priors and likelihood
+\end{enumerate}
+
+\hypertarget{other-model-blocks}{%
+\subsubsection{Other model blocks}\label{other-model-blocks}}
+
+In this session, we want to pay closer attention to the four other model blocks:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Functions}: Declare user written functions
+\item
+  \textbf{Transformed Data}: Declare and define/transform data inputs
+\item
+  \textbf{Transformed Parameters}: Declare and transform parameters
+\item
+  \textbf{Generated Quantities}: Declare and generate derivative quantities
+\end{enumerate}
+
+\hypertarget{trivial-tasks}{%
+\subsubsection{``Trivial'' tasks}\label{trivial-tasks}}
+
+As Stan is a full-blown statistical programming language, we can also accommodate numerous other tasks in the model.
+
+As \texttt{rstan} users, however, the question with many of these tasks is whether we cannot accommodate them more efficiently in R before or after estimation.
+
+\hypertarget{some-tasks-that-can-be-implemented-as-part-of-a-stan-program}{%
+\subsubsection{\texorpdfstring{Some tasks that \emph{can} be implemented as part of a Stan program}{Some tasks that can be implemented as part of a Stan program}}\label{some-tasks-that-can-be-implemented-as-part-of-a-stan-program}}
+
+\begin{itemize}
+\tightlist
+\item
+  Data standardization:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    We could first define a function that standardizes our variables in the \texttt{functions} block and then apply it to the data in the \texttt{transformed\ data} block.
+  \item
+    But we can equally standardize the data in R and pass the standardized variables to Stan.
+  \end{itemize}
+\item
+  Transformed parameters:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Last session, we sampled the linear predictor \texttt{eta} as a global variable in the \texttt{transformed\ parameters} block, which we (could have) sampled.
+  \item
+    We could have equally defined \texttt{eta} as a temporary local variable in the \texttt{model\ block}, where it would have been discarded after each iteration\ldots{}
+  \item
+    \ldots and recovered it in R per \(\mathbf{X\beta}\) if necessary.
+  \end{itemize}
+\item
+  Quantities of interest:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    We can use the \texttt{generated\ quantities} block to calculate quantities of interest (expected values, average marginal effects, etc.) or to implement posterior predictive checks.
+  \item
+    But we can do this just as well in R using the posterior draws and the data.
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{my-recommendation}{%
+\subsubsection{My recommendation}\label{my-recommendation}}
+
+There is nothing wrong per se with accommodating such ``trivial tasks'' in Stan. But several efficiency concerns may speak against it:
+
+\begin{itemize}
+\tightlist
+\item
+  If you are more proficient in R than in Stan, implementing tasks in Stan that you could easily perform in R is time not wisely invested.
+\item
+  If you need to adjust transformations on a rolling basis (e.g., changing covariate scenarios for your quantities of interest), it is wise to separate estimation from ``post-estimation'' work.
+\item
+  \emph{Most importantly:} Computational resources can be \emph{expensive}!
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Once your Stan models get too big to run on local machines, efficiency is money (literally!).
+  \item
+    Minimize run times by restricting your Stan model to essential tasks (i.e., estimation).
+  \item
+    Limit your RAM usage to what's necessary; do not sample (transformed) parameters you do not need!
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{other-model-blocks-essential-tasks}{%
+\subsubsection{Other model blocks: Essential tasks}\label{other-model-blocks-essential-tasks}}
+
+There are, however, some essential tasks that should or must be accommodated in Stan:
+
+\begin{itemize}
+\tightlist
+\item
+  Functions needed for estimation (e.g., custom log-density functions)
+\item
+  Transformed parameters that are of primary interest
+
+  \begin{itemize}
+  \tightlist
+  \item
+    In many instances, it is computationally \emph{more} efficient to specify priors for ``raw parameters'' and transform these before they enter the likelihood.
+  \item
+    In these cases, your primary concern should be sampling and diagnosing the transformed parameters.
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{weighted-likelihood}{%
+\subsubsection{Weighted likelihood}\label{weighted-likelihood}}
+
+\begin{itemize}
+\tightlist
+\item
+  Weights ensure that observations do not contribute to the log-likelihood equally, but proportionally to their idiosyncratic weights.
+\item
+  Let's incorporate this feature into our Stan program for the linear model.
+\item
+  The hack requires two things:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    the definition of a new function
+  \item
+    Two minor, single-line modifications: One in the \texttt{data}, one in the \texttt{model} block
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{the-unweighted-normal-log-likelihood}{%
+\subsubsection{The unweighted normal log-likelihood}\label{the-unweighted-normal-log-likelihood}}
+
+We first need to understand the built-in function for the unweighted log-likelihood, \texttt{normal\_lpdf}.
+
+\texttt{normal\_lpdf} defines the log of the \href{https://en.wikipedia.org/wiki/Normal_distribution}{normal probability density function} (pdf) and sums across the resulting values of all observations, which returns a scalar:
+
+\[ \mathtt{normal\_lpdf(y | eta, sigma)} = \sum_{i=1}^{N}\frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)\]
+
+\hypertarget{the-weighted-normal-log-likelihood}{%
+\subsubsection{The weighted normal log-likelihood}\label{the-weighted-normal-log-likelihood}}
+
+Why is this problematic?
+
+\begin{itemize}
+\tightlist
+\item
+  To include weights, we need to weight every single entry in the log normal pdf \emph{prior to} aggregation.
+\item
+  So, we need a length-\(N\) vector of \(\mathtt{normal\_lpdf}\) values that we can then multiply with a length-\(N\) vector of weights before we sum across all observations.
+\item
+  We therefore define a new function that returns the point-wise log normal pdf:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{functions}\NormalTok{ \{}
+  \DataTypeTok{vector}\NormalTok{ pw\_norm(}\DataTypeTok{vector}\NormalTok{ y, }\DataTypeTok{vector}\NormalTok{ eta, }\DataTypeTok{real}\NormalTok{ sigma) \{}
+    \ControlFlowTok{return}\NormalTok{ {-}}\FloatTok{0.5}\NormalTok{ * (log(}\DecValTok{2}\NormalTok{ * pi() * square(sigma)) + }
+\NormalTok{                     square((y {-} eta) / sigma));}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{code-modifications}{%
+\subsubsection{Code modifications}\label{code-modifications}}
+
+The remaining modifications are straightforward:
+
+\begin{itemize}
+\tightlist
+\item
+  We declare a vector of length \(N\) with idiosyncratic weights in the data block.
+\item
+  In the model block, we take the dot product of the \texttt{weights} vector and the vector of log-likelihood entries generated by \texttt{pw\_norm}:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{data}\NormalTok{ \{}
+\NormalTok{  ...}
+  \DataTypeTok{vector}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{\textgreater{}[N] weights;  }\CommentTok{// weights}
+\NormalTok{\}}
+
+\NormalTok{...}
+
+\KeywordTok{model}\NormalTok{ \{}
+\NormalTok{  ...}
+  
+  \CommentTok{// weighted log{-}likelihood}
+  \KeywordTok{target +=}\NormalTok{ dot\_product(weights, pw\_norm(y, eta, sigma));}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The dot product returns the sum of the pairwise products of entries of both vectors, which gives us our weighted log-likelihood:
+
+\[\mathtt{dot\_product(weights, pw\_norm(y, eta, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times \frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)\]
+
+\hypertarget{standardized-data}{%
+\subsubsection{Standardized Data}\label{standardized-data}}
+
+\begin{itemize}
+\tightlist
+\item
+  For this example from the \href{https://mc-stan.org/docs/2_19/stan-users-guide/standardizing-predictors-and-outputs.html}{Stan User's Guide}, we use the transformed data block to standardize our outcome variable and predictors.
+\item
+  Standardization can help us \emph{boost the efficiency} of our model by allowing the model to converge toward the posterior distribution faster.
+\end{itemize}
+
+\hypertarget{transformed-data}{%
+\subsubsection{Transformed data}\label{transformed-data}}
+
+\begin{itemize}
+\tightlist
+\item
+  Our initial data inputs remain the same as in the original example: We declare \(N\), \(K\), \(\mathbf{X}\) and \(\mathbf{y}\) in the data block.
+\item
+  We then use the transformed data block to standardize both \(\mathbf{y}\) and every column of \(\mathbf{X}\) (except the leading column of 1's that multiplies the intercept).
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{transformed data}\NormalTok{ \{}
+  \DataTypeTok{vector}\NormalTok{[K}\DecValTok{{-}1}\NormalTok{] sd\_x;       }\CommentTok{// std. dev. of predictors (excl. intercept)}
+  \DataTypeTok{vector}\NormalTok{[K}\DecValTok{{-}1}\NormalTok{] mean\_x;     }\CommentTok{// mean of predictors (excl. intercept)}
+  \DataTypeTok{vector}\NormalTok{[N] y\_std;        }\CommentTok{// std. outcome }
+  \DataTypeTok{matrix}\NormalTok{[N,K] x\_std = x;  }\CommentTok{// std. predictors}
+  
+\NormalTok{  y\_std = (y {-} mean(y)) / sd(y);}
+  \ControlFlowTok{for}\NormalTok{ (k }\ControlFlowTok{in} \DecValTok{2}\NormalTok{:K) \{}
+\NormalTok{    mean\_x[k}\DecValTok{{-}1}\NormalTok{] = mean(x[,k]);}
+\NormalTok{    sd\_x[k}\DecValTok{{-}1}\NormalTok{] = sd(x[,k]);}
+\NormalTok{    x\_std[,k] = (x[,k] {-} mean\_x[k}\DecValTok{{-}1}\NormalTok{]) / sd\_x[k}\DecValTok{{-}1}\NormalTok{]; }
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{consequences-and-code-modifications}{%
+\subsubsection{Consequences and code modifications}\label{consequences-and-code-modifications}}
+
+\begin{itemize}
+\tightlist
+\item
+  As a result of standardization, the posterior distributions of our estimated parameters change.
+\item
+  But we can use the generated quantities block to transform these parameters back to their original scale.
+\item
+  For now, we only need to declare the parameters for the standardized variables.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{parameters}\NormalTok{ \{}
+  \DataTypeTok{vector}\NormalTok{[K] beta\_std;      }\CommentTok{// coef vector}
+  \DataTypeTok{real}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{\textgreater{} sigma\_std; }\CommentTok{// scale parameter}
+\NormalTok{\}}
+
+\KeywordTok{model}\NormalTok{ \{}
+  \CommentTok{// local variables}
+  \DataTypeTok{vector}\NormalTok{[N] eta\_std;          }\CommentTok{// declare lin. pred.}
+\NormalTok{  eta\_std = x\_std * beta\_std; }\CommentTok{// assign lin. pred.}
+
+  \CommentTok{// priors}
+  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(beta | }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{);  }\CommentTok{// priors for beta}
+  \KeywordTok{target +=}\NormalTok{ cauchy\_lpdf(sigma | }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{);  }\CommentTok{// prior for sigma}
+  
+  \CommentTok{// log{-}likelihood}
+  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(y\_std | eta\_std, sigma\_std); }\CommentTok{// likelihood}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{retrieving-the-original-parameters}{%
+\subsubsection{Retrieving the original parameters}\label{retrieving-the-original-parameters}}
+
+Using our draws for the alternative parameters \texttt{beta\_std} and \texttt{sigma\_std}, we can then use a little algebra to retrieve the original parameters:
+
+\begin{itemize}
+\tightlist
+\item
+  \(\beta_1 = \text{sd}(y) \Big(\beta_1^{\text{std}} - \sum_{k=2}^{K} \beta_k^{\text{std}} x_k^{\text{std}}\Big) + \bar{\mathbf{y}}\)
+\item
+  \(\beta_k = \beta_k^{\text{std}} \frac{\text{sd}(y)}{\text{sd}(x_k)} \text{ for } k = 2,...,K\)
+\item
+  \(\sigma = \text{sd}(y) \sigma^{\text{std}}\)
+\end{itemize}
+
+These calculations are implemented in the generated quantities block below:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{generated quantities}\NormalTok{ \{}
+  \DataTypeTok{vector}\NormalTok{[K] beta;          }\CommentTok{// coef vector}
+  \DataTypeTok{real}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{\textgreater{} sigma;     }\CommentTok{// scale parameter}
+  
+\NormalTok{  beta[}\DecValTok{1}\NormalTok{] = sd(y) * (beta\_std[}\DecValTok{1}\NormalTok{] {-} }
+\NormalTok{    dot\_product(beta\_std[}\DecValTok{2}\NormalTok{:K], mean\_x ./ sd\_x)) + mean(y);}
+\NormalTok{  beta[}\DecValTok{2}\NormalTok{:K] = beta\_std[}\DecValTok{2}\NormalTok{:K] ./ sd\_x * sd(y);}
+\NormalTok{  sigma = sd(y) * sigma\_std;}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{sampling}{%
+\subsubsection{Sampling}\label{sampling}}
+
+We can then simply sample the original parameters produced in the \texttt{generated\ quantities} block:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm\_std }\OtherTok{\textless{}{-}}\NormalTok{ rstan}\SpecialCharTok{::}\FunctionTok{sampling}\NormalTok{(}
+\NormalTok{  lm\_std,                     }\CommentTok{\# compiled model}
+  \AttributeTok{data =}\NormalTok{ standat\_inf,         }\CommentTok{\# data input}
+  \AttributeTok{algorithm =} \StringTok{"NUTS"}\NormalTok{,         }\CommentTok{\# algorithm}
+  \AttributeTok{control =} \FunctionTok{list}\NormalTok{(             }\CommentTok{\# control arguments}
+    \AttributeTok{adapt\_delta =}\NormalTok{ .}\DecValTok{85}\NormalTok{),}
+  \AttributeTok{save\_warmup =} \ConstantTok{FALSE}\NormalTok{,        }\CommentTok{\# discard warmup sims}
+  \AttributeTok{sample\_file =} \ConstantTok{NULL}\NormalTok{,         }\CommentTok{\# no sample file}
+  \AttributeTok{diagnostic\_file =} \ConstantTok{NULL}\NormalTok{,     }\CommentTok{\# no diagnostic file}
+  \AttributeTok{pars =} \FunctionTok{c}\NormalTok{(}\StringTok{"beta"}\NormalTok{, }\StringTok{"sigma"}\NormalTok{),  }\CommentTok{\# select parameters}
+  \AttributeTok{iter =}\NormalTok{ 2000L,               }\CommentTok{\# iter per chain}
+  \AttributeTok{warmup =}\NormalTok{ 1000L,             }\CommentTok{\# warmup period}
+  \AttributeTok{thin =}\NormalTok{ 2L,                  }\CommentTok{\# thinning factor}
+  \AttributeTok{chains =}\NormalTok{ 2L,                }\CommentTok{\# num. chains}
+  \AttributeTok{cores =}\NormalTok{ 2L,                 }\CommentTok{\# num. cores}
+  \AttributeTok{seed =} \DecValTok{20210329}\NormalTok{)            }\CommentTok{\# seed}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{efficiency-concerns}{%
+\subsubsection{Efficiency concerns}\label{efficiency-concerns}}
+
+Note that this procedure is essentially cost-free and likely to speed up computation:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{transformed\ data} is only evaluated once; essentially zero extra time
+\item
+  sampling in \texttt{model} will be faster
+\item
+  while evaluated after each iteration, the transformations in \texttt{generated\ quantities} simple and have no feedback into the \texttt{model} block
+\item
+  we do not need to sample additional parameters
+\end{itemize}
+
+\hypertarget{the-hierarchical-logit-model}{%
+\subsection{The hierarchical logit model}\label{the-hierarchical-logit-model}}
+
+\hypertarget{starting-point-building-a-simple-logit-model}{%
+\subsubsection{Starting point: Building a simple logit model}\label{starting-point-building-a-simple-logit-model}}
+
+Below, you find the code for the linear model from the previous lecture.
+
+\emph{Note:} \texttt{eta} is now a local variable in the \texttt{model} block, not a variable in the \texttt{transformed\ parameters} block.
+
+Let's use it a basis to build our logit model.
+
+\begin{itemize}
+\tightlist
+\item
+  Which quantities can stay?
+\item
+  Which quantities must go?
+\item
+  What do we need to add?
+\item
+  What do we need to change?
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{data}\NormalTok{ \{}
+  \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} N; }\CommentTok{// num. observations}
+  \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} K; }\CommentTok{// num. predictors}
+  \DataTypeTok{matrix}\NormalTok{[N, K] x; }\CommentTok{// design matrix}
+  \DataTypeTok{vector}\NormalTok{[N] y;    }\CommentTok{// outcome vector}
+\NormalTok{\}}
+
+\KeywordTok{parameters}\NormalTok{ \{}
+  \DataTypeTok{vector}\NormalTok{[K] beta;      }\CommentTok{// coef vector}
+  \DataTypeTok{real}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{\textgreater{} sigma; }\CommentTok{// scale parameter}
+\NormalTok{\}}
+
+\KeywordTok{model}\NormalTok{ \{}
+  \CommentTok{// local variables}
+  \DataTypeTok{vector}\NormalTok{[N] eta;  }\CommentTok{// declare lin. pred.}
+\NormalTok{  eta = x * beta; }\CommentTok{// assign lin. pred.}
+
+  \CommentTok{// priors}
+  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(beta | }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{);  }\CommentTok{// priors for beta}
+  \KeywordTok{target +=}\NormalTok{ cauchy\_lpdf(sigma | }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{);  }\CommentTok{// prior for sigma}
+  
+  \CommentTok{// log{-}likelihood}
+  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(y | eta, sigma); }\CommentTok{// likelihood}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{extension-1-varying-intercepts}{%
+\subsubsection{Extension 1: Varying intercepts}\label{extension-1-varying-intercepts}}
+
+\begin{itemize}
+\tightlist
+\item
+  Extending our model to become a hierarchical varying-intercept model is easy.
+\item
+  All we need to do is extend the linear predictor with a group-specific zero-mean random effect:
+\end{itemize}
+
+\[y_{ij} \sim \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta + \nu_{j_{[i]}})) \\
+\nu_j \sim \text{Normal}(0, \sigma_{\nu})\]
+
+\begin{itemize}
+\tightlist
+\item
+  We accomplish this by adding a standard normal parameter in the \texttt{parameters} block, and scaling it in the \texttt{transformed\ parameters} block.
+\item
+  Note that the choice of the normal distribution is arbitrary: We could change the distribution of these ``random deviation'' from the intercept in any (plausible) way we like!
+\item
+  Of course, we also need an integer array that indicates each unit's group membership.
+\end{itemize}
+
+\hypertarget{varying-intercepts-logit-model-code}{%
+\subsubsection{Varying-intercepts logit model: Code}\label{varying-intercepts-logit-model-code}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{data}\NormalTok{ \{}
+  \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} N;                    }\CommentTok{// num. observations}
+  \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} K;                    }\CommentTok{// num. predictors}
+  \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} J;                    }\CommentTok{// num. groups}
+  \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{, }\KeywordTok{upper}\NormalTok{=J\textgreater{} jj; }\CommentTok{// group index}
+  \DataTypeTok{matrix}\NormalTok{[N, K] x;                    }\CommentTok{// model matrix}
+  \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{, }\KeywordTok{upper}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} y;  }\CommentTok{// outcome}
+\NormalTok{\}}
+
+\KeywordTok{parameters}\NormalTok{ \{}
+  \DataTypeTok{vector}\NormalTok{[K] beta;          }\CommentTok{// coef vector}
+  \DataTypeTok{vector}\NormalTok{[J] nu\_raw;        }\CommentTok{// unscaled random effect}
+  \DataTypeTok{real}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{\textgreater{} sigma\_nu;  }\CommentTok{// scale of random effect}
+\NormalTok{\}}
+
+\KeywordTok{transformed parameters}\NormalTok{ \{}
+  \DataTypeTok{vector}\NormalTok{[J] nu;            }\CommentTok{// scaled random effect}
+\NormalTok{  nu = nu\_raw * sigma\_nu;}
+\NormalTok{\}}
+
+\KeywordTok{model}\NormalTok{ \{}
+  \CommentTok{// local variables}
+  \DataTypeTok{vector}\NormalTok{[N] eta;}
+  
+\NormalTok{  eta = x * beta + nu[jj];                  }\CommentTok{// linear predictor}
+
+  \CommentTok{// priors}
+  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(beta | }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{);      }\CommentTok{// priors for beta}
+  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(nu\_raw | }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{);     }\CommentTok{// priors for nu\_raw}
+  \KeywordTok{target +=}\NormalTok{ cauchy\_lpdf(sigma\_nu | }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{);   }\CommentTok{// prior for scale of nu}
+
+  \CommentTok{// log{-}likelihood}
+  \KeywordTok{target +=}\NormalTok{ bernoulli\_logit\_lpmf(y | eta); }\CommentTok{// likelihood, incl. inverse link}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{extension-2-varying-intercepts-varying-slopes}{%
+\subsubsection{Extension 2: Varying intercepts, varying slopes}\label{extension-2-varying-intercepts-varying-slopes}}
+
+\begin{itemize}
+\tightlist
+\item
+  Extending our model to become a hierarchical varying-intercept, vary-slopes model where intercepts and slopes are mutually correlated is a bit more intricate.
+\item
+  Suppose we would like to have a varying slope for one variable, \(x\), but none for all other covariates \(\mathbf{z}\).
+\item
+  Defining \(\mathbf{x}^{\prime} = \begin{bmatrix} 1 & x_i \end{bmatrix}\), this yields the following model:
+\end{itemize}
+
+\[y_{ij} \sim \text{Bernoulli}(\text{logit}^{-1}(\mathbf{x}_i^{\prime} \beta_{j_{[i]}} + \mathbf{z} _i^{\prime} \gamma)) \\
+\beta_{1j} = \beta_1 + \nu_{1j} \\
+\beta_{2j} = \beta_2 + \nu_{2j} \\
+\begin{bmatrix} \nu_{1j} \\ \nu_{2j} \end{bmatrix} \sim \text{MVN}\left( \begin{bmatrix} 0 \\ 0 \end{bmatrix}, \Sigma_{\nu} \right)\]
+
+\begin{itemize}
+\tightlist
+\item
+  This is exactly the form in which we implement the model below.
+\item
+  We use a little efficiency trick for the variance covariance matrix of \(\nu\):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    We decompose the variance covariance matrix into:
+
+    \begin{itemize}
+    \tightlist
+    \item
+      A Cholesky correlation factor \(\Omega\) with a Cholesky LKJ correlation prior
+    \item
+      A scale vector \(\tau\)
+    \end{itemize}
+  \item
+    We then use both components in the \texttt{transformed\ parameters} block to retrieve the variance-covariance matrix \(\Sigma_{nu}\).
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{varying-intercepts-varying-slopes-logit-model-code}{%
+\subsubsection{Varying-intercepts, varying slopes logit model: Code}\label{varying-intercepts-varying-slopes-logit-model-code}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{data}\NormalTok{ \{}
+  \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} N;                      }\CommentTok{// num. observations}
+  \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} K;                      }\CommentTok{// num. predictors w. varying coefs}
+  \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} L;                      }\CommentTok{// num. predictors w. fixed coefs}
+  \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} J;                      }\CommentTok{// num. groups}
+  \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{, }\KeywordTok{upper}\NormalTok{=J\textgreater{} jj;   }\CommentTok{// group index}
+  \DataTypeTok{matrix}\NormalTok{[N, K] x;                      }\CommentTok{// matrix varying predictors, incl. intercept}
+  \DataTypeTok{matrix}\NormalTok{[N, L] z;                      }\CommentTok{// matrix fixed predictors, excl. intercept}
+  \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{, }\KeywordTok{upper}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} y;    }\CommentTok{// outcome}
+\NormalTok{\}}
+
+\KeywordTok{transformed data}\NormalTok{ \{}
+  \DataTypeTok{row\_vector}\NormalTok{[K] zeroes;               }\CommentTok{// a length{-}K row vector of 0\textquotesingle{}s}
+\NormalTok{  zeroes = rep\_row\_vector(}\FloatTok{0.0}\NormalTok{, K);}
+\NormalTok{\}}
+
+\KeywordTok{parameters}\NormalTok{ \{}
+  \CommentTok{// Fixed portions}
+  \DataTypeTok{vector}\NormalTok{[K] beta;      }\CommentTok{// fixed coef predictors w. varying coefs}
+  \DataTypeTok{vector}\NormalTok{[L] gamma;     }\CommentTok{// fixed coef predictors w. fixed coefs}
+  
+  \CommentTok{// Random portions}
+  \DataTypeTok{array}\NormalTok{[J] }\DataTypeTok{vector}\NormalTok{[K] nu;            }\CommentTok{// group{-}specific deviations}
+  \DataTypeTok{cholesky\_factor\_corr}\NormalTok{[K] L\_Omega;  }\CommentTok{// prior correlation of deviations}
+  \DataTypeTok{vector}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{\textgreater{}[K] tau;           }\CommentTok{// prior scale of deviations}
+\NormalTok{\}}
+
+\KeywordTok{transformed parameters}\NormalTok{ \{}
+  \CommentTok{// Variance{-}covariance matrix of random deviatons}
+  \DataTypeTok{matrix}\NormalTok{[K,K] Sigma;}
+\NormalTok{  Sigma = diag\_pre\_multiply(tau, L\_Omega) * diag\_pre\_multiply(tau, L\_Omega)\textquotesingle{};}
+\NormalTok{\}}
+
+\KeywordTok{model}\NormalTok{ \{}
+  \CommentTok{// local variables}
+  \DataTypeTok{vector}\NormalTok{[N] eta;}
+  
+  \CommentTok{// linear predictor}
+\NormalTok{  eta = x * beta + z * gamma;               }\CommentTok{// lin. pred. without random effect}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\NormalTok{:N) \{}
+\NormalTok{    eta[i] = eta[i] + x[i, ] * nu[jj[i]];   }\CommentTok{// add group{-}specific random effects}
+\NormalTok{  \}}
+  
+  \CommentTok{// priors}
+  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(beta | }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{);               }\CommentTok{// priors for beta}
+  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(gamma | }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{);              }\CommentTok{// priors for gamma}
+  \KeywordTok{target +=}\NormalTok{ cauchy\_lpdf(tau | }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{);                 }\CommentTok{// prior for scales of nu}
+  \KeywordTok{target +=}\NormalTok{ lkj\_corr\_cholesky\_lpdf(L\_Omega | }\FloatTok{2.0}\NormalTok{);   }\CommentTok{// Cholesky LJK corr. prior}
+  \KeywordTok{target +=}\NormalTok{ multi\_normal\_lpdf(nu | zeroes, Sigma);   }\CommentTok{// nu}
+
+
+  \CommentTok{// log{-}likelihood}
+  \KeywordTok{target +=}\NormalTok{ bernoulli\_logit\_lpmf(y | eta); }\CommentTok{// likelihood, incl. inverse link}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{transferability-to-other-glm}{%
+\subsubsection{Transferability to other GLM}\label{transferability-to-other-glm}}
+
+The specification of univariate or multivariate random effects is fairly general. It does not depend on a specific type of GLM.
+
+You could equally use the respective code chunks in a linear model or a tobit model, for instance. This is an example of modular model building.
+
+\hypertarget{developing-your-own-stan-models}{%
+\subsection{Developing your own Stan models}\label{developing-your-own-stan-models}}
+
+\hypertarget{motivation}{%
+\subsubsection{Motivation}\label{motivation}}
+
+\begin{itemize}
+\tightlist
+\item
+  The above example shows how one can continuously expand the complexity of a Stan model.
+\item
+  Yet, this is still a standard hierarchical model that you could equally estimate using a `canned solution'.
+\item
+  At some point, however, you will likely want to push past the boundaries of such canned solutions.
+\item
+  Below are some motivating examples.
+\end{itemize}
+
+\hypertarget{relaxing-model-assumptions}{%
+\subsubsection{Relaxing model assumptions}\label{relaxing-model-assumptions}}
+
+\begin{itemize}
+\tightlist
+\item
+  You estimate a hierarchical GLM with random intercepts and few groups.
+\item
+  Reviewer 2 has read up on some recent publications (e.g., \href{https://onlinelibrary.wiley.com/doi/full/10.1111/ajps.12001}{Stegmueller 2013}; \href{https://www.elff.eu/article/multilevel-improving/}{Elff et al.~2020}) and criticizes your use of normally distributed random effects.
+\item
+  Why not use Stan to relax this distributional assumption?
+\item
+  You may, e.g., reestimate your model with different distributions for your random effects, and conduct simulation studies to test their relative performance towards one another.
+\end{itemize}
+
+\hypertarget{heterogeneous-treatment-effects}{%
+\subsubsection{Heterogeneous treatment effects}\label{heterogeneous-treatment-effects}}
+
+\begin{itemize}
+\tightlist
+\item
+  You conduct an RCT with a binary treatment on political attitudes.
+\item
+  You use a standard difference-in-means estimator, which yields a null effect.
+\item
+  This is in line with your expectations, as you expect that the treatment will ``shift'' some individuals to the left, others to the right.
+\item
+  You cannot accurately characterize left-shifters an right-shifters in terms of covariates and, therefore, not present meaningful subgroup-specific difference-in-means estimates.
+\item
+  Why not focus on the variance, then?
+\item
+  Use Stan to implement a ``difference-in-variances'' estimator. Use the posterior distribution for inference on the question if your treatment polarizes political attitudes among treated individuals relative to control units.
+\end{itemize}
+
+\hypertarget{re-running-and-extending-models-written-in-defunct-or-proprietary-programming-languages}{%
+\subsubsection{Re-running (and extending) models written in defunct or proprietary programming languages}\label{re-running-and-extending-models-written-in-defunct-or-proprietary-programming-languages}}
+
+\begin{itemize}
+\tightlist
+\item
+  In \emph{When Moderate Voters Prefer Extreme Parties}, \href{https://www.cambridge.org/core/journals/american-political-science-review/article/when-moderate-voters-prefer-extreme-parties-policy-balancingin-parliamentary-elections/A6729F56D47DDD3993DD3CA02840B6B0}{Kedar (2005)} proposes a formal model for representational (sincere) and compensational (strategic) voting.
+\item
+  The model involves a mixing parameter, \(\beta\): \[u_{ij} = \theta [-\beta \times \text{representational}_{ij} - (1 - \beta) \times \text{compensational}_{ij}] + \mathbf{z}_{i}^{\prime}\delta_j \]
+\item
+  The empirical analyses implement this idea in a conditional logit model with a constrained mixing parameter, \(\beta \in [0,1]\), and coded up in \href{https://en.wikipedia.org/wiki/GAUSS_(software)}{GAUSS}.
+\item
+  Why not implement this model in Stan?
+\item
+  Why not transfer the idea of a mixing parameter to a different type of model?
+\item
+  Why not extend the idea of a mixing parameter from two to three (or more) components, and allow it to vary? One example: A trivariate heterogeneous mixing parameter that tests how consistently policy distances on (1) socio-economic issues, (2) immigration, and (3) climate change affect vote choices for voters of different generations?
+\end{itemize}
+
+\hypertarget{an-example-from-my-own-research-modeling-comparative-vote-switching}{%
+\subsubsection{An example from my own research: Modeling comparative vote switching}\label{an-example-from-my-own-research-modeling-comparative-vote-switching}}
+
+\begin{center}\includegraphics[width=0.9\linewidth]{images/fr17-plots-1} \end{center}
+
+\hypertarget{voter-transition-matrices}{%
+\subsubsection{Voter transition matrices}\label{voter-transition-matrices}}
+
+\begin{center}\includegraphics[width=0.9\linewidth]{images/transition-matrix} \end{center}
+
+\hypertarget{basic-quantities-of-interest}{%
+\paragraph{Basic quantities of interest}\label{basic-quantities-of-interest}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \emph{Party-specific retention rates}, \(p_{i,i}\)
+\item
+  \emph{Dyadic gross gains/losses}, \(p_{i,j}\)
+\item
+  \emph{Dyadic trade volumes}, \(V_{i,j} = p_{j,i} + p_{i,j}\)
+\item
+  \emph{Dyadic trade balances}, \(V_{i,j} = p_{j,i} - p_{i,j}\)
+\end{enumerate}
+
+\hypertarget{derived-quantities-of-interest-aggregate-and-normalize-as-needed}{%
+\paragraph{Derived quantities of interest: Aggregate and normalize as needed}\label{derived-quantities-of-interest-aggregate-and-normalize-as-needed}}
+
+Let our quantity of interest be \emph{government parties'} trade balances with \emph{opposition parties}, \emph{relative to their own support base at t - 1}:
+
+\[\text{QOI} = \frac{100 \times \sum_{j = 2}^{4} p_{j, 1} -  p_{1, j}}{\sum_{k = 1}^{5} p_{1, k}} = \frac{100 \times (2.6 - 5.2)}{21.6} \approx 12.0\]
+
+\hypertarget{mixed-aggregate-mnl-model-with-varying-choice-sets-mavcl}{%
+\subsubsection{Mixed Aggregate MNL Model with Varying Choice Sets (MAVCL)}\label{mixed-aggregate-mnl-model-with-varying-choice-sets-mavcl}}
+
+\hypertarget{description}{%
+\paragraph{Description}\label{description}}
+
+MAVCL models latent election-level \emph{cell proportions}, \(\Pr(y_{j} = c)\), derived as average micro-level \emph{choice probabilities}, based on cell counts, \(w_{jc}\):
+
+\begin{itemize}
+\tightlist
+\item
+  A categorical likelihood at the voter level models individual \emph{choice probabilities} (as in MNL).
+\item
+  As the model only involves election-level covariates, we can re-express this model at the election-level with \(w_{jc}\)'s serve as election-and-cell-specific frequency weights. This yields a multinomial quasi-likelihood at the election-level.
+\item
+  Here, election-cell-specific random effects capture variation of interest: Latent election-specific \emph{cell proportions}.
+\item
+  Party system heterogeneity yields election-specific choice sets \(S_j = \{1,...,C\}\)
+
+  \begin{itemize}
+  \tightlist
+  \item
+    some outcomes categories \(c\) will be deterministically empty
+  \item
+    accommodated in a modified softmax link function (see Yamamoto 2014)
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{formal-notation}{%
+\paragraph{Formal notation}\label{formal-notation}}
+
+\begin{itemize}
+\tightlist
+\item
+  Linear component: \(\eta_{jc} = \alpha_c + \mathbf{x}_j^{\prime} \beta_c + \nu_{jc} \text{  for each  } c \in S_{j}\)
+\item
+  Link function: \(\Pr(y_{j} = c | \mathbf{x}_j) = \frac{\exp(\eta_{jc})}{\sum_{c \in S_{j}} \exp(\eta_{jc})}\)
+\item
+  Likelihood: \(\log L = \sum_{j=1}^{J} \sum_{c \in S_{j}} w_{jc} \log \Pr(y_{j} = c | \mathbf{x}_j)\)
+\end{itemize}
+
+\hypertarget{take-aways-for-aspiring-model-developers}{%
+\subsection{Take-aways for aspiring model developers}\label{take-aways-for-aspiring-model-developers}}
+
+\hypertarget{determine-if-a-canned-solution-already-exists.}{%
+\subsubsection{Determine if a `canned solution' already exists.}\label{determine-if-a-canned-solution-already-exists.}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  It exists and accomplishes exactly what you want to do? \(\rightarrow\) Use it!
+\item
+  It exists but falls short of accomplishing \emph{exactly} what you want to do? \(\rightarrow\) Build up on it!
+\item
+  It doesn't exist? \(\rightarrow\) Build your own model! Note that while it may seem like you are starting from scratch, but most likely, many parts of your model will resemble existing (Stan) models.
+\end{enumerate}
+
+\hypertarget{moving-beyond-canned-solutions}{%
+\subsubsection{Moving beyond `canned solutions'}\label{moving-beyond-canned-solutions}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Choose the correct likelihood for your model. Stan will almost certainly feature the required log probability function. If it doesn't, translate the mathematical log-likelihood function to a custom \texttt{lpmf}/\texttt{lpdf} function.
+\item
+  Think about the ``right-hand side'' of your model formula (i.e., systematic component and inverse link). Start simple, increase flexibility step-wise.
+\item
+  Use the documentation and the vast online resources. Seek help when necessary.
+\item
+  Once your model runs: Validate it.
+\item
+  Once validated, move on to inference. Carefully diagnose your model!
+\end{enumerate}
+
+\hypertarget{computational-problems}{%
+\subsubsection{Computational problems}\label{computational-problems}}
+
+Suppose one or several of the following apply:
+
+\begin{itemize}
+\tightlist
+\item
+  Your algorithm-specific diagnostics throw warnings (that don't go away easily)
+\item
+  Your convergence diagnostics indicate signs of non-convergence (and increasing the warm-up period doesn't help)
+\item
+  Everything converges, but you get non-sensical estimates and predictions
+\item
+  You are confident that your model will eventually converge to a well-behaved target distribution but it takes \emph{forever} and even lengthy runs won't get you there (yet).
+\end{itemize}
+
+Then what?
+
+\hypertarget{addressing-computational-problems}{%
+\subsubsection{Addressing computational problems}\label{addressing-computational-problems}}
+
+Gelman et al.~(2020) have some answers:
+
+\hypertarget{check-for-model-misspecification}{%
+\subsubsection{Check for model misspecification}\label{check-for-model-misspecification}}
+
+\begin{itemize}
+\tightlist
+\item
+  Is the probability model correctly specified?
+\item
+  Are constraints set adequately?
+\item
+  Do your priors allow for posterior density in regions where you'd expect it?
+\item
+  Are your parameters statistically identified?
+\end{itemize}
+
+\hypertarget{when-a-complex-model-fails-reduce-complexity}{%
+\subsubsection{When a complex model fails: Reduce complexity}\label{when-a-complex-model-fails-reduce-complexity}}
+
+\begin{itemize}
+\tightlist
+\item
+  Suppose you fit a mixture model with two equations, a constrained probabilistic mixing parameter, and various random effects in each equation
+\item
+  Fit each equation separately without the random effects
+\item
+  Fit the mixture model without the random effects
+\item
+  Fit each equation with random effects
+\end{itemize}
+
+\hypertarget{be-time-efficient}{%
+\subsubsection{Be time-efficient}\label{be-time-efficient}}
+
+\begin{itemize}
+\tightlist
+\item
+  Test the model on small sets of well-behaved simulated data
+\item
+  Test the model using short runs
+\end{itemize}
+
+\hypertarget{efficiency-tuning}{%
+\subsubsection{\texorpdfstring{\href{https://mc-stan.org/docs/2_26/stan-users-guide/optimization-chapter.html}{Efficiency tuning}}{Efficiency tuning}}\label{efficiency-tuning}}
+
+\begin{itemize}
+\tightlist
+\item
+  Vectorize: Use matrix multiplication instead of loops through matrix rows.
+\item
+  Reparameterize.
+\item
+  Standardize data inputs. Increases the chances that your parameters will be on similar scales (which may speed up computation).
+\item
+  \emph{Alternatively:} Use weakly informative data-dependent priors.
+\item
+  Make priors more informative (if defensible): Can prevent chains from wandering far off the target distribution.
+\item
+  Parallelize: Markov chains are independent. Let them run at the same time (if your CPUs allow for it)!
+\end{itemize}
+
+\hypertarget{lastly-get-the-most-out-of-your-estimates}{%
+\subsubsection{Lastly: Get the most out of your estimates!}\label{lastly-get-the-most-out-of-your-estimates}}
+
+\begin{itemize}
+\tightlist
+\item
+  After validation and inference, get the most out of your posterior samples.
+\item
+  Process your posterior draws into substantively meaningful quantities of interest.
+\item
+  Visualize whenever possible.
+\end{itemize}
+
+\hypertarget{info-on-session-6}{%
+\subsection{Info on Session 6}\label{info-on-session-6}}
+
+\hypertarget{optional-task-for-the-next-two-weeks}{%
+\subsubsection{Optional task for the next two weeks}\label{optional-task-for-the-next-two-weeks}}
+
+If you already have an applied project in mind: Work on out!
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Determine if there is a pre-implemented solution for \emph{estimating} the model you have in mind.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    If yes, use it.
+  \item
+    If no, attempt to build it. If possible, validate and use it.
+  \end{itemize}
+\item
+  Diagnose your estimates.
+\item
+  Determine if there is a pre-implemented solution for \emph{processing} your model estimates such that you can interpret them optimally.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    If yes, use it.
+  \item
+    If no, attempt to build it.
+  \end{itemize}
+\end{enumerate}
+
+If you do not have an applied project in mind: Practice nonetheless!
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Select an empirical analysis you have conducted in the past.
+\item
+  Implement, validate, and estimate the model in Stan.
+\item
+  Diagnose your estimates.
+\item
+  Process your estimates into substantively meaningful quantities of interest.
+\end{enumerate}
+
+\hypertarget{structure}{%
+\subsubsection{Structure}\label{structure}}
+
+\begin{itemize}
+\tightlist
+\item
+  09:00 - 10:30: ``Elevator pitch'' presentations: \(\approx\) 3min
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Slide 1: Motivation (1-2 bullet points), formal notation, targeted estimand (quantity of interest)
+  \item
+    Slide 2: Code (the important parts)
+  \item
+    Slide 3: Remaining issues
+  \end{itemize}
+\item
+  10:45 - 12:15: Individual consultations
+
+  \begin{itemize}
+  \tightlist
+  \item
+    project-specific questions \(\rightarrow\) Denis
+  \item
+    ``generic'' course-related questions \(\rightarrow\) Tim
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{logistics}{%
+\subsubsection{Logistics}\label{logistics}}
+
+\begin{itemize}
+\tightlist
+\item
+  You can present your own projects (but don't have to!).
+\item
+  If you wish to present, sign up \emph{today} (via ILIAS)
+\item
+  If you wish to talk about your project or Bayesian stats in general, sign up for individual consultations via ILIAS
+\item
+  For consultations, feel free to send a short report detailing their model and potential problems encountered during implementation in advance of this session
+\item
+  If you do not wish to present, you are invited to join as audience members
+\end{itemize}
+
+\hypertarget{questions}{%
+\subsubsection{Questions?}\label{questions}}
+
+\end{document}

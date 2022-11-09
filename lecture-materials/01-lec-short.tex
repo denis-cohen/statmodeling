@@ -1,0 +1,1388 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  11pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{float}
+\floatplacement{figure}{ht}
+\usepackage[section]{placeins}
+\usepackage{longtable}
+\usepackage{hyperref}
+\hypersetup{colorlinks = true, linkcolor = blue, urlcolor = blue}
+\widowpenalty10000
+\clubpenalty10000
+\usepackage[page,header]{appendix}
+\usepackage{titletoc}
+\usepackage{tocloft}
+\usepackage{makecell}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Lecture: R Math \& Programming Refresher},
+  pdfauthor={Denis Cohen},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Lecture: R Math \& Programming Refresher}
+\author{Denis Cohen\footnote{Mannheim Centre for European Social Research, University of Mannheim, 68131 Mannheim, Germany. \href{mailto:denis.cohen@uni-mannheim.de}{\nolinkurl{denis.cohen@uni-mannheim.de}}.}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\setstretch{1.5}
+\hypertarget{outline}{%
+\subsection{Outline}\label{outline}}
+
+\hypertarget{thing-we-are-going-to-cover}{%
+\subsubsection{Thing we are going to cover}\label{thing-we-are-going-to-cover}}
+
+Given our time constraints, we will be fairly selective in what we cover today.
+
+Specifically, we will focus on those aspects of the R language that will be
+immediately relevant in the pursuit of or our learning objectives:
+
+\begin{itemize}
+\tightlist
+\item
+  data types
+\item
+  object types
+\item
+  algebraic operators
+\item
+  probability distributions
+\item
+  logical and numerical object slicing
+\item
+  control structures
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{for} loops
+  \item
+    \texttt{apply}, \texttt{lapply}, \texttt{sapply}
+  \end{itemize}
+\item
+  functions
+\end{itemize}
+
+\hypertarget{things-we-are-not-going-to-cover-best-practices-for-reproducible-data-projects}{%
+\subsubsection{Things we are not going to cover: Best practices for reproducible data projects}\label{things-we-are-not-going-to-cover-best-practices-for-reproducible-data-projects}}
+
+\begin{itemize}
+\tightlist
+\item
+  R Projects
+\item
+  Version control (e.g., Git)
+\item
+  Dependency management (e.g., \texttt{renv})
+\item
+  Start-up customization (\texttt{.Renviron})
+\item
+  Custom project initialization (\texttt{.Rprofile})
+\item
+  R Markdown
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{rmarkdown}
+  \item
+    \texttt{bookdown}
+  \item
+    \texttt{pagedown}
+  \item
+    \texttt{blogdown}
+  \item
+    \ldots{}
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{things-we-are-not-going-to-cover-base-r-vs-tidyverse}{%
+\subsubsection{Things we are not going to cover: Base R vs tidyverse}\label{things-we-are-not-going-to-cover-base-r-vs-tidyverse}}
+
+\begin{itemize}
+\tightlist
+\item
+  Base R: Collection of native commands
+
+  \begin{itemize}
+  \tightlist
+  \item
+    historical legacies: not necessarily a ``clean'' language/syntax
+  \end{itemize}
+\item
+  \texttt{tidyverse}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    an ``opinionated collection of R packages'' for data visualization, transformation, tidying, and import
+  \item
+    more or less uniform syntax
+  \item
+    Packages: \texttt{dplyr}, \texttt{ggplot2}, \texttt{tibble}, \texttt{readr}, \texttt{tidyr}, \texttt{purrr}
+  \end{itemize}
+\item
+  both are valid
+\item
+  both are fully compatible with one another
+\item
+  both are fully compatible with external packages
+\item
+  you can do amazing things by relying on one, on the other, or on both
+\item
+  we will use whichever best suits our purposes (here: mostly base R)
+\end{itemize}
+
+\hypertarget{further-reading}{%
+\subsubsection{Further reading}\label{further-reading}}
+
+To learn more about the above, check out my \href{https://www.mzes.uni-mannheim.de/socialsciencedatalab/}{Methods Bites} Tutorial \href{https://www.mzes.uni-mannheim.de/socialsciencedatalab/article/efficient-data-r/}{Efficient Data Management in R}, co-authored with Cosima Meyer, Marcel Neunhoeffer, and Oliver Rittmann.
+
+\hypertarget{structure-of-this-session}{%
+\subsubsection{Structure of this session}\label{structure-of-this-session}}
+
+\hypertarget{very-quick-refreshers}{%
+\paragraph{Very quick refreshers}\label{very-quick-refreshers}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Data types
+\item
+  Arithmetic operators and transformations
+\item
+  Object types
+\item
+  Object indexing
+\end{enumerate}
+
+\hypertarget{moderately-quick-refreshers}{%
+\paragraph{Moderately quick refreshers}\label{moderately-quick-refreshers}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  R objects vs mathematical objects
+\item
+  Probability distributions
+\item
+  Control structures and apply functions
+\item
+  Programming
+\end{enumerate}
+
+\hypertarget{data-types}{%
+\subsection{Data types}\label{data-types}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Real numbers ("double")}
+\NormalTok{x }\OtherTok{\textless{}{-}} \DecValTok{9}
+\NormalTok{z }\OtherTok{\textless{}{-}} \FloatTok{13.2}
+
+\CommentTok{\# Integers}
+\NormalTok{y }\OtherTok{\textless{}{-}}\NormalTok{ 4L}
+
+\CommentTok{\# Characters}
+\NormalTok{start }\OtherTok{\textless{}{-}} \StringTok{"R is so much"}
+\NormalTok{end }\OtherTok{\textless{}{-}} \StringTok{"fun!"}
+\NormalTok{sentence }\OtherTok{\textless{}{-}} \FunctionTok{paste}\NormalTok{(start, end, }\AttributeTok{sep =} \StringTok{" "}\NormalTok{)}
+
+\CommentTok{\# Logicals \& Boolean operators}
+\DecValTok{2} \SpecialCharTok{+} \DecValTok{5} \SpecialCharTok{==} \DecValTok{6}              \CommentTok{\# Does 2 + 5 equal 6?}
+\FunctionTok{isFALSE}\NormalTok{(}\DecValTok{3} \SpecialCharTok{+} \DecValTok{4} \SpecialCharTok{!=} \DecValTok{2} \SpecialCharTok{+} \DecValTok{5}\NormalTok{) }\CommentTok{\# Is it false that 3 + 4 is not equal to 2 + 5?}
+\DecValTok{3} \SpecialCharTok{|} \DecValTok{4} \SpecialCharTok{\textgreater{}=} \DecValTok{2} \SpecialCharTok{+} \DecValTok{1}          \CommentTok{\# Is 3 OR 4 greater than/equal to 2 + 1?}
+\DecValTok{3} \SpecialCharTok{\&} \DecValTok{7} \SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{)       }\CommentTok{\# Are 3 AND 7 included in an integer sequence from 1 to 5?}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{arithmetic-operators-and-transformations}{%
+\subsection{Arithmetic operators and transformations}\label{arithmetic-operators-and-transformations}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x }\SpecialCharTok{+}\NormalTok{ y     }\CommentTok{\# addition}
+\NormalTok{x }\SpecialCharTok{{-}}\NormalTok{ y     }\CommentTok{\# subtraction}
+\NormalTok{x }\SpecialCharTok{*}\NormalTok{ y     }\CommentTok{\# multiplication}
+\NormalTok{x }\SpecialCharTok{/}\NormalTok{ y     }\CommentTok{\# division}
+\NormalTok{x }\SpecialCharTok{\^{}}\NormalTok{ y     }\CommentTok{\# exponentiation}
+\FunctionTok{log}\NormalTok{(x)    }\CommentTok{\# natural logarithm}
+\FunctionTok{exp}\NormalTok{(x)    }\CommentTok{\# exponential}
+\FunctionTok{sqrt}\NormalTok{(x)   }\CommentTok{\# square root}
+\NormalTok{a }\SpecialCharTok{\%*\%}\NormalTok{ b   }\CommentTok{\# vector/matrix multiplication}
+\FunctionTok{t}\NormalTok{(a)      }\CommentTok{\# vector/matrix transposition}
+\FunctionTok{solve}\NormalTok{(A)  }\CommentTok{\# matrix inversion}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{object-types}{%
+\subsection{Object types}\label{object-types}}
+
+\hypertarget{vectors}{%
+\subsubsection{Vectors}\label{vectors}}
+
+A vector is a serial listing of data elements of the same type (e.g.~\texttt{integer}, \texttt{double}, \texttt{logical}, or \texttt{character}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{item }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"flour"}\NormalTok{, }\StringTok{"sugar"}\NormalTok{, }\StringTok{"potatoes"}\NormalTok{, }\StringTok{"tomatoes"}\NormalTok{, }\StringTok{"bananas"}\NormalTok{)}
+\NormalTok{price }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(.}\DecValTok{99}\NormalTok{, }\FloatTok{1.49}\NormalTok{, }\FloatTok{1.99}\NormalTok{, }\FloatTok{2.79}\NormalTok{, }\FloatTok{1.89}\NormalTok{)}
+\NormalTok{pricey }\OtherTok{\textless{}{-}}\NormalTok{ price }\SpecialCharTok{\textgreater{}} \FloatTok{1.5}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{matrices}{%
+\subsubsection{Matrices}\label{matrices}}
+
+A matrix is a rectangular arrangement of data elements of the same type.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mat1 }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{.}\DecValTok{35}\NormalTok{, .}\DecValTok{35}\NormalTok{, .}\DecValTok{1}\NormalTok{), }\AttributeTok{nrow =} \DecValTok{2}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{4}\NormalTok{)}
+\NormalTok{mat1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       [,1]  [,2] [,3] [,4]
+## [1,] -0.35 -0.15 0.05 0.25
+## [2,] -0.25 -0.05 0.15 0.35
+\end{verbatim}
+
+\hypertarget{arrays}{%
+\subsubsection{Arrays}\label{arrays}}
+
+An array is a multidimensional arrangement of data elements of the same type.
+
+You may think of an array as a generalization of a matrix to any number of dimensions:
+
+\begin{itemize}
+\tightlist
+\item
+  all elements are of the same type
+\item
+  fixed dimensional structure
+\item
+  any vector or matrix can be stored as an array using \texttt{as.array()}
+\end{itemize}
+
+\hypertarget{lists}{%
+\subsubsection{Lists}\label{lists}}
+
+Lists allow you to store objects of various classes, various storage types, and various sizes.
+This can be very useful, e.g., for returning various outputs from a function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{my\_list }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\NormalTok{my\_list}\SpecialCharTok{$}\NormalTok{char\_mat }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(LETTERS, }\AttributeTok{nrow =} \DecValTok{2}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{13}\NormalTok{)}
+\NormalTok{my\_list}\SpecialCharTok{$}\NormalTok{vectors }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\NormalTok{my\_list}\SpecialCharTok{$}\NormalTok{vectors}\SpecialCharTok{$}\NormalTok{num\_vec1 }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{)}
+\NormalTok{my\_list}\SpecialCharTok{$}\NormalTok{vectors}\SpecialCharTok{$}\NormalTok{num\_vec2 }\OtherTok{\textless{}{-}} \FunctionTok{runif}\NormalTok{(}\DecValTok{10}\NormalTok{, }\AttributeTok{min =} \DecValTok{0}\NormalTok{, }\AttributeTok{max =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{data-frames}{%
+\subsubsection{Data Frames}\label{data-frames}}
+
+Data frames are lists of variables of equal length, producing a
+rectangular structure. Unlike matrix columns, data frame columns can be of
+different storage types and classes.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{groceries }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{item =} \FunctionTok{c}\NormalTok{(}\StringTok{"flour"}\NormalTok{, }\StringTok{"sugar"}\NormalTok{, }\StringTok{"potatoes"}\NormalTok{, }\StringTok{"tomatoes"}\NormalTok{, }\StringTok{"bananas"}\NormalTok{),}
+  \AttributeTok{price =} \FunctionTok{c}\NormalTok{(.}\DecValTok{99}\NormalTok{, }\FloatTok{1.49}\NormalTok{, }\FloatTok{1.99}\NormalTok{, }\FloatTok{2.79}\NormalTok{, }\FloatTok{1.89}\NormalTok{)}
+\NormalTok{)}
+
+\NormalTok{groceries}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       item price
+## 1    flour  0.99
+## 2    sugar  1.49
+## 3 potatoes  1.99
+## 4 tomatoes  2.79
+## 5  bananas  1.89
+\end{verbatim}
+
+\hypertarget{object-indexing}{%
+\subsection{Object indexing}\label{object-indexing}}
+
+\hypertarget{numerical-indexing}{%
+\subsubsection{Numerical indexing}\label{numerical-indexing}}
+
+We can slice vectors, matrices, or arrays using \emph{numerical} indexing.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mat1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       [,1]  [,2] [,3] [,4]
+## [1,] -0.35 -0.15 0.05 0.25
+## [2,] -0.25 -0.05 0.15 0.35
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mat1[}\DecValTok{1}\NormalTok{, }\DecValTok{3}\SpecialCharTok{:}\DecValTok{4}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.05 0.25
+\end{verbatim}
+
+\hypertarget{indexing-by-names}{%
+\subsubsection{Indexing by names}\label{indexing-by-names}}
+
+When objects contain attributes such as \texttt{names()} (\texttt{list}, \texttt{data.frame}), \texttt{rownames()} and \texttt{colnames()} (\texttt{matrix}), or \texttt{dimnames()} (\texttt{array}), we can also index by character names:
+
+\hypertarget{naming-and-slicing-a-vector}{%
+\subsubsection{Naming and slicing a vector}\label{naming-and-slicing-a-vector}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{names}\NormalTok{(price) }\OtherTok{\textless{}{-}}\NormalTok{ item}
+\FunctionTok{str}\NormalTok{(price)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  Named num [1:5] 0.99 1.49 1.99 2.79 1.89
+##  - attr(*, "names")= chr [1:5] "flour" "sugar" "potatoes" "tomatoes" ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{price[}\FunctionTok{c}\NormalTok{(}\StringTok{"potatoes"}\NormalTok{, }\StringTok{"bananas"}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## potatoes  bananas 
+##     1.99     1.89
+\end{verbatim}
+
+\hypertarget{logical-indexing}{%
+\subsubsection{Logical indexing}\label{logical-indexing}}
+
+Lastly, we can use logical evaluations to select subsets of elements. Suppose we only want those objects from groceries that are countable (i.e., end with an ``s'') and cost at least EUR 2.00.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Countable items}
+\NormalTok{groceries}\SpecialCharTok{$}\NormalTok{item}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "flour"    "sugar"    "potatoes" "tomatoes" "bananas"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{is\_countable }\OtherTok{\textless{}{-}} 
+  \FunctionTok{substr}\NormalTok{(groceries}\SpecialCharTok{$}\NormalTok{item, }\FunctionTok{nchar}\NormalTok{(groceries}\SpecialCharTok{$}\NormalTok{item), }\FunctionTok{nchar}\NormalTok{(groceries}\SpecialCharTok{$}\NormalTok{item)) }\SpecialCharTok{==} \StringTok{"s"}
+
+\CommentTok{\# Pricey items}
+\NormalTok{groceries}\SpecialCharTok{$}\NormalTok{price}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.99 1.49 1.99 2.79 1.89
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{is\_very\_pricey }\OtherTok{\textless{}{-}}\NormalTok{ groceries}\SpecialCharTok{$}\NormalTok{price }\SpecialCharTok{\textgreater{}} \FloatTok{2.00}
+
+\CommentTok{\# Find subset}
+\NormalTok{groceries[is\_very\_pricey }\SpecialCharTok{\&}\NormalTok{ is\_countable, ]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       item price
+## 4 tomatoes  2.79
+\end{verbatim}
+
+\hypertarget{r-objects-vs-mathematical-objects}{%
+\subsection{R objects vs mathematical objects}\label{r-objects-vs-mathematical-objects}}
+
+Time for some confusion!
+
+Scalars, vectors, and matrices are frequently used objects in linear algebra.
+
+Unfortunately, they do not translate straightforwardly into numeric R objects
+
+\hypertarget{scalars}{%
+\subsubsection{Scalars}\label{scalars}}
+
+A scalar is just a single numeric element (e.g., an integer or a real number).
+
+R does \textbf{not} have an object type for scalars. Scalars are stored as numeric vectors of length 1.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x }\OtherTok{\textless{}{-}} \FloatTok{1.5}
+\FunctionTok{class}\NormalTok{(x)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "numeric"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{typeof}\NormalTok{(x)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "double"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{is.vector}\NormalTok{(x)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{length}\NormalTok{(x)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1
+\end{verbatim}
+
+Of course, it is not that easy. In math, the inner product of two vectors returns a scalar:
+
+\[s = \mathbf{a}^{\prime} \mathbf{b} = \begin{bmatrix} 0.5 & 1 & 1.5\end{bmatrix} \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix} = 0.5 \times 1 + 1 \times 2 + 1.5 \times 3 = 7\]
+
+In R, however,\ldots{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{a }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{1.5}\NormalTok{)}
+\NormalTok{b }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{)}
+
+\NormalTok{s }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(a) }\SpecialCharTok{\%*\%}\NormalTok{ b}
+\NormalTok{s}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1]
+## [1,]    7
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{class}\NormalTok{(s)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "matrix" "array"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{typeof}\NormalTok{(s)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "double"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{is.vector}\NormalTok{(s)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] FALSE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{is.matrix}\NormalTok{(s)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{dim}\NormalTok{(s)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1 1
+\end{verbatim}
+
+\ldots{}\texttt{s} will be stored as a matrix of dimensions \(1 \times 1\). This can be annoying, because it prevents you from using \texttt{s} for simple tasks like scalar multiplication:
+
+\[ 7 \begin{bmatrix} 1 & 3 \\ 2 & 4\end{bmatrix} = \begin{bmatrix} 7 & 21 \\ 14 & 28\end{bmatrix}\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{4}\NormalTok{, }\AttributeTok{nrow =} \DecValTok{2}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{)}
+\NormalTok{s }\SpecialCharTok{*}\NormalTok{ m}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Error in s * m: non-conformable arrays
+\end{verbatim}
+
+So, to make this work, we need to store \texttt{s} as object type \texttt{vector} to ensure it behaves like a scalar:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{4}\NormalTok{, }\AttributeTok{nrow =} \DecValTok{2}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{)}
+\NormalTok{s }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(s)}
+\NormalTok{s }\SpecialCharTok{*}\NormalTok{ m}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]    7   21
+## [2,]   14   28
+\end{verbatim}
+
+\hypertarget{vectors-1}{%
+\subsubsection{Vectors}\label{vectors-1}}
+
+Whereas the mathematical concept of a scalar is stored as a \texttt{vector} object in R, the mathematical concept of a vector \emph{sometimes} requires the object type \texttt{matrix}.
+
+We usually distinguish row and column vectors in linear algebra. Row vectors are matrices of dimensions \(1 \times K\) whereas column vectors are matrices of dimensions \(K \times 1\).
+
+In R, vectors are just serial listings, without fixed dimensions. R will \emph{mostly}
+treat numeric \texttt{vector} objects like column vectors. Yet sometimes, when (pre-)multiplying other vectors or matrices, R will automatically transpose the vector on the left to ensure conformability:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{t}\NormalTok{(a) }\SpecialCharTok{\%*\%}\NormalTok{ b}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1]
+## [1,]    7
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{a }\SpecialCharTok{\%*\%}\NormalTok{ b}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1]
+## [1,]    7
+\end{verbatim}
+
+So \texttt{a\ \%*\%\ b}, same as the more literal \texttt{t(a)\ \%*\%\ b}, yields the inner product \(\mathbf{a}^{\prime} \mathbf{b}\).
+
+To get the outer product \(\mathbf{a}\mathbf{b}^{\prime}\), which results in a matrix of dimensions \(3 \times 3\), you can do the following:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{a }\SpecialCharTok{\%*\%} \FunctionTok{t}\NormalTok{(b)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2] [,3]
+## [1,]  0.5    1  1.5
+## [2,]  1.0    2  3.0
+## [3,]  1.5    3  4.5
+\end{verbatim}
+
+You can ensure unambiguous dimensions by defining vectors as matrices:
+
+\begin{verbatim}
+##      [,1]
+## [1,]  0.5
+## [2,]  1.0
+## [3,]  1.5
+\end{verbatim}
+
+\begin{verbatim}
+##      [,1] [,2] [,3]
+## [1,]  0.5    1  1.5
+\end{verbatim}
+
+\hypertarget{summary}{%
+\subsubsection{Summary}\label{summary}}
+
+\begin{itemize}
+\tightlist
+\item
+  Scalars are vectors, and sometimes matrices.
+\item
+  Vectors are column vectors, but sometimes act like row vectors, and can be defined as matrices.
+\item
+  Matrices are, in fact, matrices.
+\end{itemize}
+
+\hypertarget{probability-distributions}{%
+\subsection{Probability distributions}\label{probability-distributions}}
+
+\hypertarget{commands}{%
+\subsubsection{Commands}\label{commands}}
+
+For common probability distributions, R features the following four commands (where \texttt{dist} is a placeholder):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{ddist(x)}: Probability density/mass function (pdf/pmf). Takes a value \(x\) and returns the probability density/mass \(P(X=x)\).\\
+\item
+  \texttt{pdist(x)}: Cumulative distribution function (CDF). Takes a value \(x\) and returns the cumulative probability \(P(X \leq x)\).
+\item
+  \texttt{qdist(q)}: Quantile function or inverse CDF. Takes a cumulative probability \(P(X \leq x)\) and returns the corresponding value \(x\).
+\item
+  \texttt{rdist(n)}: Produces \(n\) random draws from the distribution.
+\end{enumerate}
+
+\hypertarget{the-standard-normal-distribution}{%
+\subsubsection{The standard normal distribution}\label{the-standard-normal-distribution}}
+
+Let's illustrate these using everyone's favorite, the standard normal, \(\text{N} \sim (0, 1)\):
+
+\begin{center}\includegraphics{01-lec-short_files/figure-latex/stdnorm-1-1} \end{center}
+
+\hypertarget{pdf}{%
+\subsubsection{pdf}\label{pdf}}
+
+To get the probability density at any value \(x\), e.g., \(x = -1\), run:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{dnorm}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{, }\AttributeTok{mean =} \DecValTok{0}\NormalTok{, }\AttributeTok{sd =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2419707
+\end{verbatim}
+
+\begin{center}\includegraphics{01-lec-short_files/figure-latex/stdnorm-3-1} \end{center}
+
+\hypertarget{cdf-and-quantile-function}{%
+\subsubsection{CDF and quantile function}\label{cdf-and-quantile-function}}
+
+To get the cumulative probability up to any value \(x\), e.g., \(x = 1.9599\), run:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pnorm}\NormalTok{(}\FloatTok{1.9599}\NormalTok{, }\AttributeTok{mean =} \DecValTok{0}\NormalTok{, }\AttributeTok{sd =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.9749963
+\end{verbatim}
+
+\begin{center}\includegraphics{01-lec-short_files/figure-latex/stdnorm-5-1} \end{center}
+
+Conversely, use \texttt{qnorm} to get the \(x\) values for any desired cumulative probability:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qnorm}\NormalTok{(}\FunctionTok{c}\NormalTok{(.}\DecValTok{025}\NormalTok{, .}\DecValTok{5}\NormalTok{, .}\DecValTok{975}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -1.959964  0.000000  1.959964
+\end{verbatim}
+
+\begin{center}\includegraphics{01-lec-short_files/figure-latex/stdnorm-7-1} \end{center}
+
+\hypertarget{random-number-generation}{%
+\subsubsection{Random number generation}\label{random-number-generation}}
+
+Lastly, to generate random draws from a distribution with specific parameters, use \texttt{rnorm()}. The higher the number of draws, the better the chances that the frequency distribution of your random draws will approximate the underlying pdf:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Define number of draws}
+\NormalTok{n\_sim }\OtherTok{\textless{}{-}}\NormalTok{ 1000000L}
+
+\CommentTok{\# Take random draws}
+\NormalTok{x\_sim }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(n\_sim, }\AttributeTok{mean =} \DecValTok{0}\NormalTok{, }\AttributeTok{sd =} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# Visualize}
+\FunctionTok{hist}\NormalTok{(}
+\NormalTok{  x\_sim,}
+  \AttributeTok{main =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Simulated Standard Normal pdf, N = "}\NormalTok{, n\_sim),}
+  \AttributeTok{xlab =} \StringTok{"x"}\NormalTok{,}
+  \AttributeTok{ylab =} \StringTok{"Pr(X=x)"}\NormalTok{,}
+  \AttributeTok{freq =} \ConstantTok{FALSE}\NormalTok{,}
+  \AttributeTok{breaks =} \FunctionTok{log}\NormalTok{(n\_sim) }\SpecialCharTok{*} \DecValTok{3}\NormalTok{,}
+  \AttributeTok{border =} \StringTok{"gray60"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{01-lec-short_files/figure-latex/stdnorm-8-1.pdf}
+
+\hypertarget{control-structures-and-apply-functions}{%
+\subsection{Control structures and apply functions}\label{control-structures-and-apply-functions}}
+
+\hypertarget{control-structures-in-r}{%
+\subsubsection{Control structures in R}\label{control-structures-in-r}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  if, else, ifelse
+\item
+  for
+\item
+  while
+\item
+  repeat
+\item
+  break
+\item
+  next
+\item
+  return
+\end{enumerate}
+
+\ldots we will only focus on a few here.
+
+\hypertarget{auxiliary-tools-for-indexing}{%
+\subsubsection{Auxiliary tools for indexing}\label{auxiliary-tools-for-indexing}}
+
+\texttt{seq\_len()} and \texttt{seq\_along()} are very helpful in defining integer sequences:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# seq\_len()}
+\FunctionTok{nrow}\NormalTok{(groceries)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(groceries)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1 2 3 4 5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{seq\_len}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(groceries))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1 2 3 4 5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# seq\_along}
+\FunctionTok{length}\NormalTok{(item)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{seq\_along}\NormalTok{(item)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1 2 3 4 5
+\end{verbatim}
+
+\hypertarget{for-loop}{%
+\subsubsection{for-loop}\label{for-loop}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \FunctionTok{seq\_len}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(groceries))) \{}
+  \FunctionTok{print}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{"Item "}\NormalTok{, i, }\StringTok{": "}\NormalTok{, groceries}\SpecialCharTok{$}\NormalTok{item[i]))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Item 1: flour"
+## [1] "Item 2: sugar"
+## [1] "Item 3: potatoes"
+## [1] "Item 4: tomatoes"
+## [1] "Item 5: bananas"
+\end{verbatim}
+
+\hypertarget{if-else}{%
+\subsubsection{if, else}\label{if-else}}
+
+Let's re-establish which foods are pricey (\(\geq 1.50\text{EUR})\) \ldots{}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \FunctionTok{seq\_len}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(groceries))) \{}
+  \ControlFlowTok{if}\NormalTok{ (groceries}\SpecialCharTok{$}\NormalTok{price[i] }\SpecialCharTok{\textgreater{}=} \FloatTok{1.5}\NormalTok{) \{}
+    \FunctionTok{print}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{"Item "}\NormalTok{, i, }\StringTok{": Sooooo pricey!"}\NormalTok{))}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+    \FunctionTok{print}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{"Item "}\NormalTok{, i, }\StringTok{": Sooooo cheap!"}\NormalTok{))}
+\NormalTok{  \} }
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Item 1: Sooooo cheap!"
+## [1] "Item 2: Sooooo cheap!"
+## [1] "Item 3: Sooooo pricey!"
+## [1] "Item 4: Sooooo pricey!"
+## [1] "Item 5: Sooooo pricey!"
+\end{verbatim}
+
+We may want to store this information in an object (e.g., a vector or a variable).
+
+\emph{As a general rule:}
+
+\begin{itemize}
+\tightlist
+\item
+  Whenever possible, initialize an empty \emph{container} of fixed dimensions and subsequently fill it with values.
+\item
+  Avoid sequentially growing objects by appending elements/rows/columns via \texttt{c()}, \texttt{rbind()}, or \texttt{cbind()}.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# Initialize container (here, a vector)}
+\NormalTok{pricey\_or\_not }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\ConstantTok{NA}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(groceries))}
+
+\DocumentationTok{\#\# Fill container}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \FunctionTok{seq\_len}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(groceries))) \{}
+  \ControlFlowTok{if}\NormalTok{ (groceries}\SpecialCharTok{$}\NormalTok{price[i] }\SpecialCharTok{\textgreater{}=} \FloatTok{1.5}\NormalTok{) \{}
+\NormalTok{    pricey\_or\_not[i] }\OtherTok{\textless{}{-}} \StringTok{"pricey"}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{    pricey\_or\_not[i] }\OtherTok{\textless{}{-}} \StringTok{"cheap"}
+\NormalTok{  \} }
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{ifelse}{%
+\subsubsection{ifelse}\label{ifelse}}
+
+For efficiency gains, we may vectorize the operation:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ifelse}\NormalTok{(groceries}\SpecialCharTok{$}\NormalTok{price }\SpecialCharTok{\textgreater{}=} \FloatTok{1.5}\NormalTok{, }\StringTok{"pricey"}\NormalTok{, }\StringTok{"cheap"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "cheap"  "cheap"  "pricey" "pricey" "pricey"
+\end{verbatim}
+
+\hypertarget{lapply-sapply-vapply}{%
+\subsubsection{lapply, sapply, vapply}\label{lapply-sapply-vapply}}
+
+Use \texttt{lapply()}, \texttt{sapply()}, or \texttt{vapply()} to apply functions element-wise (e.g., to elements of vector, variables of a data frame, or objects in a list).
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{lapply()} returns a list by default.
+\item
+  \texttt{sapply()} will simplify this list to a vector/matrix/array if the list consists of elements/vectors/matrices of equal lengths/dimensions.
+\item
+  \texttt{vapply()} allows you to specify which type of eligible output you want.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{lapply}\NormalTok{(groceries, is.numeric)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $item
+## [1] FALSE
+## 
+## $price
+## [1] TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sapply}\NormalTok{(groceries, is.numeric)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  item price 
+## FALSE  TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{vapply}\NormalTok{(groceries, is.numeric, }\FunctionTok{logical}\NormalTok{(}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  item price 
+## FALSE  TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{vapply}\NormalTok{(groceries, is.numeric, }\FunctionTok{numeric}\NormalTok{(}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  item price 
+##     0     1
+\end{verbatim}
+
+\hypertarget{apply}{%
+\subsubsection{apply}\label{apply}}
+
+Use \texttt{apply()} on matrices or arrays to apply a function across selected dimension(s) of a matrix or array.
+
+\hypertarget{row--and-column-means}{%
+\subsubsection{Row- and column-means}\label{row--and-column-means}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mat1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       [,1]  [,2] [,3] [,4]
+## [1,] -0.35 -0.15 0.05 0.25
+## [2,] -0.25 -0.05 0.15 0.35
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{apply}\NormalTok{(mat1, }\DecValTok{1}\NormalTok{, mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -0.05  0.05
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{apply}\NormalTok{(mat1, }\DecValTok{2}\NormalTok{, mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -0.3 -0.1  0.1  0.3
+\end{verbatim}
+
+\hypertarget{custom-functions}{%
+\subsubsection{Custom functions}\label{custom-functions}}
+
+You can apply custom functions to all apply functions:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{count\_negative }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{ (x) \{}
+  \FunctionTok{sum}\NormalTok{(x }\SpecialCharTok{\textless{}} \DecValTok{0}\NormalTok{)}
+\NormalTok{\}}
+\FunctionTok{apply}\NormalTok{(mat1, }\DecValTok{1}\NormalTok{, count\_negative)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2 2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{apply}\NormalTok{(mat1, }\DecValTok{2}\NormalTok{, count\_negative)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2 2 0 0
+\end{verbatim}
+
+\hypertarget{programming}{%
+\subsection{Programming}\label{programming}}
+
+\hypertarget{good-coding-practices}{%
+\subsubsection{Good coding practices}\label{good-coding-practices}}
+
+\hypertarget{style-guide}{%
+\paragraph{Style Guide}\label{style-guide}}
+
+\begin{itemize}
+\tightlist
+\item
+  Adhere to a style guide. It not only ensures consistency, but also allows your readers to focus on \emph{what} you code instead of \emph{how} you code it.
+\item
+  The most prolific style guide is presented in \href{http://adv-r.had.co.nz/Style.html}{Advanced R} by Hadley Wickham.
+\item
+  In RStudio, select code and use the shortcut \texttt{Ctrl+Shift+A} to automatically reformat your code according to this style guide.
+\end{itemize}
+
+\hypertarget{kis-keep-it-simple}{%
+\paragraph{KIS: Keep it simple}\label{kis-keep-it-simple}}
+
+\begin{itemize}
+\tightlist
+\item
+  Be clear about inputs and outputs from the start.
+\item
+  Break down the problem top-down:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Split a task into sub-tasks (and, maybe, split these into sub-sub-tasks).
+  \item
+    Each task should be solved in a self-contained step.
+  \end{itemize}
+\item
+  Then, aggregate solutions bottom-up:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Output from completed sub-sub-tasks become inputs to sub-tasks.
+  \item
+    Output from completed sub-tasks become final output.
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{dry-dont-repeat-yourself}{%
+\paragraph{DRY: Don't repeat yourself}\label{dry-dont-repeat-yourself}}
+
+\begin{itemize}
+\tightlist
+\item
+  Do not perform the same calculation twice; define an object.
+\item
+  Do not perform the same operation twice; define a function.
+\item
+  This can not only speed up your code and make it more legible; it also makes debugging \emph{much} easier.
+\end{itemize}
+
+\hypertarget{writing-simple-functions}{%
+\subsubsection{Writing simple functions}\label{writing-simple-functions}}
+
+Here, we will program a simple function that allows us to simulate the \emph{Central Limit Theorem} (what does it say again?).
+
+\hypertarget{simulate-data}{%
+\subsubsection{Simulate data}\label{simulate-data}}
+
+We will use simulated data input:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Simulate}
+\NormalTok{simulated\_var }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(}\FunctionTok{runif}\NormalTok{(}\DecValTok{1000000}\NormalTok{, }\DecValTok{0}\NormalTok{,}\DecValTok{4}\NormalTok{))}
+
+\CommentTok{\# Plot}
+\FunctionTok{hist}\NormalTok{(}
+\NormalTok{  simulated\_var,}
+  \AttributeTok{xlab =} \StringTok{"A very non{-}normal variable"}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{01-lec-short_files/figure-latex/sim-data-1.pdf}
+
+\hypertarget{writing-a-function-good}{%
+\subsubsection{Writing a function: Good}\label{writing-a-function-good}}
+
+\begin{itemize}
+\tightlist
+\item
+  adheres to style guide
+\item
+  uses comments
+\item
+  meaningful names for function, arguments, and objects
+\item
+  avoids redundancy and repetition
+\item
+  gives user control and information over output
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{simulate\_clt }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}
+\NormalTok{  data,}
+  \AttributeTok{n\_means =}\NormalTok{ 1000L,}
+  \AttributeTok{n\_obs =}\NormalTok{ 1000L,}
+  \AttributeTok{value =} \FunctionTok{c}\NormalTok{(}\StringTok{"all"}\NormalTok{, }\StringTok{"sims"}\NormalTok{, }\StringTok{"analytical"}\NormalTok{, }\StringTok{"quantiles"}\NormalTok{),}
+  \AttributeTok{seed =}\NormalTok{ 20210325L}
+\NormalTok{) \{}
+  \CommentTok{\# Set seed}
+  \FunctionTok{set.seed}\NormalTok{(seed)}
+  
+  \CommentTok{\# Initialize container}
+\NormalTok{  samples }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\ConstantTok{NA}\NormalTok{, }\AttributeTok{nrow =}\NormalTok{ n\_obs, }\AttributeTok{ncol =}\NormalTok{ n\_means)}
+  
+  \DocumentationTok{\#\# Fill container}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \FunctionTok{seq\_len}\NormalTok{(n\_means)) \{}
+\NormalTok{    samples[, i] }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(data, }\AttributeTok{size =}\NormalTok{ n\_obs)}
+\NormalTok{  \}}
+  
+  \CommentTok{\# Obtain sample means}
+\NormalTok{  sample\_means }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(samples, }\DecValTok{2}\NormalTok{, mean)}
+  
+  \CommentTok{\# Calculate normal{-}approximation 95\% CI}
+  \ControlFlowTok{if}\NormalTok{ (value }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"all"}\NormalTok{, }\StringTok{"analytical"}\NormalTok{)) \{}
+\NormalTok{    mean\_of\_means }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(sample\_means)}
+\NormalTok{    sd\_of\_means }\OtherTok{\textless{}{-}} \FunctionTok{sd}\NormalTok{(sample\_means)}
+\NormalTok{    analytical\_ci }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+\NormalTok{      mean\_of\_means,}
+\NormalTok{      mean\_of\_means }\SpecialCharTok{+} \FunctionTok{qnorm}\NormalTok{(.}\DecValTok{025}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ sd\_of\_means,}
+\NormalTok{      mean\_of\_means }\SpecialCharTok{+} \FunctionTok{qnorm}\NormalTok{(.}\DecValTok{975}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ sd\_of\_means}
+\NormalTok{    )}
+\NormalTok{  \}}
+  
+  \CommentTok{\# Calculate quantile{-}based 95\% CI}
+  \ControlFlowTok{if}\NormalTok{ (value }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"all"}\NormalTok{, }\StringTok{"quantiles"}\NormalTok{)) \{}
+\NormalTok{    quantile\_ci }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(sample\_means, }\FunctionTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{, .}\DecValTok{025}\NormalTok{, .}\DecValTok{975}\NormalTok{))}
+\NormalTok{  \}}
+  
+  \CommentTok{\# Return conditionally}
+  \ControlFlowTok{if}\NormalTok{ (value }\SpecialCharTok{==} \StringTok{"sims"}\NormalTok{) \{}
+    \FunctionTok{return}\NormalTok{(sample\_means)}
+\NormalTok{  \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (value }\SpecialCharTok{==} \StringTok{"analytical"}\NormalTok{) \{}
+    \FunctionTok{return}\NormalTok{(analytical\_ci)}
+\NormalTok{  \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (value }\SpecialCharTok{==} \StringTok{"quantiles"}\NormalTok{) \{}
+    \FunctionTok{return}\NormalTok{(quantile\_ci)}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+    \FunctionTok{return}\NormalTok{(}
+      \FunctionTok{list}\NormalTok{(}\AttributeTok{sims =}\NormalTok{ sample\_means, }
+           \AttributeTok{analytical =}\NormalTok{ analytical\_ci,}
+           \AttributeTok{quantiles =}\NormalTok{ quantile\_ci)}
+\NormalTok{      )}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{Note:} This function does likely not use the most computationally efficient way of solving the problem, but it incorporates many of the concepts discussed so far.
+
+\hypertarget{writing-a-function-bad}{%
+\subsubsection{Writing a function: Bad}\label{writing-a-function-bad}}
+
+\begin{itemize}
+\tightlist
+\item
+  does not adhere to style guide
+\item
+  does not use comments
+\item
+  no meaningful names for function, arguments, and objects
+\item
+  lots of redundancy and repetition
+\item
+  no control and information over output
+\item
+  no seed \(\rightarrow\) output not reproducible
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{clt.function }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(data,n1,n2) \{}\FunctionTok{c}\NormalTok{(}\FunctionTok{mean}\NormalTok{(}\FunctionTok{apply}\NormalTok{(}\FunctionTok{replicate}\NormalTok{(n1,}\FunctionTok{sample}\NormalTok{(data,n2)),}\DecValTok{2}\NormalTok{,mean)),}
+\FunctionTok{mean}\NormalTok{(}\FunctionTok{apply}\NormalTok{(}\FunctionTok{replicate}\NormalTok{(n1,}\FunctionTok{sample}\NormalTok{(data,n2)),}\DecValTok{2}\NormalTok{,mean))}\SpecialCharTok{{-}}\FloatTok{1.96}\SpecialCharTok{*}\FunctionTok{sd}\NormalTok{(}\FunctionTok{apply}\NormalTok{(}\FunctionTok{replicate}\NormalTok{(n1,}\FunctionTok{sample}\NormalTok{(data,n2)),}\DecValTok{2}\NormalTok{,mean)),}
+\FunctionTok{mean}\NormalTok{(}\FunctionTok{apply}\NormalTok{(}\FunctionTok{replicate}\NormalTok{(n1,}\FunctionTok{sample}\NormalTok{(data,n2)),}\DecValTok{2}\NormalTok{,mean))}\SpecialCharTok{+}\FloatTok{1.96}\SpecialCharTok{*}\FunctionTok{sd}\NormalTok{(}\FunctionTok{apply}\NormalTok{(}\FunctionTok{replicate}\NormalTok{(n1,}\FunctionTok{sample}\NormalTok{(data,n2)),}\DecValTok{2}\NormalTok{,mean)))\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{simulate\_clt}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ simulated\_var,}
+  \AttributeTok{n\_means =}\NormalTok{ 1000L,}
+  \AttributeTok{n\_obs =}\NormalTok{ 200L,}
+  \AttributeTok{value =} \StringTok{"quantiles"}\NormalTok{,}
+  \AttributeTok{seed =}\NormalTok{ 20210329L}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      50%     2.5%    97.5% 
+## 13.34851 11.53176 15.30893
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{clt.function}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ simulated\_var,}
+  \AttributeTok{n1 =}\NormalTok{ 1000L,}
+  \AttributeTok{n2 =}\NormalTok{ 200L}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 13.40816 11.42934 15.30087
+\end{verbatim}
+
+\end{document}

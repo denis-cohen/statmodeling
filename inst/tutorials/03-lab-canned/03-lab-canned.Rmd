@@ -453,7 +453,7 @@ What do you conclude? Does the ZOIB-family accurately model the observed
 sample-level distribution of the outcome? Are you happy with the predictive
 accuracy of our current systematic component?
 
-## Bonus: QOI or multi-family models
+## Bonus: QOI for multi-family models
 
 ### Quantities of interest
 

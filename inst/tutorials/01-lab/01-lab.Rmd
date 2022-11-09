@@ -278,7 +278,7 @@ Before we start, let's be clear what we want eventually: For every value combina
 
 So our container must accommodate `length(se_vals) * length(la_vals) * 3L = 5043L` values.
 
-We could, of course, store these in a vector of length 5043. Or in three matrices of dimensions 41$\times$41, which we could subsequently wrap in a list. Let's go for the most convenient solution, though: A three-dimensional `array` of dimensions `dim = c(length(se_vals), length(la_vals), 3L)`. Let's initialize this object with `NA`s.
+We could, of course, store these in a vector of length 5043. Or in three matrices of dimensions $41 \times 41$, which we could subsequently wrap in a list. Let's go for the most convenient solution, though: A three-dimensional `array` of dimensions `dim = c(length(se_vals), length(la_vals), 3L)`. Let's initialize this object with `NA`s.
 
 ```{r proc2-1-setup}
 se_vals <- seq(0, 10, .25)
