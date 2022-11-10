@@ -152,7 +152,7 @@ We first need to understand the built-in function for the unweighted log-likelih
 
 `normal_lpdf` defines the log of the [normal probability density function](https://en.wikipedia.org/wiki/Normal_distribution) (pdf) and sums across the resulting values of all observations, which returns a scalar:
 
-$$ \mathtt{normal\_lpdf(y | eta, sigma)} = \sum_{i=1}^{N}\frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)$$
+$$ \mathtt{normal\_lpdf(y | eta, sigma)} = \sum_{i=1}^{N} - \frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)^2$$
 
 ### The weighted normal log-likelihood
 
@@ -198,7 +198,7 @@ model {
 
 The dot product returns the sum of the pairwise products of entries of both vectors, which gives us our weighted log-likelihood:
 
-$$\mathtt{dot\_product(weights, pw\_norm(y, eta, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times \frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)$$
+$$\mathtt{dot\_product(weights, pw\_norm(y, eta, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times -\frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)^2$$
 
 ### Standardized Data
 
