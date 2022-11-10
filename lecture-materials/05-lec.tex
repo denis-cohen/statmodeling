@@ -292,7 +292,7 @@ We first need to understand the built-in function for the unweighted log-likelih
 
 \texttt{normal\_lpdf} defines the log of the \href{https://en.wikipedia.org/wiki/Normal_distribution}{normal probability density function} (pdf) and sums across the resulting values of all observations, which returns a scalar:
 
-\[ \mathtt{normal\_lpdf(y | eta, sigma)} = \sum_{i=1}^{N}\frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)\]
+\[ \mathtt{normal\_lpdf(y | eta, sigma)} = \sum_{i=1}^{N} - \frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)^2\]
 
 \hypertarget{the-weighted-normal-log-likelihood}{%
 \subsubsection{The weighted normal log-likelihood}\label{the-weighted-normal-log-likelihood}}
@@ -353,7 +353,7 @@ The remaining modifications are straightforward:
 
 The dot product returns the sum of the pairwise products of entries of both vectors, which gives us our weighted log-likelihood:
 
-\[\mathtt{dot\_product(weights, pw\_norm(y, eta, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times \frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)\]
+\[\mathtt{dot\_product(weights, pw\_norm(y, eta, sigma))} = \\ \sum_{i=1}^{N}\mathtt{weights}_i \times -\frac{1}{2} \log (2 \pi \sigma^2) \Big( \frac{y_i-\eta_i}{\sigma}\Big)^2\]
 
 \hypertarget{standardized-data}{%
 \subsubsection{Standardized Data}\label{standardized-data}}
@@ -421,8 +421,8 @@ The dot product returns the sum of the pairwise products of entries of both vect
 \NormalTok{  eta\_std = x\_std * beta\_std; }\CommentTok{// assign lin. pred.}
 
   \CommentTok{// priors}
-  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(beta | }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{);  }\CommentTok{// priors for beta}
-  \KeywordTok{target +=}\NormalTok{ cauchy\_lpdf(sigma | }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{);  }\CommentTok{// prior for sigma}
+  \KeywordTok{target +=}\NormalTok{ normal\_lpdf(beta\_std | }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{);  }\CommentTok{// priors for beta\_std}
+  \KeywordTok{target +=}\NormalTok{ cauchy\_lpdf(sigma\_std | }\DecValTok{0}\NormalTok{, }\DecValTok{5}\NormalTok{);  }\CommentTok{// prior for sigma\_std}
   
   \CommentTok{// log{-}likelihood}
   \KeywordTok{target +=}\NormalTok{ normal\_lpdf(y\_std | eta\_std, sigma\_std); }\CommentTok{// likelihood}
@@ -590,7 +590,7 @@ Let's use it a basis to build our logit model.
   \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} N;                    }\CommentTok{// num. observations}
   \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} K;                    }\CommentTok{// num. predictors}
   \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} J;                    }\CommentTok{// num. groups}
-  \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{, }\KeywordTok{upper}\NormalTok{=J\textgreater{} jj; }\CommentTok{// group index}
+  \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{, }\KeywordTok{upper}\NormalTok{=J\textgreater{} jj; }\CommentTok{// group index}
   \DataTypeTok{matrix}\NormalTok{[N, K] x;                    }\CommentTok{// model matrix}
   \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{, }\KeywordTok{upper}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} y;  }\CommentTok{// outcome}
 \NormalTok{\}}
@@ -675,7 +675,7 @@ Let's use it a basis to build our logit model.
   \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} K;                      }\CommentTok{// num. predictors w. varying coefs}
   \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} L;                      }\CommentTok{// num. predictors w. fixed coefs}
   \DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} J;                      }\CommentTok{// num. groups}
-  \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{, }\KeywordTok{upper}\NormalTok{=J\textgreater{} jj;   }\CommentTok{// group index}
+  \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{1}\NormalTok{, }\KeywordTok{upper}\NormalTok{=J\textgreater{} jj;   }\CommentTok{// group index}
   \DataTypeTok{matrix}\NormalTok{[N, K] x;                      }\CommentTok{// matrix varying predictors, incl. intercept}
   \DataTypeTok{matrix}\NormalTok{[N, L] z;                      }\CommentTok{// matrix fixed predictors, excl. intercept}
   \DataTypeTok{array}\NormalTok{[N] }\DataTypeTok{int}\NormalTok{\textless{}}\KeywordTok{lower}\NormalTok{=}\DecValTok{0}\NormalTok{, }\KeywordTok{upper}\NormalTok{=}\DecValTok{1}\NormalTok{\textgreater{} y;    }\CommentTok{// outcome}
@@ -1017,7 +1017,7 @@ Gelman et al.~(2020) have some answers:
 \hypertarget{optional-task-for-the-next-two-weeks}{%
 \subsubsection{Optional task for the next two weeks}\label{optional-task-for-the-next-two-weeks}}
 
-If you already have an applied project in mind: Work on out!
+If you already have an applied project in mind: Work on it!
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}

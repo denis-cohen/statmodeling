@@ -245,8 +245,8 @@ model {
   eta_std = x_std * beta_std; // assign lin. pred.
 
   // priors
-  target += normal_lpdf(beta | 0, 10);  // priors for beta
-  target += cauchy_lpdf(sigma | 0, 5);  // prior for sigma
+  target += normal_lpdf(beta_std | 0, 10);  // priors for beta_std
+  target += cauchy_lpdf(sigma_std | 0, 5);  // prior for sigma_std
   
   // log-likelihood
   target += normal_lpdf(y_std | eta_std, sigma_std); // likelihood
@@ -395,7 +395,7 @@ data {
   int<lower=1> N;                    // num. observations
   int<lower=1> K;                    // num. predictors
   int<lower=1> J;                    // num. groups
-  array[N] int<lower=0, upper=J> jj; // group index
+  array[N] int<lower=1, upper=J> jj; // group index
   matrix[N, K] x;                    // model matrix
   array[N] int<lower=0, upper=1> y;  // outcome
 }
@@ -454,7 +454,7 @@ data {
   int<lower=1> K;                      // num. predictors w. varying coefs
   int<lower=1> L;                      // num. predictors w. fixed coefs
   int<lower=1> J;                      // num. groups
-  array[N] int<lower=0, upper=J> jj;   // group index
+  array[N] int<lower=1, upper=J> jj;   // group index
   matrix[N, K] x;                      // matrix varying predictors, incl. intercept
   matrix[N, L] z;                      // matrix fixed predictors, excl. intercept
   array[N] int<lower=0, upper=1> y;    // outcome
@@ -660,7 +660,7 @@ Gelman et al. (2020) have some answers:
 
 ### Optional task for the next two weeks
 
-If you already have an applied project in mind: Work on out!
+If you already have an applied project in mind: Work on it!
 
 1. Determine if there is a pre-implemented solution for *estimating* the model you have in mind.
     - If yes, use it.
